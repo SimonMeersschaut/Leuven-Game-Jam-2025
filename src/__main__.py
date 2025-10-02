@@ -1,7 +1,10 @@
-# from world.world import world
-# from audio import audio
-# from filehandler import filehandler
-from engine import engine
+from engine import Engine
 
 
-engine.start()
+if __name__ == "__main__":
+    try:
+        engine = Engine()
+        engine.start()
+    except Exception as e:
+        input("Uncaught error: "+str(e))
+        raise e

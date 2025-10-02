@@ -1,36 +1,39 @@
 import pygame
 
+from scenes.menu import MenuScene
+from scenes.game import GameScene
+from scenes.loading import LoadingScene
+
+
 class Engine:
     """One instance will controll the entire game rendering process."""
 
     def __init__(self):
-        ...
-    
-    # def load(self):
-    #     ################################# LOAD UP A BASIC WINDOW AND CLOCK #################################
-    #     pygame.init()
-    #     # DISPLAY_W, DISPLAY_H = 1920, 1080
-    #     pygame.display.set_caption("Anna's Ants")
-    #     
-    #     running = True
-    #     clock = pygame.time.Clock()
-    #     pygame.mixer.init()
-    #     mode = 'menu'
+        self.clock = pygame.time.Clock()
+        pygame.mixer.init()
 
-        ################################# LOAD PLAYER AND SPRITESHEET ###################################
-        #################################### LOAD THE LEVEL #######################################
-        # world.preload('', screen)
-        # menu.initialize()
+        self.scenes = {
+            "MENU": MenuScene(),
+            "GAME": GameScene(),
+            "LOADING": LoadingScene(),
+        }
+        self.current_scene = self.scenes["MENU"]
 
-        # audio.preload('resources/audio/background.mp3')
-        # audio.play('resources/audio/background.mp3')
-        # audio_counter = 0
+    def switch_scene(self, scene_name: str):
+        self.current_scene = self.scenes[scene_name]
+        self.current_scene.load(self)
 
     def start(self):
-        screen = pygame.display.set_mode((1920, 1080), pygame.FULLSCREEN)
+        pygame.init()
+        # DISPLAY_W, DISPLAY_H = 1920, 1080
+        pygame.display.set_caption("Game Jam")
+
+        self.screen = pygame.display.set_mode((1000, 1000))#, pygame.FULLSCREEN)
+        self.current_scene.load(self)
+        
         running = True
         while running:
-            # clock.tick(60)
+            self.clock.tick(60)
             # audio_counter += 1
             # if audio_counter > 2100:
             #     audio_counter = 0
@@ -46,8 +49,7 @@ class Engine:
                         exit()
             
             ################################# UPDATE/ Animate SPRITE #################################
+            self.current_scene.render(self)
 
             ################################# UPDATE WINDOW AND DISPLAY #################################
-            screen.fill((0, 180, 240)) # Fills the entire screen with light blue
-
             pygame.display.flip()
