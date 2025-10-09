@@ -1,3 +1,4 @@
+from engine import Engine
 
 class Scene:
     """Each instance is a renderable game-scene."""
@@ -8,5 +9,5 @@ class Scene:
     def load(self, engine: object):
         pass
     
-    def render(self, engine: object):
+    def render(self, engine: Engine, events: list, dt: float):
         pass

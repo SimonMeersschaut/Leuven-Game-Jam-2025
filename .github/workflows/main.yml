@@ -4,19 +4,20 @@ on:
   push:
     branches:
       - main
+  pull_request:
+    branches:
+      - "*"
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v2
-      with:
-        # Fetches all history for all branches and tags
-        fetch-depth: 0
+    - name: Checkout repository
+      uses: actions/checkout@v4
 
     - name: Set up Python
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@v5
       with:
         python-version: '3.10'
 
@@ -26,39 +27,33 @@ jobs:
         pip install -r requirements.txt
         pip install pyinstaller
 
-    - name: Create Version File
-      run: echo "${{ github.run_number }}" > VERSION.txt
+    - name: Compile application
+      run: pyinstaller compile.spec
 
-    - name: Commit and Push Version File
+    - name: Zip distribution folder
+      run: zip -r KULGameJam.zip dist/KULGameJam
+
+    - name: Test run application (5 seconds)
+      if: github.event_name == 'pull_request'
       run: |
-        git config --global user.name 'github-actions'
-        git config --global user.email 'github-actions@github.com'
-        git add VERSION.txt
-        git commit -m "Update VERSION.txt to ${{ github.run_number }} [skip ci]"
-        git push
+        echo "Starting application for a 5-second smoke test..."
+        timeout 5s dist/KULGameJam/KULGameJam || true
 
-    - name: Compile
-      run: |
-        pyinstaller --noconfirm --onefile --windowed --add-data "resources;resources" "src/__main__.py"
-
-    - name: Create Release
-      id: create_release
-      uses: actions/create-release@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - name: Upload ZIP artifact for pull requests
+      if: github.event_name == 'pull_request'
+      uses: actions/upload-artifact@v4
       with:
-        tag_name: ${{ github.run_number }}
-        release_name: Release ${{ github.run_number }}
+        name: KULGameJam-build-${{ github.run_number }}
+        path: KULGameJam.zip
+
+    - name: Create GitHub Release
+      if: github.ref == 'refs/heads/main'
+      uses: softprops/action-gh-release@v2
+      with:
+        tag_name: build-${{ github.run_number }}
+        name: Release ${{ github.run_number }}
         draft: false
-        prerelease: true
-
-    - name: Upload Release Asset
-      id: upload-release-asset 
-      uses: actions/upload-release-asset@v1
+        prerelease: false
+        files: KULGameJam.zip
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./dist/__main__.exe
-        asset_name: game-${{ github.run_number }}.exe
-        asset_content_type: application/vnd.microsoft.portable-executable
