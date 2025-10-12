@@ -1,5 +1,9 @@
 import pygame
+from enum import Enum, auto
 
+class Modes(Enum):
+    main_menu = auto()
+    game = auto()
 
 class Engine:
     """A single instance will controll the entire game rendering process."""
@@ -13,6 +17,10 @@ class Engine:
 
         self.fonts = {}
         self.images = {}
+
+        self.mode = Modes.main_menu
+
+        # self.game = Game()
     
     def get_font(self, fontname, fontsize):
         path = f"resources/fonts/{fontname}.ttf"
@@ -24,19 +32,20 @@ class Engine:
             self.fonts.update({identifier: font})
             return font
     
-    def run(self, render_new_frame):
+    def run(self, menu, game):
         pygame.init()
         pygame.display.set_caption("Game Jam 2025")
 
         DISPLAY_W, DISPLAY_H = 1000, 600
         self._screen = pygame.display.set_mode((DISPLAY_W, DISPLAY_H)) #, pygame.FULLSCREEN)
 
-        FRAME_RATE = 60 # FPS
-        FREQUENCY = 1/FRAME_RATE # Hz
+        FRAME_RATE = 60 # FPS (Hz)
+        FREQUENCY = 1/FRAME_RATE # seconds
         
         running = True
         while running:
             self.clock.tick(FRAME_RATE)
+            delta_t = FREQUENCY
             # audio_counter += 1
             # if audio_counter > 2100:
             #     audio_counter = 0
@@ -53,7 +62,14 @@ class Engine:
                         exit()
             
             # Update and draw active scene
-            render_new_frame(events=events, dt=FREQUENCY)
+            if self.mode == Modes.main_menu:
+                menu.update(delta_t, events)
+                menu.render()
+            elif self.mode == Modes.game:
+                game.update(delta_t, events)
+                game.render()
+            else:
+                raise ValueError("EngineError: the type of mode was not registered in the engine.")
 
             # Send screen update
             pygame.display.flip()
