@@ -4,8 +4,7 @@ import pygame
 class Engine:
     """A single instance will controll the entire game rendering process."""
 
-    def __init__(self, render_new_frame: callable):
-        self._render_new_frame = render_new_frame
+    def __init__(self):
         self._screen = None
 
         self.clock = pygame.time.Clock()
@@ -25,11 +24,11 @@ class Engine:
             self.fonts.update({identifier: font})
             return font
     
-    def run(self):
+    def run(self, render_new_frame):
         pygame.init()
-        pygame.display.set_caption("Game Jam")
+        pygame.display.set_caption("Game Jam 2025")
 
-        DISPLAY_W, DISPLAY_H = 1000, 1000
+        DISPLAY_W, DISPLAY_H = 1000, 600
         self._screen = pygame.display.set_mode((DISPLAY_W, DISPLAY_H)) #, pygame.FULLSCREEN)
 
         FRAME_RATE = 60 # FPS
@@ -54,7 +53,7 @@ class Engine:
                         exit()
             
             # Update and draw active scene
-            self._render_new_frame(self, events=events, dt=FREQUENCY)
+            render_new_frame(events=events, dt=FREQUENCY)
 
             # Send screen update
             pygame.display.flip()
@@ -96,3 +95,9 @@ class Engine:
     
     def fill(self, color):
         return self._screen.fill(color)
+
+    def is_pressed(self, key) -> bool:
+        # TODO
+        ...
+
+engine = Engine()
