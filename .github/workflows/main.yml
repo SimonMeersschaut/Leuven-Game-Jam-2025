@@ -57,3 +57,43 @@ jobs:
         files: KULGameJam.zip
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  windows-pr-build:
+    if: github.event_name == 'pull_request'
+    runs-on: windows-latest
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.10'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install pyinstaller
+
+    - name: Build Windows executable with PyInstaller
+      run: |
+        pyinstaller --clean --noconfirm compile.spec
+
+    - name: Copy resources into distribution (Windows)
+      if: always()
+      run: |
+        REM Ensure dist folder exists and copy resources
+        if exist dist\KULGameJam ( rmdir /s /q dist\KULGameJam )
+        mkdir dist\KULGameJam
+        xcopy /E /I /Y resources dist\KULGameJam\resources || echo No resources to copy
+
+    - name: Zip Windows distribution
+      run: |
+        powershell -Command "Compress-Archive -Path 'dist\KULGameJam\*' -DestinationPath 'KULGameJam-windows-pr.zip' -Force"
+
+    - name: Upload ZIP artifact for pull requests
+      uses: actions/upload-artifact@v4
+      with:
+        name: KULGameJam-windows-build-${{ github.run_number }}
+        path: KULGameJam-windows-pr.zip
