@@ -10,6 +10,7 @@ on:
 
 permissions:
   contents: write
+  issues: write
 
 jobs:
   build-pr-windows:
@@ -55,3 +56,22 @@ jobs:
       with:
         name: KULGameJam-windows-build-${{ github.run_number }}
         path: KULGameJam-windows-pr.zip
+
+    - name: Post PR comment with release link (if release exists)
+      if: success()
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        REPO: ${{ github.repository }}
+        BRANCH: ${{ github.event.pull_request.head.ref }}
+        PR_NUMBER: ${{ github.event.pull_request.number }}
+      run: |
+        echo Looking up latest release for branch "$BRANCH"
+        api_url="https://api.github.com/repos/$REPO/releases"
+        release_url=$(curl -s -H "Authorization: token $GITHUB_TOKEN" "$api_url" | jq -r ".[] | select(.tag_name | startswith(\"$BRANCH-\")) | .html_url" | head -n 1)
+        if [ -n "$release_url" ]; then
+          echo "Found release: $release_url"
+          comment_body=$(jq -nc --arg url "$release_url" '{body: ("Windows build available: " + $url)}')
+          curl -s -H "Authorization: token $GITHUB_TOKEN" -H "Content-Type: application/json" -d "$comment_body" "https://api.github.com/repos/$REPO/issues/$PR_NUMBER/comments" >/dev/null
+        else
+          echo "No release found for branch $BRANCH"
+        fi
