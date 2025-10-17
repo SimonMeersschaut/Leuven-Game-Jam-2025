@@ -13,57 +13,7 @@ on:
       - "*"
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
-
-    steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
-
-    - name: Set up Python
-      uses: actions/setup-python@v5
-      with:
-        python-version: '3.10'
-
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install -r requirements.txt
-        pip install pyinstaller
-
-    - name: Compile application
-      run: pyinstaller compile.spec
-
-    - name: Zip distribution folder
-      run: zip -r KULGameJam.zip dist/KULGameJam
-
-    - name: Test run application (5 seconds)
-      if: github.event_name == 'pull_request'
-      run: |
-        echo "Starting application for a 5-second smoke test..."
-        timeout 5s dist/KULGameJam/KULGameJam || true
-
-    - name: Upload ZIP artifact for pull requests
-      if: github.event_name == 'pull_request'
-      uses: actions/upload-artifact@v4
-      with:
-        name: KULGameJam-build-${{ github.run_number }}
-        path: KULGameJam.zip
-
-    - name: Create GitHub Release
-      if: github.event_name == 'push'
-      uses: softprops/action-gh-release@v2
-      with:
-        tag_name: ${{ github.ref_name }}-build-${{ github.run_number }}
-        name: ${{ github.ref_name }} Release ${{ github.run_number }}
-        draft: false
-        prerelease: false
-        files: KULGameJam.zip
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
   windows-pr-build:
-    if: github.event_name == 'pull_request'
     runs-on: windows-latest
     steps:
     - name: Checkout repository
@@ -78,7 +28,6 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install -r requirements.txt
-        pip install pyinstaller
 
     - name: Build Windows executable with PyInstaller
       run: |
@@ -87,9 +36,6 @@ jobs:
     - name: Copy resources into distribution (Windows)
       if: always()
       run: |
-        REM Ensure dist folder exists and copy resources
-        if exist dist\KULGameJam ( rmdir /s /q dist\KULGameJam )
-        mkdir dist\KULGameJam
         xcopy /E /I /Y resources dist\KULGameJam\resources || echo No resources to copy
 
     - name: Zip Windows distribution
