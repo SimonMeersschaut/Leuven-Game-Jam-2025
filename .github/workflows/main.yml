@@ -108,14 +108,18 @@ jobs:
         }
         if ($resp) {
           $upload_url = $resp.upload_url -replace '\{.*\}$',''
-          Write-Host "Found existing release for $tag"
+          $release_id = $resp.id
+          Write-Host "Found existing release for $tag (id=$release_id)"
           Add-Content -Path $env:GITHUB_OUTPUT -Value "upload_url=$upload_url"
+          Add-Content -Path $env:GITHUB_OUTPUT -Value "release_id=$release_id"
         } else {
           $body = @{ tag_name = $tag; name = $tag; draft = $false; prerelease = $false } | ConvertTo-Json
           $create = Invoke-RestMethod -Uri "https://api.github.com/repos/$repo/releases" -Headers $headers -Method Post -Body $body -ContentType 'application/json'
           $upload_url = $create.upload_url -replace '\{.*\}$',''
-          Write-Host "Created release for $tag"
+          $release_id = $create.id
+          Write-Host "Created release for $tag (id=$release_id)"
           Add-Content -Path $env:GITHUB_OUTPUT -Value "upload_url=$upload_url"
+          Add-Content -Path $env:GITHUB_OUTPUT -Value "release_id=$release_id"
         }
 
     - name: Download build artifact
@@ -124,10 +128,46 @@ jobs:
         name: KULGameJam-windows-build
         path: ./artifact
 
+    - name: Verify artifact and prepare asset name
+      id: prepare_asset
+      run: |
+        $file = './artifact/KULGameJam-windows-pr.zip'
+        if (-not (Test-Path $file)) { Write-Error "Artifact not found at $file"; exit 1 }
+        # sanitize name: remove spaces and control chars
+        $tag = "${{ steps.version.outputs.tag }}"
+        $safeName = "KULGameJam-windows-$tag.zip" -replace '\s+','-'
+        $safeName = $safeName -replace '[^a-zA-Z0-9._-]',''
+        Add-Content -Path $env:GITHUB_OUTPUT -Value "asset_name=$safeName"
+
+    - name: Delete existing release asset with same name (if any)
+      if: steps.prepare_asset.outputs.asset_name != ''
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        REPO: ${{ github.repository }}
+      run: |
+        $assetName = "${{ steps.prepare_asset.outputs.asset_name }}"
+        $releaseId = "${{ steps.get_release.outputs.release_id }}"
+        if (-not $releaseId) { Write-Host "No release id available, skipping asset deletion"; exit 0 }
+        $token = $env:GITHUB_TOKEN
+        $repo = $env:REPO
+        $headers = @{ Authorization = "token $token"; 'User-Agent' = 'github-actions' }
+        $url = "https://api.github.com/repos/$repo/releases/$releaseId/assets"
+        try {
+          $assets = Invoke-RestMethod -Uri $url -Headers $headers -ErrorAction Stop
+        } catch {
+          $assets = @()
+        }
+        foreach ($a in $assets) {
+          if ($a.name -eq $assetName) {
+            Write-Host "Deleting existing asset $assetName (id=$($a.id))"
+            Invoke-RestMethod -Uri "https://api.github.com/repos/$repo/releases/assets/$($a.id)" -Headers $headers -Method Delete
+          }
+        }
+
     - name: Upload release asset
       uses: actions/upload-release-asset@v1
       with:
         upload_url: ${{ steps.get_release.outputs.upload_url }}
         asset_path: ./artifact/KULGameJam-windows-pr.zip
-        asset_name: KULGameJam-windows-${{ steps.version.outputs.tag }}.zip
+        asset_name: ${{ steps.prepare_asset.outputs.asset_name }}
         asset_content_type: application/zip
