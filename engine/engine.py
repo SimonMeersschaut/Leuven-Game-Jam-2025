@@ -9,7 +9,11 @@ class Engine:
     """A single instance will controll the entire game rendering process."""
 
     def __init__(self):
-        self._screen = None
+        pygame.init()
+        pygame.display.set_caption("Game Jam 2025")
+
+        DISPLAY_W, DISPLAY_H = 1000, 600
+        self._screen = pygame.display.set_mode((DISPLAY_W, DISPLAY_H)) #, pygame.FULLSCREEN)
 
         self.clock = pygame.time.Clock()
         pygame.mixer.init()
@@ -19,7 +23,7 @@ class Engine:
         self.images = {}
 
         self.mode = Modes.main_menu
-
+        self.cache = {}
         # self.game = Game()
     
     def get_font(self, fontname, fontsize):
@@ -33,11 +37,7 @@ class Engine:
             return font
     
     def run(self, menu, game):
-        pygame.init()
-        pygame.display.set_caption("Game Jam 2025")
-
-        DISPLAY_W, DISPLAY_H = 1000, 600
-        self._screen = pygame.display.set_mode((DISPLAY_W, DISPLAY_H)) #, pygame.FULLSCREEN)
+        
 
         FRAME_RATE = 60 # FPS (Hz)
         FREQUENCY = 1/FRAME_RATE # seconds
