@@ -19,6 +19,11 @@ class Menu:
 
     def render(self):
         engine.fill((60, 60, 60))
+        
+        paper_background = pygame.transform.scale(engine.get_image('resources/buttons/paper_background.jpeg'), (1000, 600))
+        engine.render_image(paper_background, (0, 0))
+        
+        
 
         if self.state == "main_menu":
             title = engine.render_text("pixel", 48, "KUL Game Jam 2025", (255, 255, 255))
@@ -32,14 +37,8 @@ class Menu:
 
         elif self.state == "credits":
             
-            credits_text = engine.render_text("pixel", 48, "Credits", (255, 255, 255))
-            engine.render_image(credits_text, (500 - credits_text.get_width()/2, 20))
-            
-            art_by_text = engine.render_text("pixel", 24, "Art by:", (255, 255, 255))
-            engine.render_image(art_by_text, (500 - art_by_text.get_width()/2, 100))
-            artist_text = engine.render_text("pixel", 20, "Tijn op een kladblok van Simon", (255, 255, 255))
-            engine.render_image(artist_text, (500 - artist_text.get_width()/2, 140))
-
+            credits_text = pygame.transform.scale(engine.get_image('resources/buttons/credits_list_paper.png'), (2448/6, 3262/6))
+            engine.render_image(credits_text, (500 - credits_text.get_width()/2, -100))
 
             back_button = pygame.transform.scale(engine.get_image('resources/buttons/back_paper.jpeg'), (200, 100))
             engine.render_image(back_button, (400, 400))
