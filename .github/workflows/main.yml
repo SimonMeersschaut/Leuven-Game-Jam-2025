@@ -44,7 +44,8 @@ jobs:
     - name: Upload ZIP artifact for pull requests
       uses: actions/upload-artifact@v4
       with:
-        name: KULGameJam-windows-build-${{ github.run_number }}
+        # use a stable artifact name so the downstream job can reliably download it
+        name: KULGameJam-windows-build
         path: KULGameJam-windows-pr.zip
 
   create-release:
@@ -81,10 +82,16 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+    - name: Download build artifact
+      uses: actions/download-artifact@v3
+      with:
+        name: KULGameJam-windows-build
+        path: ./artifact
+
     - name: Upload release asset
       uses: actions/upload-release-asset@v1
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./KULGameJam-windows-pr.zip
+        asset_path: ./artifact/KULGameJam-windows-pr.zip
         asset_name: KULGameJam-windows-${{ steps.version.outputs.tag }}.zip
         asset_content_type: application/zip
