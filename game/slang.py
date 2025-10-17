@@ -14,7 +14,7 @@ class Snake:
         mouse_pos = pygame.mouse.get_pos()
         # print(mouse_pos)
         if self.slang_image_button.collidepoint(mouse_pos):
-            print('dit lukt')
+            # print('dit lukt')
             for event in events:
                 if event.type==pygame.MOUSEBUTTONDOWN:
                     self.x=random.randint(1,1000)
