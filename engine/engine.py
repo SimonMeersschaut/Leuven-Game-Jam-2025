@@ -23,6 +23,8 @@ class Engine:
         self.images_cache = {}
 
         self.mode = Modes.main_menu
+        self.cache = {}
+        # self.game = Game()
 
         self.width, self.height = 1000, 600
     
