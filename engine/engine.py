@@ -19,6 +19,8 @@ class Engine:
         self.images = {}
 
         self.mode = Modes.main_menu
+        
+        self.cache = {}
 
         # self.game = Game()
     
