@@ -62,25 +62,61 @@ jobs:
       id: version
       run: |
         $ver = Get-Content -Path VERSION.txt -ErrorAction Stop | Select-Object -First 1
-        echo "::set-output name=tag::v$ver"
+        # ensure a single leading v
+        if ($ver -like 'v*') { $tag = $ver.Trim() } else { $tag = "v$($ver.Trim())" }
+        Add-Content -Path $env:GITHUB_OUTPUT -Value "tag=$tag"
 
-    - name: Create tag
+    - name: Create tag (if missing)
+      id: create_tag
       run: |
         git config user.name "github-actions[bot]"
         git config user.email "github-actions[bot]@users.noreply.github.com"
-        git tag -a "${{ steps.version.outputs.tag }}" -m "Release ${{ steps.version.outputs.tag }}"
-        git push origin "${{ steps.version.outputs.tag }}"
+        $tag = "${{ steps.version.outputs.tag }}"
+        git fetch --tags
+        # check local tag
+        $local = git rev-parse -q --verify "refs/tags/$tag" 2>$null
+        if ($local) {
+          Write-Host "Local tag $tag already exists, skipping tag creation"
+        } else {
+          git tag -a $tag -m "Release $tag"
+        }
+        # check remote tag
+        $remote = git ls-remote --tags origin "refs/tags/$tag"
+        if ($remote) {
+          Write-Host "Remote tag $tag already exists, skipping push"
+        } else {
+          git push origin $tag
+        }
 
-    - name: Create GitHub Release
-      id: create_release
-      uses: actions/create-release@v1
-      with:
-        tag_name: ${{ steps.version.outputs.tag }}
-        release_name: ${{ steps.version.outputs.tag }}
-        draft: false
-        prerelease: false
+    - name: Get or create GitHub Release
+      id: get_release
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        REPO: ${{ github.repository }}
+      run: |
+        $tag = "${{ steps.version.outputs.tag }}"
+        $token = $env:GITHUB_TOKEN
+        $repo = $env:REPO
+        $headers = @{ Authorization = "token $token"; 'User-Agent' = 'github-actions' }
+        # Try to get existing release by tag
+        $url = "https://api.github.com/repos/$repo/releases/tags/$tag"
+        $resp = $null
+        try {
+          $resp = Invoke-RestMethod -Uri $url -Headers $headers -ErrorAction Stop
+        } catch {
+          $resp = $null
+        }
+        if ($resp) {
+          $upload_url = $resp.upload_url -replace '\{.*\}$',''
+          Write-Host "Found existing release for $tag"
+          Add-Content -Path $env:GITHUB_OUTPUT -Value "upload_url=$upload_url"
+        } else {
+          $body = @{ tag_name = $tag; name = $tag; draft = $false; prerelease = $false } | ConvertTo-Json
+          $create = Invoke-RestMethod -Uri "https://api.github.com/repos/$repo/releases" -Headers $headers -Method Post -Body $body -ContentType 'application/json'
+          $upload_url = $create.upload_url -replace '\{.*\}$',''
+          Write-Host "Created release for $tag"
+          Add-Content -Path $env:GITHUB_OUTPUT -Value "upload_url=$upload_url"
+        }
 
     - name: Download build artifact
       uses: actions/download-artifact@v4
@@ -91,7 +127,7 @@ jobs:
     - name: Upload release asset
       uses: actions/upload-release-asset@v1
       with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        upload_url: ${{ steps.get_release.outputs.upload_url }}
         asset_path: ./artifact/KULGameJam-windows-pr.zip
         asset_name: KULGameJam-windows-${{ steps.version.outputs.tag }}.zip
         asset_content_type: application/zip
