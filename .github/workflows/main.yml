@@ -1,25 +1,22 @@
 name: Build and Release
 
-permissions:
-  contents: write
-  packages: write
-
 on:
   push:
     branches:
-      - "main"
+      - main
 
 jobs:
-  windows-pr-build:
-    runs-on: windows-latest
+  build:
+    runs-on: ubuntu-latest
+
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
+    - uses: actions/checkout@v2
       with:
+        # Fetches all history for all branches and tags
         fetch-depth: 0
 
     - name: Set up Python
-      uses: actions/setup-python@v5
+      uses: actions/setup-python@v2
       with:
         python-version: '3.10'
 
@@ -27,167 +24,41 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install -r requirements.txt
+        pip install pyinstaller
 
-    - name: Build Windows executable with PyInstaller
+    - name: Create Version File
+      run: echo "${{ github.run_number }}" > VERSION.txt
+
+    - name: Commit and Push Version File
       run: |
-        pyinstaller --clean --noconfirm compile.spec
+        git config --global user.name 'github-actions'
+        git config --global user.email 'github-actions@github.com'
+        git add VERSION.txt
+        git commit -m "Update VERSION.txt to ${{ github.run_number }} [skip ci]"
+        git push
 
-    - name: Copy resources into distribution (Windows)
-      if: always()
+    - name: Compile
       run: |
-        xcopy /E /I /Y resources dist\KULGameJam\resources || echo No resources to copy
+        pyinstaller --noconfirm --onefile --windowed --add-data "resources;resources" "src/__main__.py"
 
-    - name: Zip Windows distribution
-      run: |
-        powershell -Command "Compress-Archive -Path 'dist\KULGameJam' -DestinationPath 'KULGameJam-windows-pr.zip' -Force"
-
-    - name: Upload ZIP artifact for pull requests
-      uses: actions/upload-artifact@v4
-      with:
-        # use a stable artifact name so the downstream job can reliably download it
-        name: KULGameJam-windows-build
-        path: KULGameJam-windows-pr.zip
-
-  create-release:
-    needs: windows-pr-build
-    runs-on: windows-latest
-    if: startsWith(github.ref, 'refs/heads/') && github.event_name == 'push'
-    steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
-      with:
-        fetch-depth: 0
-
-    - name: Read version
-      id: version
-      run: |
-        $ver = Get-Content -Path VERSION.txt -ErrorAction Stop | Select-Object -First 1
-        # ensure a single leading v
-        if ($ver -like 'v*') { $tag = $ver.Trim() } else { $tag = "v$($ver.Trim())" }
-        Add-Content -Path $env:GITHUB_OUTPUT -Value "tag=$tag"
-
-    - name: Create tag (if missing)
-      id: create_tag
-      run: |
-        git config user.name "github-actions[bot]"
-        git config user.email "github-actions[bot]@users.noreply.github.com"
-        $tag = "${{ steps.version.outputs.tag }}"
-        git fetch --tags
-        # check local tag
-        $local = git rev-parse -q --verify "refs/tags/$tag" 2>$null
-        if ($local) {
-          Write-Host "Local tag $tag already exists, skipping tag creation"
-        } else {
-          git tag -a $tag -m "Release $tag"
-        }
-        # check remote tag
-        $remote = git ls-remote --tags origin "refs/tags/$tag"
-        if ($remote) {
-          Write-Host "Remote tag $tag already exists, skipping push"
-        } else {
-          git push origin $tag
-        }
-
-    - name: Get or create GitHub Release
-      id: get_release
+    - name: Create Release
+      id: create_release
+      uses: actions/create-release@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        REPO: ${{ github.repository }}
-      run: |
-        $tag = "${{ steps.version.outputs.tag }}"
-        $token = $env:GITHUB_TOKEN
-        $repo = $env:REPO
-        $headers = @{ Authorization = "token $token"; 'User-Agent' = 'github-actions' }
-        # Try to get existing release by tag
-        $url = "https://api.github.com/repos/$repo/releases/tags/$tag"
-        $resp = $null
-        try {
-          $resp = Invoke-RestMethod -Uri $url -Headers $headers -ErrorAction Stop
-        } catch {
-          $resp = $null
-        }
-        if ($resp) {
-          $upload_url = $resp.upload_url -replace '\{.*\}$',''
-          $release_id = $resp.id
-          Write-Host "Found existing release for $tag (id=$release_id)"
-          Add-Content -Path $env:GITHUB_OUTPUT -Value "upload_url=$upload_url"
-          Add-Content -Path $env:GITHUB_OUTPUT -Value "release_id=$release_id"
-        } else {
-          $body = @{ tag_name = $tag; name = $tag; draft = $false; prerelease = $false } | ConvertTo-Json
-          $create = Invoke-RestMethod -Uri "https://api.github.com/repos/$repo/releases" -Headers $headers -Method Post -Body $body -ContentType 'application/json'
-          $upload_url = $create.upload_url -replace '\{.*\}$',''
-          $release_id = $create.id
-          Write-Host "Created release for $tag (id=$release_id)"
-          Add-Content -Path $env:GITHUB_OUTPUT -Value "upload_url=$upload_url"
-          Add-Content -Path $env:GITHUB_OUTPUT -Value "release_id=$release_id"
-        }
-
-    - name: Download build artifact
-      uses: actions/download-artifact@v4
       with:
-        name: KULGameJam-windows-build
-        path: ./artifact
+        tag_name: ${{ github.run_number }}
+        release_name: Release ${{ github.run_number }}
+        draft: false
+        prerelease: true
 
-    - name: Verify artifact and prepare asset name
-      id: prepare_asset
-      run: |
-        $file = './artifact/KULGameJam-windows-pr.zip'
-        if (-not (Test-Path $file)) { Write-Error "Artifact not found at $file"; exit 1 }
-        # sanitize name: remove spaces and control chars
-        $tag = "${{ steps.version.outputs.tag }}"
-        $safeName = "KULGameJam-windows-$tag.zip" -replace '\s+','-'
-        $safeName = $safeName -replace '[^a-zA-Z0-9._-]',''
-        Add-Content -Path $env:GITHUB_OUTPUT -Value "asset_name=$safeName"
-
-    - name: Delete existing release asset with same name (if any)
-      if: steps.prepare_asset.outputs.asset_name != ''
+    - name: Upload Release Asset
+      id: upload-release-asset 
+      uses: actions/upload-release-asset@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        REPO: ${{ github.repository }}
-      run: |
-        $assetName = "${{ steps.prepare_asset.outputs.asset_name }}"
-        $releaseId = "${{ steps.get_release.outputs.release_id }}"
-        if (-not $releaseId) { Write-Host "No release id available, skipping asset deletion"; exit 0 }
-        $token = $env:GITHUB_TOKEN
-        $repo = $env:REPO
-        $headers = @{ Authorization = "token $token"; 'User-Agent' = 'github-actions' }
-        $url = "https://api.github.com/repos/$repo/releases/$releaseId/assets"
-        try {
-          $assets = Invoke-RestMethod -Uri $url -Headers $headers -ErrorAction Stop
-        } catch {
-          $assets = @()
-        }
-        foreach ($a in $assets) {
-          if ($a.name -eq $assetName) {
-            Write-Host "Deleting existing asset $assetName (id=$($a.id))"
-            Invoke-RestMethod -Uri "https://api.github.com/repos/$repo/releases/assets/$($a.id)" -Headers $headers -Method Delete
-          }
-        }
-
-    - name: Upload release asset (verbose REST)
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      run: |
-        $uploadUrl = "${{ steps.get_release.outputs.upload_url }}"
-        $assetName = "${{ steps.prepare_asset.outputs.asset_name }}"
-        $file = './artifact/KULGameJam-windows-pr.zip'
-        if (-not (Test-Path $file)) { Write-Error "Artifact not found at $file"; exit 1 }
-        $encoded = [System.Uri]::EscapeDataString($assetName)
-        $uri = "$uploadUrl?name=$encoded"
-        Write-Host "Uploading $file to $uri"
-        $headers = @{ Authorization = "token $env:GITHUB_TOKEN"; 'User-Agent' = 'github-actions' }
-        try {
-          $response = Invoke-WebRequest -Uri $uri -Headers $headers -Method Post -InFile $file -ContentType 'application/zip' -UseBasicParsing -Verbose -ErrorAction Stop
-          Write-Host "Status: $($response.StatusCode)"
-          $body = $response.Content
-          Write-Host "Response body: $body"
-          Write-Host "Upload successful"
-        } catch {
-          Write-Error "Upload failed: $($_.Exception.Message)"
-          if ($_.Exception.Response) {
-            $reader = New-Object System.IO.StreamReader($_.Exception.Response.GetResponseStream())
-            $respBody = $reader.ReadToEnd()
-            Write-Error "Response body: $respBody"
-          }
-          exit 1
-        }
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./dist/__main__.exe
+        asset_name: game-${{ github.run_number }}.exe
+        asset_content_type: application/vnd.microsoft.portable-executable
