@@ -23,8 +23,6 @@ class Engine:
         self.images_cache = {}
 
         self.mode = Modes.main_menu
-        self.cache = {}
-        # self.game = Game()
 
         self.width, self.height = 1000, 600
     
@@ -86,9 +84,9 @@ class Engine:
             # cache hit
             if self.images_cache[image_path]:
                 if '.set.' in image_path:
-                    return self.cache[image_path][index]
+                    return self.images_cache[image_path][index]
                 else:
-                    return self.cache[image_path]
+                    return self.images_cache[image_path]
         
         # load image
         if '.set.' in image_path:
