@@ -16,11 +16,11 @@ class Engine:
         pygame.font.init()
 
         self.fonts = {}
-        self.images = {}
+        self.images_cache = {}
 
         self.mode = Modes.main_menu
 
-        # self.game = Game()
+        self.width, self.height = 1000, 600
     
     def get_font(self, fontname, fontsize):
         path = f"resources/fonts/{fontname}.ttf"
@@ -36,8 +36,8 @@ class Engine:
         pygame.init()
         pygame.display.set_caption("Game Jam 2025")
 
-        DISPLAY_W, DISPLAY_H = 1000, 600
-        self._screen = pygame.display.set_mode((DISPLAY_W, DISPLAY_H)) #, pygame.FULLSCREEN)
+        
+        self._screen = pygame.display.set_mode((self.width, self.height)) #, pygame.FULLSCREEN)
 
         FRAME_RATE = 60 # FPS (Hz)
         FREQUENCY = 1/FRAME_RATE # seconds
@@ -79,10 +79,10 @@ class Engine:
         font = self.get_font(fontname, fontsize)
         return font.render(text, False, color)
 
-    def get_image(self, image_path: str, size=1, index = 0, tile_size = 128):
-        if image_path in self.cache:
+    def get_image(self, image_path: str, index = 0, tile_size = 128):
+        if image_path in self.images_cache:
             # cache hit
-            if self.cache[image_path]['size'] == size:
+            if self.images_cache[image_path]:
                 if '.set.' in image_path:
                     return self.cache[image_path][index]
                 else:
@@ -98,12 +98,12 @@ class Engine:
                 for x in range(0, tileset_width, tile_size[0])
                 # for y in range(0, tileset_height, tile_size[1])
             ]
-            self.images.update({image_path: tileset})
+            self.images_cache.update({image_path: tileset})
             return tileset[index]
         else:
             # default image
             im = pygame.image.load(image_path).convert_alpha()
-            self.images.update({image_path: im})
+            self.images_cache.update({image_path: im})
             return im
         
     def render_image(self, image, position):
@@ -112,8 +112,11 @@ class Engine:
     def fill(self, color):
         return self._screen.fill(color)
 
+    def get_pressed_keys(self) -> dict:
+        return pygame.key.get_pressed()
+
     def is_pressed(self, key) -> bool:
-        # TODO
-        ...
+        return self.get_pressed_keys()[key]
+
 
 engine = Engine()
