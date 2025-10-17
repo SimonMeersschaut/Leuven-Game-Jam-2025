@@ -164,10 +164,30 @@ jobs:
           }
         }
 
-    - name: Upload release asset
-      uses: actions/upload-release-asset@v1
-      with:
-        upload_url: ${{ steps.get_release.outputs.upload_url }}
-        asset_path: ./artifact/KULGameJam-windows-pr.zip
-        asset_name: ${{ steps.prepare_asset.outputs.asset_name }}
-        asset_content_type: application/zip
+    - name: Upload release asset (verbose REST)
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        $uploadUrl = "${{ steps.get_release.outputs.upload_url }}"
+        $assetName = "${{ steps.prepare_asset.outputs.asset_name }}"
+        $file = './artifact/KULGameJam-windows-pr.zip'
+        if (-not (Test-Path $file)) { Write-Error "Artifact not found at $file"; exit 1 }
+        $encoded = [System.Uri]::EscapeDataString($assetName)
+        $uri = "$uploadUrl?name=$encoded"
+        Write-Host "Uploading $file to $uri"
+        $headers = @{ Authorization = "token $env:GITHUB_TOKEN"; 'User-Agent' = 'github-actions' }
+        try {
+          $response = Invoke-WebRequest -Uri $uri -Headers $headers -Method Post -InFile $file -ContentType 'application/zip' -UseBasicParsing -Verbose -ErrorAction Stop
+          Write-Host "Status: $($response.StatusCode)"
+          $body = $response.Content
+          Write-Host "Response body: $body"
+          Write-Host "Upload successful"
+        } catch {
+          Write-Error "Upload failed: $($_.Exception.Message)"
+          if ($_.Exception.Response) {
+            $reader = New-Object System.IO.StreamReader($_.Exception.Response.GetResponseStream())
+            $respBody = $reader.ReadToEnd()
+            Write-Error "Response body: $respBody"
+          }
+          exit 1
+        }
