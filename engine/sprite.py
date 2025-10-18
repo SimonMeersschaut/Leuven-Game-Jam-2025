@@ -1,3 +1,4 @@
+import resources
 from engine import Engine, engine, Modes
 import pygame
 
@@ -94,11 +95,18 @@ class Button(Sprite):
     def __init__(self, image_path, position=(0, 0), height=None, width=None, align_x=None, align_y=None):
         super().__init__(image_path, position, height, width, align_x, align_y)
     
-    def render(self):
-        """Renders the sprite on the screen at its position."""
-        if self.is_hovered():
+    def update(self):
+        if self.is_hovered() and not self.is_clicked():
             self.scale_factor(1.1)
+        elif self.is_clicked():
+            self.scale_factor(0.9)
+
+            click_sound = pygame.mixer.Sound('resources/sounds/paper_twist_short_loud.wav')
+            pygame.mixer.Sound.play(click_sound)
         else:
             self.reset_scale()
-
+    
+    def render(self):
+        """Renders the sprite on the screen at its position."""
+        self.update()
         super().render()
