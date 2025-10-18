@@ -1,5 +1,5 @@
 from engine import Engine, engine, Modes
-from engine import button as btn
+from engine import sprite as btn
 import pygame
 
 class Credits:
