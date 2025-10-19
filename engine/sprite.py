@@ -103,9 +103,9 @@ class Button(Sprite):
         super().__init__(image_path, position, height, width, align_x, align_y)
     
     def update(self):
+        
         if self.is_hovered() and not self.is_clicked():
             if self.just_unclicked():
-                print("sound played")
                 click_sound = pygame.mixer.Sound('resources/sounds/paper_twist_short_loud.wav')
                 pygame.mixer.Sound.play(click_sound)
             
@@ -129,7 +129,8 @@ class Button(Sprite):
             self.previously_hovered = False
             self.previously_clicked = False
     
-    def render(self):
-        """Renders the sprite on the screen at its position."""
+    def update_and_check_clicked(self):
+        just_unclicked = self.just_unclicked()
         self.update()
-        super().render()
+        
+        return just_unclicked

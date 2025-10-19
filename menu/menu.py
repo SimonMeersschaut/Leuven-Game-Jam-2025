@@ -13,13 +13,13 @@ class Menu:
         self.credits = Credits(self)
 
     def update(self, delta_t, events):
-        
+
         if self.state == "credits":
             self.credits.update()
         else:
-            if self.play_button.just_unclicked():
+            if self.play_button.update_and_check_clicked():
                 engine.mode = Modes.game
-            elif self.credits_button.just_unclicked():
+            elif self.credits_button.update_and_check_clicked():
                 self.state = "credits"
 
     def render(self):
