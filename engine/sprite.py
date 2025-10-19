@@ -16,6 +16,9 @@ class Sprite():
         """ 
         self.image_path = image_path
         
+        self.previously_hovered = False
+        self.previously_clicked = False
+        
         image = engine.get_image(image_path)
         if height and width:
             pass
@@ -101,18 +104,29 @@ class Button(Sprite):
     
     def update(self):
         if self.is_hovered() and not self.is_clicked():
-            self.scale_factor(1.1)
-
             if self.just_unclicked():
+                print("sound played")
                 click_sound = pygame.mixer.Sound('resources/sounds/paper_twist_short_loud.wav')
                 pygame.mixer.Sound.play(click_sound)
             
+            self.scale_factor(1.1)
+            
+            self.previously_hovered = True
+            self.previously_clicked = False         
+        elif self.is_hovered() and not self.previously_hovered:
+            self.scale_factor(1.1)
+            self.previously_hovered = False
             self.previously_clicked = False
-        elif self.is_clicked():
-            self.scale_factor(0.9)
-            self.previously_clicked = True
+    
+        elif self.is_clicked() and self.previously_hovered:
+            if self.previously_clicked == False:
+                self.scale_factor(0.9)
+                
+                self.previously_hovered = True
+                self.previously_clicked = True
         else:
             self.reset_scale()
+            self.previously_hovered = False
             self.previously_clicked = False
     
     def render(self):

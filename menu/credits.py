@@ -11,9 +11,7 @@ class Credits:
         self.credits_text = Sprite('resources/buttons/credits_list_paper.png', (-1, 0), 2448/6, align_x="center")
 
 
-    def update(self):
-        self.back_button.update()
-        
+    def update(self):        
         if self.back_button.just_unclicked():
             self.main_menu.state = "main_menu"
             

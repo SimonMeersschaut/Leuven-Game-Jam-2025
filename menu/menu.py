@@ -17,9 +17,6 @@ class Menu:
         if self.state == "credits":
             self.credits.update()
         else:
-            self.play_button.update()
-            self.credits_button.update()
-            
             if self.play_button.just_unclicked():
                 engine.mode = Modes.game
             elif self.credits_button.just_unclicked():
