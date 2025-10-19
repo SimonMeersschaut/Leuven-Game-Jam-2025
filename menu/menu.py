@@ -20,9 +20,9 @@ class Menu:
             self.play_button.update()
             self.credits_button.update()
             
-            if self.play_button.is_clicked():
+            if self.play_button.just_unclicked():
                 engine.mode = Modes.game
-            elif self.credits_button.is_clicked():
+            elif self.credits_button.just_unclicked():
                 self.state = "credits"
 
     def render(self):

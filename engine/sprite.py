@@ -91,6 +91,10 @@ class Sprite():
     def is_clicked(self):
         return self.is_hovered() and pygame.mouse.get_pressed()[0]  # left mouse button
 
+    def just_unclicked(self):
+        return (not self.is_clicked()) and self.previously_clicked
+            
+        
 class Button(Sprite):
     def __init__(self, image_path, position=(0, 0), height=None, width=None, align_x=None, align_y=None):
         super().__init__(image_path, position, height, width, align_x, align_y)
@@ -98,13 +102,18 @@ class Button(Sprite):
     def update(self):
         if self.is_hovered() and not self.is_clicked():
             self.scale_factor(1.1)
+
+            if self.just_unclicked():
+                click_sound = pygame.mixer.Sound('resources/sounds/paper_twist_short_loud.wav')
+                pygame.mixer.Sound.play(click_sound)
+            
+            self.previously_clicked = False
         elif self.is_clicked():
             self.scale_factor(0.9)
-
-            click_sound = pygame.mixer.Sound('resources/sounds/paper_twist_short_loud.wav')
-            pygame.mixer.Sound.play(click_sound)
+            self.previously_clicked = True
         else:
             self.reset_scale()
+            self.previously_clicked = False
     
     def render(self):
         """Renders the sprite on the screen at its position."""

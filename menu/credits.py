@@ -14,7 +14,7 @@ class Credits:
     def update(self):
         self.back_button.update()
         
-        if self.back_button.is_clicked():
+        if self.back_button.just_unclicked():
             self.main_menu.state = "main_menu"
             
 
