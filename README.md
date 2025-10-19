@@ -10,7 +10,7 @@ Then run the main file (from the root directory): ```python ./src/```
 
 Engine:
 
-![Engine Properties](docs/engine-props.png)
+![Engine Properties](docs/engine-props-light.png)
 
 <picture>
   <source media="(prefers-color-scheme: light)" srcset="docs/engine-props-light.png">
