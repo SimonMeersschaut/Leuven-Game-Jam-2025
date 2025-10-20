@@ -7,10 +7,12 @@ class Menu:
     def __init__(self):
         self.state = "main_menu"
 
-        self.play_button = Button('resources/buttons/play_paper.jpeg', (-1, 160), height=100, align_x="center")
-        self.credits_button = Button('resources/buttons/credits_paper.jpeg', (-1, 300), height=100, align_x="center")
+        self.play_button = Button('resources/buttons/play_paper.jpeg', (-1, 400), height=100, align_x="center")
+        self.credits_button = Button('resources/buttons/credits_paper.jpeg', (-1, 550), height=100, align_x="center")
 
         self.credits = Credits(self)
+
+        self.paper_background = pygame.transform.scale(engine.get_image('resources/buttons/paper_background.jpeg'), (1920, 1080))
 
     def update(self, delta_t, events):
 
@@ -30,8 +32,8 @@ class Menu:
         else:
             engine.fill((60, 60, 60))
             
-            paper_background = pygame.transform.scale(engine.get_image('resources/buttons/paper_background.jpeg'), (1000, 600))
-            engine.render_image(paper_background, (0, 0))
+            
+            engine.render_image(self.paper_background, (0, 0))
 
             self.play_button.render()
             self.credits_button.render()

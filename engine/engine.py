@@ -12,8 +12,8 @@ class Engine:
         pygame.init()
         pygame.display.set_caption("Game Jam 2025")
 
-        DISPLAY_W, DISPLAY_H = 1000, 600
-        self._screen = pygame.display.set_mode((DISPLAY_W, DISPLAY_H)) #, pygame.FULLSCREEN)
+        self.DISPLAY_W, self.DISPLAY_H = 1920, 1080
+        self._screen = pygame.display.set_mode((self.DISPLAY_W, self.DISPLAY_H) , pygame.FULLSCREEN)
 
         self.clock = pygame.time.Clock()
         pygame.mixer.init()
@@ -24,8 +24,6 @@ class Engine:
 
         self.mode = Modes.main_menu
 
-        self.width, self.height = 1000, 600
-    
     def get_font(self, fontname, fontsize):
         path = f"resources/fonts/{fontname}.ttf"
         identifier = (path, fontsize)
