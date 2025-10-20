@@ -1,24 +1,25 @@
 from engine import Engine, engine, Modes
-from engine import button as btn
+from engine.sprite import Button, Sprite
 from .credits import Credits
 import pygame
 
 class Menu:
     def __init__(self):
         self.state = "main_menu"
-        
-        self.play_button = btn.Button('resources/buttons/play_paper.jpeg', (400, 160), height=100)
-        self.credits_button = btn.Button('resources/buttons/credits_paper.jpeg', (400, 300), height=100)
+
+        self.play_button = Button('resources/buttons/play_paper.jpeg', (-1, 160), height=100, align_x="center")
+        self.credits_button = Button('resources/buttons/credits_paper.jpeg', (-1, 300), height=100, align_x="center")
 
         self.credits = Credits(self)
 
     def update(self, delta_t, events):
+
         if self.state == "credits":
-            self.credits.update(delta_t, events)
+            self.credits.update()
         else:
-            if self.play_button.is_clicked():
+            if self.play_button.update_and_check_clicked():
                 engine.mode = Modes.game
-            elif self.credits_button.is_clicked():
+            elif self.credits_button.update_and_check_clicked():
                 self.state = "credits"
 
     def render(self):
