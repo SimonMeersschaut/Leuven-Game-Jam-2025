@@ -1,12 +1,13 @@
 from engine import engine 
+from engine.draggable_sprite import Draggable_Sprite
 import pygame
 
-class Fragment:
-    def __init__(self):
-        pass
+class Fragment(Draggable_Sprite):
+    def __init__(self, image_path="resources/images/plate.png", position=(100, 100), height=None, width=None):
+        super().__init__(image_path, position, height, width)
  
-    def update(self, delta_t: float, events: list):
-        pass
+    def update(self):
+        super().update()
 
     def render(self):
-        pass
+        super().render()
