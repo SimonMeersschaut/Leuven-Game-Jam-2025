@@ -19,7 +19,7 @@ class Draggable_Sprite(Sprite):
             self.scale_factor(1.1)
             self.move(pygame.mouse.get_pos()[0] - self.true_width*1.1 // 2, pygame.mouse.get_pos()[1] - self.true_height*1.1 // 2)
         else:
-            self.scale_factor(1.0)
+            self.reset_scale()
             
             
     def render(self):
