@@ -8,26 +8,39 @@ class Draggable_Sprite(Sprite):
         super().__init__(image_path, position, height, width)
         
         self.holding = False
+        self.hovering = False
+        self.previously_holding = False
+        self.previously_hovering = False
 
     def update(self):
+        self.previously_holding = self.holding
+        self.previously_hovering = self.hovering
+
         if self.is_clicked():
             self.holding = True
         if not self.is_clicked():
             self.holding = False
 
+        if self.is_hovered():
+            self.hovering = True
+        else:
+            self.hovering = False
+
         if self.holding:
             self.scale_factor(1.1)
             self.move(pygame.mouse.get_pos()[0] - self.true_width*1.1 // 2, pygame.mouse.get_pos()[1] - self.true_height*1.1 // 2)
-        else:
+        elif self.previously_holding:
             self.reset_scale()
+            self.move(pygame.mouse.get_pos()[0] - self.true_width // 2, pygame.mouse.get_pos()[1] - self.true_height // 2)
+            
             
             
     def render(self):
-        if self.holding:
+        if self.holding and not self.previously_holding:
             pygame.mouse.set_cursor(*pygame.cursors.diamond)
-        elif self.is_hovered():
+        elif not self.holding and self.hovering and (not self.previously_hovering or self.previously_holding):
             pygame.mouse.set_cursor(*pygame.cursors.broken_x)
-        else:
+        elif not self.holding and not self.hovering and (self.previously_hovering or self.previously_holding):
             pygame.mouse.set_cursor(*pygame.cursors.arrow)
         
         super().render()
