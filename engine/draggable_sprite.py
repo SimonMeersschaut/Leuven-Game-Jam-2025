@@ -23,4 +23,11 @@ class Draggable_Sprite(Sprite):
             
             
     def render(self):
+        if self.holding:
+            pygame.mouse.set_cursor(*pygame.cursors.diamond)
+        elif self.is_hovered():
+            pygame.mouse.set_cursor(*pygame.cursors.broken_x)
+        else:
+            pygame.mouse.set_cursor(*pygame.cursors.arrow)
+        
         super().render()
