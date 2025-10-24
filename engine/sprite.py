@@ -60,6 +60,8 @@ class Sprite():
     def move(self, x, y):
         """Moves the sprite to a new position."""
         self.position = (x, y)
+        self.true_position = (x, y)
+        # Does this cause problems when changing position while scaled?
         self.rect.topleft = self.position
 
     def scale(self, width, height):
