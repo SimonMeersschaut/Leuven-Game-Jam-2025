@@ -13,8 +13,10 @@ class DraggableSprite(Sprite):
         self.previously_hovering = False
 
     def update(self):
+        # Holding logic is in plate_supervisor
         if self.holding:
-            self.scale_factor(1.1)
+            if not self.previously_holding:
+                self.scale_factor(1.1)
             self.move(engine.get_scaled_mouse_pos()[0] - self.true_width*1.1 // 2, engine.get_scaled_mouse_pos()[1] - self.true_height*1.1 // 2)
         elif self.previously_holding:
             self.reset_scale()
