@@ -12,14 +12,14 @@ class Engine:
         pygame.init()
         pygame.display.set_caption("Game Jam 2025")
 
-        DISPLAY_W, DISPLAY_H = 1280, 720
-        self._screen = pygame.Surface((DISPLAY_W, DISPLAY_H))
+        self.DISPLAY_W, self.DISPLAY_H = 1280, 720
+        self._screen = pygame.Surface((self.DISPLAY_W, self.DISPLAY_H))
         # make the real window resizable so we can auto-scale the internal 1080p surface
-        self.real_screen = pygame.display.set_mode((DISPLAY_W, DISPLAY_H), pygame.RESIZABLE) #, pygame.FULLSCREEN)
+        self.real_screen = pygame.display.set_mode((self.DISPLAY_W, self.DISPLAY_H), pygame.RESIZABLE) #, pygame.FULLSCREEN)
         # track real window size
         self.real_width, self.real_height = self.real_screen.get_size()
         # store canonical internal resolution for scaling computations
-        self._base_width, self._base_height = DISPLAY_W, DISPLAY_H
+        self._base_width, self._base_height = self.DISPLAY_W, self.DISPLAY_H
 
         self.clock = pygame.time.Clock()
         pygame.mixer.init()
