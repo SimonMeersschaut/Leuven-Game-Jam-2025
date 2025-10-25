@@ -6,6 +6,9 @@ def draw_points(points, surf):
     for point in points:
         pygame.draw.circle(surf, (0, 255, 0), point, 5)
 
+def index_to_radians(index, pieces: int) -> float:
+    return math.radians(index * (360.0 / pieces) - 90)
+
 def create_polygon_points(theta, center, radius, w, h, direction: int):
     MIN_VERTICES = 20
     MAX_VERTICES = 30
@@ -52,6 +55,9 @@ def shatter_plate(surface, split_lines: list[bool], pieces=8):
     """
     # split_lines = [True, True, False, False, True, False, False, False]
 
+    if len([split_line for split_line in split_lines if split_line]) < 2:
+        raise ValueError("A plate splits in at least two pieces.")
+
     if isinstance(surface, str):
         surface = pygame.transform.scale(pygame.image.load(surface),(400, 400))
 
@@ -64,27 +70,39 @@ def shatter_plate(surface, split_lines: list[bool], pieces=8):
     cx, cy = w // 2, h // 2
     radius = min(cx, cy)
 
+    thetas = []
+    for split_index in range(pieces):
+        if split_lines[split_index]:
+            # find next break line
+            end_split_line_index = split_index + 1
+            while (not split_lines[end_split_line_index]) and end_split_line_index < 7:
+                end_split_line_index += 1
+
+            thetas.append((
+                index_to_radians(split_index, pieces), 
+                index_to_radians(end_split_line_index, pieces), 
+            ))
+
+
     wedges = []
-    for i in range(pieces):
-        theta1 = math.radians(i * (360.0 / pieces) - 90)
-        theta2 = math.radians((i + 1) * (360.0 / pieces) - 90)
+    for (theta_start, theta_end) in thetas:
 
         # Build polygon points: center + points along arc from theta1 to theta2
         center = (cx, cy)
 
         # Create arc
         arc = []
-        steps = max(2, int(radius * (theta2 - theta1) / 8))
+        steps = max(2, int(radius * (theta_end - theta_start) / 8))
         for s in range(steps + 1):
-            t = theta1 + (theta2 - theta1) * (s / steps)
+            t = theta_start + (theta_end - theta_start) * (s / steps)
             x = cx + radius * math.cos(t)
             y = cy + radius * math.sin(t)
             arc.append((int(x), int(y)))
 
         # Create broken break line
         gold_glues = []
-        for side, theta in [(LEFT, theta1), (RIGHT, theta2)]:
-            if do_break(i, split_lines, side=side):
+        for side, theta in [(LEFT, theta_start), (RIGHT, theta_end)]:
+            # if do_break(i, split_lines, side=side):
                 direction = 1 if side == LEFT else -1
 
                 golden_mask = pygame.Surface((w, h), pygame.SRCALPHA)
@@ -105,8 +123,8 @@ def shatter_plate(surface, split_lines: list[bool], pieces=8):
                 golden_glue.fill((255, 215, 0, 255)) # Gold Color
                 golden_glue.blit(golden_mask, (0, 0), special_flags=pygame.BLEND_RGBA_MULT)
                 gold_glues.append(golden_glue)
-            else:
-                gold_glues.append(None)
+            # else:
+            #     gold_glues.append(None)
 
         mask_points = [center] + arc
 

@@ -1,5 +1,7 @@
 from .fragment import Fragment
 import pygame
+from ..shatter import shatter_plate
+import random
 
 class PlateSupervisor:
     def __init__(self):
@@ -8,9 +10,16 @@ class PlateSupervisor:
 
 
     def create_plate_pieces(self, image_path="resources/images/plate.png", position=(100, 100), height=None, width=None):
-        plate = Fragment(image_path, position, height, width)
-        self.plates.append(plate)
-        return plate
+        split_lines = [random.getrandbits(1) for _ in range(8)]
+        pieces = shatter_plate("resources/images/plate.png", split_lines)
+        plates = []
+        for (left_gold_glue, piece_image, right_gold_glue) in pieces:
+            self.plates.append(Fragment(
+                left_gold_glue,
+                piece_image,
+                right_gold_glue,
+            ))
+        return plates
     
     def update(self):
         self.hovered_plate = None

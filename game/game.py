@@ -13,8 +13,9 @@ class Game:
         self.slang = Snake()
         
         self.plate_supervisor = PlateSupervisor()
-        self.plate_1 = self.plate_supervisor.create_plate_pieces("resources/images/plate.png", width=200)
-        self.plate_2 = self.plate_supervisor.create_plate_pieces("resources/images/plate.png", width=150)
+        self.plate_supervisor.create_plate_pieces()
+        # self.plate_1 = self.plate_supervisor.create_plate_pieces("resources/images/plate.png", width=200)
+        # self.plate_2 = self.plate_supervisor.create_plate_pieces("resources/images/plate.png", width=150)
         self.stats = Stats()
         self.loading_bar = Loading_bar()
 
