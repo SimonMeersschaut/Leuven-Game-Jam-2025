@@ -2,7 +2,7 @@ from engine import engine
 import pygame
 import time
 
-class Loading_bar:
+class Loadingbar:
     def __init__(self):
         loading_bar_image_scalar=0.08
         self.loading_bar_image=engine.get_image('resources/images/loading_bar.png')
@@ -31,31 +31,34 @@ class Loading_bar:
         self.length_progression_bar=0.6*self.length_loading_bar_image
         self.wave_started=False
         self.start_wave_time=0
+        self.wave_level=0
 
         elephant_head_image_scalar=0.0012*self.length_progression_bar
-        print(elephant_head_image_scalar)
         self.elephant_head_image=engine.get_image('resources/images/elephant_head.png')
         self.elephant_head_image=pygame.transform.scale_by(self.elephant_head_image,elephant_head_image_scalar)
         self.width_elephant_head_image, self.length_elephant_head_image=self.elephant_head_image.get_size()
+
         
 
-    def start_wave(self,level_wave):
+    def start_wave(self,wave_level):
+        self.wave_level=wave_level
         self.wave_started=True
         self.start_wave_time=time.time()
-        if level_wave%3 == 1:
+        if wave_level%3 == 1:
             self.current_icon=self.falling_faster_image
             self.width_current_icon,self.length_current_icon=self.width_falling_faster_image, self.length_falling_faster_image
-        if level_wave%3 == 2:
+        if wave_level%3 == 2:
             self.current_icon=self.more_pieces_image
             self.width_current_icon,self.length_current_icon=self.width_more_pieces_image, self.length_more_pieces_image
-        if level_wave%3 == 0:
+        if wave_level%3 == 0:
             self.current_icon=self.more_colors_image
             self.width_current_icon,self.length_current_icon=self.width_more_colors_image, self.length_more_colors_image
         self.width_progression_bar=0      
-        
+  
     def update(self, delta_t: float, events: list):
+        wave_time_duration=20
         if self.wave_started and self.width_progression_bar<0.76*self.width_loading_bar_image:
-            self.width_progression_bar=self.width_loading_bar_image*((time.time()-self.start_wave_time)/6)
+            self.width_progression_bar=self.width_loading_bar_image*((time.time()-self.start_wave_time)/wave_time_duration)
         
     def render(self):
         x_loading_bar_image=engine.DISPLAY_W/2-self.width_loading_bar_image/2
