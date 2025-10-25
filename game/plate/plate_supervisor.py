@@ -18,18 +18,24 @@ def is_combineable(attendance_1: list[bool], attendance_2: list[bool]) -> bool:
     return (not intersect) and edges_align
 
 class PlateSupervisor:
-    def __init__(self):
+    def __init__(self, loading_bar):
         self.fragments = []
         self.held_fragment = None
+        self.loading_bar = loading_bar
+
+        self.time_until_next_spawn = 1
 
         # wave settings
-        self.falling_speed = 1
+        self.falling_multiplier = 1
         self.average_split = 1
-        self.average_time_between_plates = 10
+        self.average_time_between_plates = 20
 
-    def create_plate_pieces(self, image_path="resources/images/plate.png", position=(100, 100), height=None, width=None):
-        split_lines = [random.getrandbits(1) for _ in range(8)]
-        split_lines[0] = 1
+    def spawn_plate(self):
+        self.time_until_next_spawn = max(0, random.normalvariate(self.average_time_between_plates, 5))
+
+        # split_lines = [random.getrandbits(1) for _ in range(8)]
+        split_lines = [True, False, False, False, True, False, False, False]
+        # split_lines[0] = 1
         pieces = shatter_plate("resources/images/plate.png", split_lines)
         plates = []
         for piece in pieces:
@@ -40,14 +46,20 @@ class PlateSupervisor:
         return plates
     
     def update(self, delta_t: float, events: list):
+        # Check for spawning
+        self.time_until_next_spawn -= delta_t
+        if self.time_until_next_spawn <= 0:
+            self.spawn_plate()
+
+        # Update Fragments
         self.hovered_plate = None
 
         if self.held_fragment and pygame.mouse.get_pressed()[0]:
             self.held_fragment.holding = True
-            self.held_fragment.update(delta_t, events)
+            self.held_fragment.update(delta_t, events, self.falling_multiplier)
             # check if 'glueable'
             for fragment in self.fragments:
-                fragment.update(delta_t, events)
+                fragment.update(delta_t, events, self.falling_multiplier)
                 if is_combineable(self.held_fragment.attendance_list, fragment.attendance_list):
                     if is_within_distance(self.held_fragment.get_center_pos(), fragment.get_center_pos(), 70):
                         self.held_fragment.combine_with(fragment)
@@ -60,6 +72,8 @@ class PlateSupervisor:
                 if fragment.finished_animation_start_time is not None:
                     if time.time() - fragment.finished_animation_start_time > 2:
                         self.fragments.remove(fragment)
+                        if len(self.fragments) == 0:
+                            self.spawn_plate()
         else:
             self.held_fragment = None
         
@@ -79,7 +93,7 @@ class PlateSupervisor:
                 else:
                     fragment.hovering = False
 
-                fragment.update(delta_t, events)
+                fragment.update(delta_t, events, self.falling_multiplier)
                 if fragment.finished_animation_start_time is not None:
                     if time.time() - fragment.finished_animation_start_time > 2:
                         self.fragments.remove(fragment)

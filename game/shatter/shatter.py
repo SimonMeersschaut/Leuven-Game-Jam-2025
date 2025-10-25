@@ -43,7 +43,7 @@ LEFT = False
 RIGHT = True
 
 def do_break(i, split_lines: list[bool], side:bool):
-    return split_lines[(i + (1 if side==RIGHT else 0)) % len(split_lines)]
+    return split_lines[(i + (1 if side==RIGHT else 0)) % 8]
 
 def shatter_plate(surface, split_lines: list[bool], pieces=8):
     """Split a circular plate surface into `pieces` wedges (from center).
@@ -74,7 +74,7 @@ def shatter_plate(surface, split_lines: list[bool], pieces=8):
         if split_lines[split_index]:
             # find next break line
             end_split_line_index = split_index + 1
-            while end_split_line_index < 7 and (not split_lines[end_split_line_index]):
+            while end_split_line_index <= 7 and (not split_lines[end_split_line_index]):
                 end_split_line_index += 1
 
             # Create attendance list

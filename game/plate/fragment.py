@@ -12,11 +12,11 @@ class Fragment(DraggableSprite):
         self.finished_animation_start_time = None
         super().__init__(surface, position, height, width)
  
-    def update(self, delta_t: float, events: list):
+    def update(self, delta_t: float, events: list, falling_multiplier: float):
         if not self.is_playing_finished_animation:
-            self.move(self.position[0], self.position[1] + delta_t*80)
+            self.move(self.position[0], self.position[1] + delta_t*50*falling_multiplier)
 
-        super().update()
+            super().update()
     
     def get_center_pos(self):
         return (self.position[0] + self.center_offset[0], self.position[1] + self.center_offset[1])
