@@ -32,8 +32,8 @@ class Menu:
         else:
             engine.fill((60, 60, 60))
             
-            
-            engine.render_image(self.paper_background, (0, 0))
+            paper_background = pygame.transform.scale(engine.get_image('resources/buttons/paper_background.jpeg'), (1280, 720))
+            engine.render_image(paper_background, (0, 0))
 
             self.play_button.render()
             self.credits_button.render()

@@ -92,7 +92,7 @@ class Sprite():
         engine.render_image(self.image, self.position)
 
     def is_hovered(self):
-        return self.rect.collidepoint(pygame.mouse.get_pos())  # check if mouse is over the button
+        return self.rect.collidepoint(engine.get_scaled_mouse_pos())  # check if mouse is over the button
     
     def is_clicked(self):
         return self.is_hovered() and pygame.mouse.get_pressed()[0]  # left mouse button

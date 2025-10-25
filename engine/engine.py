@@ -12,8 +12,14 @@ class Engine:
         pygame.init()
         pygame.display.set_caption("Game Jam 2025")
 
-        self.DISPLAY_W, self.DISPLAY_H = 1920, 1080
-        self._screen = pygame.display.set_mode((self.DISPLAY_W, self.DISPLAY_H) , pygame.FULLSCREEN)
+        self.DISPLAY_W, self.DISPLAY_H = 1280, 720
+        self._screen = pygame.Surface((self.DISPLAY_W, self.DISPLAY_H))
+        # make the real window resizable so we can auto-scale the internal 1080p surface
+        self.real_screen = pygame.display.set_mode((self.DISPLAY_W, self.DISPLAY_H), pygame.RESIZABLE) #, pygame.FULLSCREEN)
+        # track real window size
+        self.real_width, self.real_height = self.real_screen.get_size()
+        # store canonical internal resolution for scaling computations
+        self._base_width, self._base_height = self.DISPLAY_W, self.DISPLAY_H
 
         self.clock = pygame.time.Clock()
         pygame.mixer.init()
@@ -24,6 +30,8 @@ class Engine:
 
         self.mode = Modes.main_menu
 
+        self.width, self.height = 1920, 1080
+    
     def get_font(self, fontname, fontsize):
         path = f"resources/fonts/{fontname}.ttf"
         identifier = (path, fontsize)
@@ -58,7 +66,11 @@ class Engine:
                     if event.key == pygame.K_ESCAPE:
                         pygame.quit()
                         exit()
-            
+                elif event.type == pygame.VIDEORESIZE:
+                    # update tracked real window size and recreate the display surface
+                    self.real_width, self.real_height = event.size
+                    self.real_screen = pygame.display.set_mode((self.real_width, self.real_height), pygame.RESIZABLE)
+
             # Update and draw active scene
             if self.mode == Modes.main_menu:
                 menu.update(delta_t, events)
@@ -69,7 +81,20 @@ class Engine:
             else:
                 raise ValueError("EngineError: the type of mode was not registered in the engine.")
 
-            # Send screen update
+            # Send screen update: scale internal 1920x1080 surface to window while preserving 16:9
+            # compute scale that fits the base surface into the real window
+            scale_x = self.real_width / self._base_width
+            scale_y = self.real_height / self._base_height
+            scale = min(scale_x, scale_y)
+            scaled_w = max(1, int(self._base_width * scale))
+            scaled_h = max(1, int(self._base_height * scale))
+
+            # create scaled surface and center it, fill background black for letter/pillar boxing
+            scaled_surface = pygame.transform.smoothscale(self._screen, (scaled_w, scaled_h))
+            self.real_screen.fill((0, 0, 0))
+            dest_x = (self.real_width - scaled_w) // 2
+            dest_y = (self.real_height - scaled_h) // 2
+            self.real_screen.blit(scaled_surface, (dest_x, dest_y))
             pygame.display.flip()
     
     def render_text(self, fontname: str, fontsize: int, text:str, color: tuple[int, int, int]):
@@ -116,5 +141,21 @@ class Engine:
     def is_pressed(self, key) -> bool:
         return self.get_pressed_keys()[key]
 
+    def get_scaled_mouse_pos(self) -> tuple[int, int]:
+        """Returns the mouse position scaled to the internal 1920x1080 resolution."""
+        mx, my = pygame.mouse.get_pos()
+        scale_x = self.real_width / self._base_width
+        scale_y = self.real_height / self._base_height
+        scale = min(scale_x, scale_y)
+
+        # compute offsets due to letter/pillar boxing
+        offset_x = (self.real_width - (self._base_width * scale)) / 2
+        offset_y = (self.real_height - (self._base_height * scale)) / 2
+
+        # scale mouse position back to internal resolution
+        scaled_mx = (mx - offset_x) / scale
+        scaled_my = (my - offset_y) / scale
+
+        return int(scaled_mx), int(scaled_my)
 
 engine = Engine()
