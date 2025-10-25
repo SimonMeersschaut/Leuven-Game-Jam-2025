@@ -23,7 +23,7 @@ class Game:
         self.hond.update(delta_t, events)
         self.slang.update(delta_t,events,self.loading_bar,self.stats)
         
-        self.plate_supervisor.update()
+        self.plate_supervisor.update(delta_t, events)
         
         self.stats.update(delta_t,events)
         self.loading_bar.update(delta_t,events)

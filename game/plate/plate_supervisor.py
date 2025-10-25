@@ -31,14 +31,15 @@ class PlateSupervisor:
             ))
         return plates
     
-    def update(self):
+    def update(self, delta_t: float, events: list):
         self.hovered_plate = None
 
         if self.held_fragment and pygame.mouse.get_pressed()[0]:
             self.held_fragment.holding = True
-            self.held_fragment.update()
+            self.held_fragment.update(delta_t, events)
             # check if 'glueable'
             for fragment in self.fragments:
+                fragment.update(delta_t, events)
                 if is_combineable(self.held_fragment.attendance_list, fragment.attendance_list):
                     if is_within_distance(self.held_fragment.position, fragment.position, 50):
                         self.held_fragment.combine_with(fragment)
@@ -65,7 +66,7 @@ class PlateSupervisor:
                 else:
                     fragment.hovering = False
 
-                fragment.update()
+                fragment.update(delta_t, events)
 
     def render(self):
         for plate in reversed(self.fragments):
