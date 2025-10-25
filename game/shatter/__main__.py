@@ -5,4 +5,5 @@ if __name__ == "__main__":
     image_path = "plate.png"
 
     pieces = shatter_surface(image_path, pieces=8)
-    show_surface(pieces)
+    # show_surface(pieces)
+    show_pieces_cv2(pieces)

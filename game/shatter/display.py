@@ -18,8 +18,8 @@ def show_pieces_cv2(pieces: list, cols=4, window_name='pieces'):
     w, h = pieces[0].get_size()
 
     # Make a canvas large enough to place pieces around the center
-    canvas_w = max(w, int(w * 2.5))
-    canvas_h = max(h, int(h * 2.5))
+    canvas_w = w
+    canvas_h = h
 
     # Start with a red background (BGR for OpenCV: (0,0,255))
     canvas = np.zeros((canvas_h, canvas_w, 3), dtype=np.uint8)
@@ -27,7 +27,7 @@ def show_pieces_cv2(pieces: list, cols=4, window_name='pieces'):
 
     center_x = canvas_w // 2
     center_y = canvas_h // 2
-    offset = 20  # pixels away from center
+    offset = 0  # pixels away from center
 
     for idx, surf in enumerate(pieces):
         # RGB array from pygame surface
