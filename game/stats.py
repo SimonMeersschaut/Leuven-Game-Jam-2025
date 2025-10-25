@@ -31,8 +31,8 @@ class Stats:
 
     
     def update(self, delta_t: float, events: list):
-        ...
-    
+        self.money_image=engine.render_text('birthstone',80,f'€{self.money}',(0,255,0))
+
     def render(self):
         for live in range(self.lives):
             engine.render_image(self.lives_image,(50+1.5*live*self.width_lives_image,50))
