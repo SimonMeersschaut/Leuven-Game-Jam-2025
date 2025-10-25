@@ -16,12 +16,10 @@ class Game:
         self.elephant_ass=engine.get_image("resources/images/elephant_ass.png")
         self.elephant_ass=pygame.transform.scale_by(self.elephant_ass,0.2)
         self.width_elephant_ass,self.length_elephant_ass=self.elephant_ass.get_size()
-        self.plate_supervisor = PlateSupervisor(self.loading_bar)
-        self.plate_1 = self.plate_supervisor.create_plate("resources/images/plate.png", width=200)
-        self.plate_2 = self.plate_supervisor.create_plate("resources/images/plate.png", width=150)
         self.stats = Stats(1)
         self.loading_bar = Loadingbar()
         self.gameoverscreen = Gameoverscreen()
+        self.plate_supervisor = PlateSupervisor(self.loading_bar)
         self.plate_supervisor.spawn_plate()
 
     def update(self, delta_t: float, events: list):
