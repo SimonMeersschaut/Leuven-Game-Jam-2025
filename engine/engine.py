@@ -47,6 +47,8 @@ class Engine:
 
         FRAME_RATE = 60 # FPS (Hz)
         FREQUENCY = 1/FRAME_RATE # seconds
+
+        menu.shop.game = game
         
         running = True
         while running:

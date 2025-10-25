@@ -19,7 +19,10 @@ class PlateSupervisor:
         self.held_fragment = None
 
     def create_plate_pieces(self, image_path="resources/images/plate.png", position=(100, 100), height=None, width=None):
-        split_lines = [random.getrandbits(1) for _ in range(8)]
+        split_lines = []
+        while (split_lines.count(1) < 2):
+            split_lines = [random.getrandbits(1) for _ in range(8)]
+            print(split_lines)
         pieces = shatter_plate("resources/images/plate.png", split_lines)
         plates = []
         for (left_gold_glue, piece_image, right_gold_glue, attendance_list) in pieces:

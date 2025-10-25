@@ -4,6 +4,7 @@ from engine.draggable_sprite import DraggableSprite
 class Fragment(DraggableSprite):
     def __init__(self, left_gold_glue, surface, right_gold_glue, attendance_list: list[bool], position=(100, 100), height=None, width=None):
         self.attendance_list = attendance_list
+        self.velocity = (0, 0)
         super().__init__(surface, position, height, width)
  
     def update(self):
