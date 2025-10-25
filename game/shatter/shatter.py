@@ -53,7 +53,6 @@ def shatter_plate(surface, split_lines: list[bool], pieces=8):
     is available, the function will display a grid of pieces in a single
     OpenCV window.
     """
-    # split_lines = [True, True, False, False, True, False, False, False]
 
     if len([split_line for split_line in split_lines if split_line]) < 2:
         raise ValueError("A plate splits in at least two pieces.")
@@ -75,17 +74,23 @@ def shatter_plate(surface, split_lines: list[bool], pieces=8):
         if split_lines[split_index]:
             # find next break line
             end_split_line_index = split_index + 1
-            while (not split_lines[end_split_line_index]) and end_split_line_index < 7:
+            while end_split_line_index < 7 and (not split_lines[end_split_line_index]):
                 end_split_line_index += 1
+
+            # Create attendance list
+            attendance_list = [False for _ in range(8)]
+            for i in range(split_index, end_split_line_index):
+                attendance_list[i] = True
 
             thetas.append((
                 index_to_radians(split_index, pieces), 
                 index_to_radians(end_split_line_index, pieces), 
+                attendance_list
             ))
 
 
     wedges = []
-    for (theta_start, theta_end) in thetas:
+    for (theta_start, theta_end, attendance_list) in thetas:
 
         # Build polygon points: center + points along arc from theta1 to theta2
         center = (cx, cy)
@@ -134,7 +139,8 @@ def shatter_plate(surface, split_lines: list[bool], pieces=8):
         piece.blit(surface, (0, 0))
         piece.blit(mask, (0, 0), special_flags=pygame.BLEND_RGBA_MULT)
 
-        wedges.append((gold_glues[0], piece, gold_glues[1]))
+        wedges.append((gold_glues[0], piece, gold_glues[1], attendance_list))
+        # attendance_list: where this fragment exists (in the list of the entire plate)
         
     return wedges
 
