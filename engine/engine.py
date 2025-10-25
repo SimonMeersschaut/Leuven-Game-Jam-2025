@@ -1,5 +1,6 @@
 import pygame
 from enum import Enum, auto
+from .pointers import Pointers
 
 class Modes(Enum):
     main_menu = auto()
@@ -31,6 +32,8 @@ class Engine:
         self.mode = Modes.main_menu
 
         self.width, self.height = 1920, 1080
+        
+        self.pointers_handler = Pointers()
     
     def get_font(self, fontname, fontsize):
         path = f"resources/fonts/{fontname}.ttf"
@@ -70,6 +73,8 @@ class Engine:
                     # update tracked real window size and recreate the display surface
                     self.real_width, self.real_height = event.size
                     self.real_screen = pygame.display.set_mode((self.real_width, self.real_height), pygame.RESIZABLE)
+                elif event.type == pygame.MOUSEBUTTONDOWN or event.type == pygame.MOUSEBUTTONUP or event.type == pygame.MOUSEMOTION or event.type == pygame.FINGERDOWN or event.type == pygame.FINGERUP or event.type == pygame.FINGERMOTION:
+                   self.pointers_handler.handle_pointer_input(event)
 
             # Update and draw active scene
             if self.mode == Modes.main_menu:
