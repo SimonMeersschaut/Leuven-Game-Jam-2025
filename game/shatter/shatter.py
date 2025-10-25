@@ -17,7 +17,7 @@ def create_polygon_points(theta, center, radius, w, h, direction: int):
     cx, cy = center
     create_split_points = lambda theta, points_radii : [(cx + r * math.cos(theta), cy + r * math.sin(theta)) for r in points_radii]
 
-    points_radii = sorted([random.random()*w/2 for _ in range(random.randint(MIN_VERTICES, MAX_VERTICES))])
+    points_radii = [0] + sorted([random.random()*w/2 for _ in range(random.randint(MIN_VERTICES, MAX_VERTICES))]) + [w/2]
     split_points_1 = create_split_points(theta, points_radii)
 
     # move the split points perpendicular to the split line
@@ -42,7 +42,7 @@ RIGHT = True
 def do_break(i, split_lines: list[bool], side:bool):
     return split_lines[(i + (1 if side==RIGHT else 0)) % len(split_lines)]
 
-def shatter_surface(surface, pieces=8):
+def shatter_surface(surface, split_lines: list[bool], pieces=8):
     """Split a circular plate surface into `pieces` wedges (from center).
 
     Returns a list of pygame.Surface objects (each same size as input, with
@@ -50,8 +50,7 @@ def shatter_surface(surface, pieces=8):
     is available, the function will display a grid of pieces in a single
     OpenCV window.
     """
-
-    split_lines = [True, False, False, False, True, False, False, False]
+    # split_lines = [True, True, False, False, True, False, False, False]
 
     if isinstance(surface, str):
         surface = pygame.transform.scale(pygame.image.load(surface),(400, 400))
@@ -82,28 +81,32 @@ def shatter_surface(surface, pieces=8):
             y = cy + radius * math.sin(t)
             arc.append((int(x), int(y)))
 
-        polygons = []
-        if do_break(i, split_lines, side=LEFT):
-            polygons.append(create_polygon_points(theta1, center, radius, w, h, 1))
-        if do_break(i, split_lines, side=RIGHT):
-            polygons.append(create_polygon_points(theta2, center, radius, w, h, -1))
+        # Create broken break line
+        gold_glues = []
+        for side, theta in [(LEFT, theta1), (RIGHT, theta2)]:
+            if do_break(i, split_lines, side=side):
+                direction = 1 if side == LEFT else -1
 
-        if len(polygons) > 0:
-            golden_mask = pygame.Surface((w, h), pygame.SRCALPHA)
-            golden_mask.fill((0, 0, 0, 0))
-            inverse_golden_mask = pygame.Surface((w, h), pygame.SRCALPHA)
-            inverse_golden_mask.fill((255, 255, 255, 255))
+                golden_mask = pygame.Surface((w, h), pygame.SRCALPHA)
+                golden_mask.fill((0, 0, 0, 0))
+                inverse_golden_mask = pygame.Surface((w, h), pygame.SRCALPHA)
+                inverse_golden_mask.fill((255, 255, 255, 255))
 
-            for polygon_points in polygons:
+                polygon_points = create_polygon_points(theta, center, radius, w, h, direction)
+
                 pygame.draw.polygon(golden_mask, (255, 255, 255, 255), polygon_points)
                 pygame.draw.polygon(inverse_golden_mask, (0, 0, 0, 0), polygon_points)
 
-            plate_minus_golden = surface.copy()
-            # Multiply RGB/alpha by mask; polygon area becomes transparent
-            plate_minus_golden.blit(inverse_golden_mask, (0, 0), special_flags=pygame.BLEND_RGBA_MULT)
-
-        else:
-            plate_minus_golden = surface
+                # Multiply RGB/alpha by mask; polygon area becomes transparent
+                surface.blit(inverse_golden_mask, (0, 0), special_flags=pygame.BLEND_RGBA_MULT)
+                
+                # Create gold glue
+                golden_glue = pygame.Surface((w, h), pygame.SRCALPHA)
+                golden_glue.fill((255, 215, 0, 255)) # Gold Color
+                golden_glue.blit(golden_mask, (0, 0), special_flags=pygame.BLEND_RGBA_MULT)
+                gold_glues.append(golden_glue)
+            else:
+                gold_glues.append(None)
 
         mask_points = [center] + arc
 
@@ -113,10 +116,10 @@ def shatter_surface(surface, pieces=8):
 
         # Copy original and multiply by mask so outside becomes transparent
         piece = pygame.Surface((w, h), pygame.SRCALPHA)
-        piece.blit(plate_minus_golden, (0, 0))
+        piece.blit(surface, (0, 0))
         piece.blit(mask, (0, 0), special_flags=pygame.BLEND_RGBA_MULT)
 
-        wedges.append(piece)
+        wedges.append((gold_glues[0], piece, gold_glues[1]))
         
     return wedges
 
