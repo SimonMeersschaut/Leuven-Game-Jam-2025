@@ -7,7 +7,7 @@ class PlateSupervisor:
         self.held_plate = None
 
 
-    def create_plate(self, image_path="resources/images/plate.png", position=(100, 100), height=None, width=None):
+    def create_plate_pieces(self, image_path="resources/images/plate.png", position=(100, 100), height=None, width=None):
         plate = Fragment(image_path, position, height, width)
         self.plates.append(plate)
         return plate

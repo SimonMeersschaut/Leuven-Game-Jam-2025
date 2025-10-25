@@ -42,7 +42,7 @@ RIGHT = True
 def do_break(i, split_lines: list[bool], side:bool):
     return split_lines[(i + (1 if side==RIGHT else 0)) % len(split_lines)]
 
-def shatter_surface(surface, split_lines: list[bool], pieces=8):
+def shatter_plate(surface, split_lines: list[bool], pieces=8):
     """Split a circular plate surface into `pieces` wedges (from center).
 
     Returns a list of pygame.Surface objects (each same size as input, with
