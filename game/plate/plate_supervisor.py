@@ -17,6 +17,7 @@ class PlateSupervisor:
         
         if self.held_plate is not None and pygame.mouse.get_pressed()[0]:
             self.held_plate.holding = True
+            self.held_plate.holding_pointer_index = "__mouse___"
         else:
             self.held_plate = None
 
