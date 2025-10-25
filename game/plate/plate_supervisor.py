@@ -5,7 +5,7 @@ import random
 
 class PlateSupervisor:
     def __init__(self):
-        self.plates = []
+        self.fragments = []
         self.held_plate = None
 
 
@@ -14,7 +14,7 @@ class PlateSupervisor:
         pieces = shatter_plate("resources/images/plate.png", split_lines)
         plates = []
         for (left_gold_glue, piece_image, right_gold_glue) in pieces:
-            self.plates.append(Fragment(
+            self.fragments.append(Fragment(
                 left_gold_glue,
                 piece_image,
                 right_gold_glue,
@@ -23,30 +23,31 @@ class PlateSupervisor:
     
     def update(self):
         self.hovered_plate = None
-        
-        if self.held_plate is not None and pygame.mouse.get_pressed()[0]:
+
+        if self.held_plate and pygame.mouse.get_pressed()[0]:
             self.held_plate.holding = True
+            self.held_plate.update()
         else:
             self.held_plate = None
+        
+            for fragment in self.fragments:
+                fragment.previously_holding = fragment.holding
+                fragment.previously_hovering = fragment.hovering
 
-        for plate in self.plates:
-            plate.previously_holding = plate.holding
-            plate.previously_hovering = plate.hovering
+                if fragment.is_clicked() and self.held_plate is None:
+                    fragment.holding = True
+                    self.held_plate = fragment
+                elif not self.held_plate == fragment:
+                    fragment.holding = False
 
-            if plate.is_clicked() and self.held_plate is None:
-                plate.holding = True
-                self.held_plate = plate
-            elif not self.held_plate == plate:
-                plate.holding = False
+                if fragment.is_hovered() and self.hovered_plate is None:
+                    fragment.hovering = True
+                    self.hovered_plate = fragment
+                else:
+                    fragment.hovering = False
 
-            if plate.is_hovered() and self.hovered_plate is None:
-                plate.hovering = True
-                self.hovered_plate = plate
-            else:
-                plate.hovering = False
-
-            plate.update()
+                fragment.update()
 
     def render(self):
-        for plate in reversed(self.plates):
+        for plate in reversed(self.fragments):
             plate.render()
