@@ -8,6 +8,7 @@ class DraggableSprite(Sprite):
         super().__init__(image_path, position, height, width)
         
         self.holding = False
+        self.holding_index = -1
         self.hovering = False
         self.previously_holding = False
         self.previously_hovering = False
