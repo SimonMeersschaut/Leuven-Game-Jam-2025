@@ -12,6 +12,8 @@ class Menu:
 
         self.credits = Credits(self)
 
+        self.paper_background = pygame.transform.scale(engine.get_image('resources/buttons/paper_background.jpeg'), (1920, 1080))
+
     def update(self, delta_t, events):
 
         if self.state == "credits":
@@ -30,8 +32,8 @@ class Menu:
         else:
             engine.fill((60, 60, 60))
             
-            paper_background = pygame.transform.scale(engine.get_image('resources/buttons/paper_background.jpeg'), (1000, 600))
-            engine.render_image(paper_background, (0, 0))
+            
+            engine.render_image(self.paper_background, (0, 0))
 
             self.play_button.render()
             self.credits_button.render()
