@@ -25,6 +25,7 @@ class PlateSupervisor:
         # wave settings
         self.falling_speed = 1
         self.average_split = 1
+        self.average_time_between_plates = 10
 
     def create_plate_pieces(self, image_path="resources/images/plate.png", position=(100, 100), height=None, width=None):
         split_lines = [random.getrandbits(1) for _ in range(8)]
@@ -53,7 +54,7 @@ class PlateSupervisor:
                         self.fragments.remove(fragment)
                         # Test full plate
                         if all(self.held_fragment.attendance_list) and not self.held_fragment.is_playing_finished_animation:
-                            engine.spawn_particles(self.held_fragment.get_center_pos(), count=100, color=(255,200,60), spread=160, speed=200, lifetime=2, radius=6)
+                            engine.spawn_particles(self.held_fragment.get_center_pos(), count=200, color=(255,200,60), spread=160, speed=200, lifetime=2, radius=2)
                             self.held_fragment.is_playing_finished_animation = True
                             self.held_fragment.finished_animation_start_time = time.time()
                 if fragment.finished_animation_start_time is not None:
