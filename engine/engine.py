@@ -13,7 +13,7 @@ class Engine:
         pygame.display.set_caption("Game Jam 2025")
 
         self.DISPLAY_W, self.DISPLAY_H = 1920, 1080
-        self._screen = pygame.display.set_mode((self.DISPLAY_W, self.DISPLAY_H) , pygame.FULLSCREEN)
+        self._screen = pygame.display.set_mode((self.DISPLAY_W, self.DISPLAY_H))
 
         self.clock = pygame.time.Clock()
         pygame.mixer.init()
