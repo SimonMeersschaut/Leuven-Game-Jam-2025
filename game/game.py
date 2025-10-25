@@ -14,7 +14,9 @@ class Game:
         
         self.plate_supervisor = PlateSupervisor()
         self.plate_supervisor.create_plate_pieces()
-        self.stats = Stats()
+        # self.plate_1 = self.plate_supervisor.create_plate_pieces("resources/images/plate.png", width=200)
+        # self.plate_2 = self.plate_supervisor.create_plate_pieces("resources/images/plate.png", width=150)
+        self.stats = Stats(1)
         self.loading_bar = Loading_bar()
 
     def update(self, delta_t: float, events: list):
