@@ -12,7 +12,7 @@ class Stats:
         self.width_lost_lives_image, self.length_lost_lives_image=self.lost_lives_image.get_size()
 
         self.money=0
-        self.money_image=engine.render_text('pixel',80,f'€{self.money}',(0,255,0))
+        self.money_image=engine.render_text('birthstone',80,f'€{self.money}',(0,255,0))
         self.width_money_image,self.length_money_image=self.money_image.get_size()
 
         self.lives=5
@@ -23,7 +23,9 @@ class Stats:
     
     def update_money(self,amount):
         self.money+=amount
-        self.money_image=engine.render_text('pixel',60,f'€{self.money}',(0,255,0))
+        self.money_image=engine.render_text('birthstone',80,f'€{self.money}',(0,255,0))
+        self.width_money_image,self.length_money_image=self.money_image.get_size()
+
 
 
     
@@ -37,4 +39,4 @@ class Stats:
         for lost_live in range(5-self.lives):
             engine.render_image(self.lost_lives_image,(50+1.5*(self.lives*self.width_lives_image)+self.width_lost_lives_image*lost_live*1.5,50))
 
-        engine.render_image(self.money_image,(engine.DISPLAY_W-self.width_money_image*1.5,30))
+        engine.render_image(self.money_image,(engine.DISPLAY_W-self.width_money_image-30,30))
