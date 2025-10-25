@@ -20,12 +20,10 @@ class Game:
 
     def update(self, delta_t: float, events: list):
         self.hond.update(delta_t, events)
-        self.slang.update(delta_t,events)
+        self.slang.update(delta_t,events,self.loading_bar,self.stats)
         
         self.plate_supervisor.update()
         
-        self.hond.update(delta_t, events)
-        self.slang.update(delta_t,events)
         self.stats.update(delta_t,events)
         self.loading_bar.update(delta_t,events)
 
