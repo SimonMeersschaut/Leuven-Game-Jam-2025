@@ -33,14 +33,16 @@ class Shop:
                 self.game.stats.money -= self.multiplier_price
         elif self.buy_kak.update_and_check_clicked():
             if self.game.stats.money >= self.kak_price:
-                self.game.stats.money -= self.kak_price
-                self.game.stats.kak = True
-                self.kak_disabled = True
+                if self.kak_disabled == False:
+                    self.game.stats.money -= self.kak_price
+                    self.game.stats.kak = True
+                    self.kak_disabled = True
         elif self.buy_extra_leven.update_and_check_clicked():
             if self.game.stats.money >= self.extra_leven_price:
-                self.game.stats.money -= self.extra_leven_price
-                self.game.stats.extra_leven = True
-                self.extra_leven_disabled = True
+                if self.extra_leven_disabled == False:
+                    self.game.stats.money -= self.extra_leven_price
+                    self.game.stats.extra_leven = True
+                    self.extra_leven_disabled = True
 
     def render(self):
         engine.fill((60, 60, 60))
