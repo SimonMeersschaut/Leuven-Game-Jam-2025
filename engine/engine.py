@@ -74,8 +74,9 @@ class Engine:
                     self.real_width, self.real_height = event.size
                     self.real_screen = pygame.display.set_mode((self.real_width, self.real_height), pygame.RESIZABLE)
                 elif event.type == pygame.MOUSEBUTTONDOWN or event.type == pygame.MOUSEBUTTONUP or event.type == pygame.MOUSEMOTION or event.type == pygame.FINGERDOWN or event.type == pygame.FINGERUP or event.type == pygame.FINGERMOTION:
-                   self.pointers_handler.handle_pointer_input(event)
+                   self.pointers_handler.handle_pointer_input(event, self)
 
+                        
             # Update and draw active scene
             if self.mode == Modes.main_menu:
                 menu.update(delta_t, events)
@@ -158,6 +159,23 @@ class Engine:
         offset_y = (self.real_height - (self._base_height * scale)) / 2
 
         # scale mouse position back to internal resolution
+        scaled_mx = (mx - offset_x) / scale
+        scaled_my = (my - offset_y) / scale
+
+        return int(scaled_mx), int(scaled_my)
+
+    def get_scaled_pointer_position(self, pos: tuple[int, int]) -> tuple[int, int]:
+        """Scales a position from real window coordinates to internal 1920x1080 coordinates."""
+        mx, my = pos
+        scale_x = self.real_width / self._base_width
+        scale_y = self.real_height / self._base_height
+        scale = min(scale_x, scale_y)
+
+        # compute offsets due to letter/pillar boxing
+        offset_x = (self.real_width - (self._base_width * scale)) / 2
+        offset_y = (self.real_height - (self._base_height * scale)) / 2
+
+        # scale position back to internal resolution
         scaled_mx = (mx - offset_x) / scale
         scaled_my = (my - offset_y) / scale
 

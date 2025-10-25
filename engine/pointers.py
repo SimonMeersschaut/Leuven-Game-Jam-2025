@@ -4,7 +4,7 @@ class Pointers:
     def __init__(self):
         self.pointers = {}
         
-    def handle_pointer_input(self, event):
+    def handle_pointer_input(self, event, engine):
         if event.type == pygame.FINGERDOWN:
             self.add_pointer(event.finger_id, (event.x, event.y))
             
@@ -13,7 +13,20 @@ class Pointers:
             
         elif event.type == pygame.FINGERMOTION:
             self.pointers[event.finger_id] = (event.x, event.y)
+        
+        elif event.type == pygame.MOUSEBUTTONDOWN:
+            if event.button == 1:  # Left click
+                self.add_pointer("__mouse__", engine.get_scaled_mouse_pos())
+                
+        elif event.type == pygame.MOUSEBUTTONUP:
+            if event.button == 1:  # Left click
+                self.remove_pointer("__mouse__")
+        
+        elif event.type == pygame.MOUSEMOTION:
+            if "__mouse__" in self.pointers:
+                self.pointers["__mouse__"] = engine.get_scaled_mouse_pos()
 
+        
     def add_pointer(self, finger_id, position):
         self.pointers[finger_id] = position
         
@@ -22,9 +35,17 @@ class Pointers:
     
     def get_intersecting_pointers(self, rect):
         intersecting_pointers = []
-        for pointer_id, (pos) in self.pointers.items():
+        for pointer_id, pos in self.pointers.items():
             scaled_x = pos[0] * 1920
             scaled_y = pos[1] * 1080
             if rect.collidepoint((scaled_x, scaled_y)):
                 intersecting_pointers.append(pointer_id)
         return intersecting_pointers
+    
+    def get_scaled_finger_position(self, finger_id, engine):
+        if finger_id == "__mouse__":
+            return engine.get_scaled_mouse_pos()
+        pos = self.pointers.get(finger_id)
+        return engine.get_scaled_pos(pos)
+
+pointers = Pointers()

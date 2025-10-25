@@ -1,5 +1,6 @@
 import resources
 from engine import Engine, engine, Modes
+from engine.pointers import pointers
 import pygame
 
 class Sprite():
@@ -100,7 +101,9 @@ class Sprite():
     def just_unclicked(self):
         return (not self.is_clicked()) and self.previously_clicked
             
-        
+    def get_intersecting_pointers(self):
+        return pointers.get_intersecting_pointers(self.rect)
+    
 class Button(Sprite):
     def __init__(self, image_path, position=(0, 0), height=None, width=None, align_x=None, align_y=None):
         super().__init__(image_path, position, height, width, align_x, align_y)
