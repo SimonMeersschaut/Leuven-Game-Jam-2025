@@ -15,10 +15,10 @@ class DraggableSprite(Sprite):
     def update(self):
         if self.holding:
             self.scale_factor(1.1)
-            self.move(pygame.mouse.get_pos()[0] - self.true_width*1.1 // 2, pygame.mouse.get_pos()[1] - self.true_height*1.1 // 2)
+            self.move(engine.get_scaled_mouse_pos()[0] - self.true_width*1.1 // 2, engine.get_scaled_mouse_pos()[1] - self.true_height*1.1 // 2)
         elif self.previously_holding:
             self.reset_scale()
-            self.move(pygame.mouse.get_pos()[0] - self.true_width // 2, pygame.mouse.get_pos()[1] - self.true_height // 2)
+            self.move(engine.get_scaled_mouse_pos()[0] - self.true_width // 2, engine.get_scaled_mouse_pos()[1] - self.true_height // 2)
             
             
             

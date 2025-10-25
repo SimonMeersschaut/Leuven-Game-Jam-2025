@@ -141,5 +141,21 @@ class Engine:
     def is_pressed(self, key) -> bool:
         return self.get_pressed_keys()[key]
 
+    def get_scaled_mouse_pos(self) -> tuple[int, int]:
+        """Returns the mouse position scaled to the internal 1920x1080 resolution."""
+        mx, my = pygame.mouse.get_pos()
+        scale_x = self.real_width / self._base_width
+        scale_y = self.real_height / self._base_height
+        scale = min(scale_x, scale_y)
+
+        # compute offsets due to letter/pillar boxing
+        offset_x = (self.real_width - (self._base_width * scale)) / 2
+        offset_y = (self.real_height - (self._base_height * scale)) / 2
+
+        # scale mouse position back to internal resolution
+        scaled_mx = (mx - offset_x) / scale
+        scaled_my = (my - offset_y) / scale
+
+        return int(scaled_mx), int(scaled_my)
 
 engine = Engine()
