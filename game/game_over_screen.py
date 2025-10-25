@@ -23,8 +23,12 @@ class Gameoverscreen:
             
 
     def render(self):
-        engine.render_image(self.game_over_screen_line1_image,(200,200))
-        engine.render_image(self.game_over_screen_line2_image,(200,300))
+        x_line1=200
+        y_line1=200
+        engine.render_image(self.game_over_screen_line1_image,(x_line1,y_line1))
+        x_line2=x_line1
+        y_line2=y_line1+100
+        engine.render_image(self.game_over_screen_line2_image,(x_line2,y_line2))
 
         
     

@@ -13,6 +13,9 @@ class Game:
         self.hond = Hond()
         self.slang = Snake()
         
+        self.elephant_ass=engine.get_image("resources/images/elephant_ass.png")
+        self.elephant_ass=pygame.transform.scale_by(self.elephant_ass,0.2)
+        self.width_elephant_ass,self.length_elephant_ass=self.elephant_ass.get_size()
         self.plate_supervisor = PlateSupervisor()
         self.plate_1 = self.plate_supervisor.create_plate("resources/images/plate.png", width=200)
         self.plate_2 = self.plate_supervisor.create_plate("resources/images/plate.png", width=150)
@@ -38,6 +41,7 @@ class Game:
         self.plate_supervisor.render()
         self.stats.render()
         self.loading_bar.render()
+        engine.render_image(self.elephant_ass,(engine.DISPLAY_W/2-self.width_elephant_ass/2,engine.DISPLAY_H-self.length_elephant_ass-50))
         if self.stats.lives <=0:
             self.gameoverscreen.render()
 
