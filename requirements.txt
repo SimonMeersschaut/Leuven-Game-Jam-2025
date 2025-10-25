@@ -2,3 +2,5 @@ pygame
 pyinstaller
 numpy
 opencv-python
+random
+time
