@@ -22,8 +22,6 @@ class DraggableSprite(Sprite):
             self.reset_scale()
             self.move(engine.get_scaled_mouse_pos()[0] - self.true_width // 2, engine.get_scaled_mouse_pos()[1] - self.true_height // 2)
             
-            
-            
     def render(self):
         if self.holding and not self.previously_holding:
             pygame.mouse.set_cursor(*pygame.cursors.diamond)

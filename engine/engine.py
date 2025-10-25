@@ -1,5 +1,6 @@
 import pygame
 from enum import Enum, auto
+from .particles import ParticleSystem
 
 class Modes(Enum):
     main_menu = auto()
@@ -28,6 +29,9 @@ class Engine:
         self.fonts = {}
         self.images_cache = {}
 
+        # particle system for transient VFX (spawn with engine.spawn_particles)
+        self.particles = ParticleSystem()
+
         self.mode = Modes.main_menu
 
         self.width, self.height = 1920, 1080
@@ -47,6 +51,8 @@ class Engine:
 
         FRAME_RATE = 60 # FPS (Hz)
         FREQUENCY = 1/FRAME_RATE # seconds
+
+        menu.shop.game = game
         
         running = True
         while running:
@@ -81,6 +87,8 @@ class Engine:
             else:
                 raise ValueError("EngineError: the type of mode was not registered in the engine.")
 
+            
+
             # Send screen update: scale internal 1920x1080 surface to window while preserving 16:9
             # compute scale that fits the base surface into the real window
             scale_x = self.real_width / self._base_width
@@ -89,6 +97,11 @@ class Engine:
             scaled_w = max(1, int(self._base_width * scale))
             scaled_h = max(1, int(self._base_height * scale))
 
+            # update and render transient particles on the internal screen
+            # (particle coordinates are in the engine's internal resolution)
+            self.particles.update(delta_t)
+            self.particles.render(self._screen)
+            
             # create scaled surface and center it, fill background black for letter/pillar boxing
             scaled_surface = pygame.transform.smoothscale(self._screen, (scaled_w, scaled_h))
             self.real_screen.fill((0, 0, 0))
@@ -157,5 +170,12 @@ class Engine:
         scaled_my = (my - offset_y) / scale
 
         return int(scaled_mx), int(scaled_my)
+
+    def spawn_particles(self, pos: tuple[int, int], count: int = 20, color: tuple[int, int, int] = (255, 215, 0), spread: float = 60.0, speed: float = 200.0, lifetime: float = 1.0, radius: float = 4.0) -> None:
+        """Spawn particles in internal (unscaled) coordinates.
+
+        Example: engine.spawn_particles((x, y), count=30)
+        """
+        self.particles.spawn(pos, count=count, color=color, spread=spread, speed=speed, lifetime=lifetime, radius=radius)
 
 engine = Engine()

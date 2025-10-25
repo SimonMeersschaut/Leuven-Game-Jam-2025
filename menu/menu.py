@@ -1,6 +1,7 @@
 from engine import Engine, engine, Modes
 from engine.sprite import Button, Sprite
 from .credits import Credits
+from .shop import Shop
 import pygame
 
 class Menu:
@@ -8,25 +9,33 @@ class Menu:
         self.state = "main_menu"
 
         self.play_button = Button('resources/buttons/play_paper.jpeg', (-1, 160), height=100, align_x="center")
-        self.credits_button = Button('resources/buttons/credits_paper.jpeg', (-1, 300), height=100, align_x="center")
+        self.shop_button = Button('resources/buttons/credits_paper.jpeg', (-1, 300), height=100, align_x="center")
+        self.credits_button = Button('resources/buttons/credits_paper.jpeg', (-1, 440), height=100, align_x="center")
 
+        self.shop = Shop(self)
         self.credits = Credits(self)
 
         self.paper_background = pygame.transform.scale(engine.get_image('resources/buttons/paper_background.jpeg'), (1920, 1080))
 
     def update(self, delta_t, events):
 
-        if self.state == "credits":
+        if self.state == "shop":
+            self.shop.update()
+        elif self.state == "credits":
             self.credits.update()
         else:
             if self.play_button.update_and_check_clicked():
                 engine.mode = Modes.game
+            elif self.shop_button.update_and_check_clicked():
+                self.state = "shop"
             elif self.credits_button.update_and_check_clicked():
                 self.state = "credits"
 
     def render(self):
         
-        if self.state == "credits":
+        if self.state == "shop":
+            self.shop.render()
+        elif self.state == "credits":
             self.credits.render()
         
         else:
@@ -36,6 +45,7 @@ class Menu:
             engine.render_image(paper_background, (0, 0))
 
             self.play_button.render()
+            self.shop_button.render()
             self.credits_button.render()
 
             title = engine.render_text("pixel", 48, "KUL Game Jam 2025", (255, 255, 255))

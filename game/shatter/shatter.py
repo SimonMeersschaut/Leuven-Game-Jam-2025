@@ -6,6 +6,9 @@ def draw_points(points, surf):
     for point in points:
         pygame.draw.circle(surf, (0, 255, 0), point, 5)
 
+def index_to_radians(index, pieces: int) -> float:
+    return math.radians(index * (360.0 / pieces) - 90)
+
 def create_polygon_points(theta, center, radius, w, h, direction: int):
     MIN_VERTICES = 20
     MAX_VERTICES = 30
@@ -17,7 +20,7 @@ def create_polygon_points(theta, center, radius, w, h, direction: int):
     cx, cy = center
     create_split_points = lambda theta, points_radii : [(cx + r * math.cos(theta), cy + r * math.sin(theta)) for r in points_radii]
 
-    points_radii = sorted([random.random()*w/2 for _ in range(random.randint(MIN_VERTICES, MAX_VERTICES))])
+    points_radii = [0] + sorted([random.random()*w/2 for _ in range(random.randint(MIN_VERTICES, MAX_VERTICES))]) + [w/2]
     split_points_1 = create_split_points(theta, points_radii)
 
     # move the split points perpendicular to the split line
@@ -40,9 +43,9 @@ LEFT = False
 RIGHT = True
 
 def do_break(i, split_lines: list[bool], side:bool):
-    return split_lines[(i + (1 if side==RIGHT else 0)) % len(split_lines)]
+    return split_lines[(i + (1 if side==RIGHT else 0)) % 8]
 
-def shatter_surface(surface, pieces=8):
+def shatter_plate(surface, split_lines: list[bool], pieces=8):
     """Split a circular plate surface into `pieces` wedges (from center).
 
     Returns a list of pygame.Surface objects (each same size as input, with
@@ -51,7 +54,8 @@ def shatter_surface(surface, pieces=8):
     OpenCV window.
     """
 
-    split_lines = [True, False, False, False, True, False, False, False]
+    if len([split_line for split_line in split_lines if split_line]) < 2:
+        raise ValueError("A plate splits in at least two pieces.")
 
     if isinstance(surface, str):
         surface = pygame.transform.scale(pygame.image.load(surface),(400, 400))
@@ -65,45 +69,64 @@ def shatter_surface(surface, pieces=8):
     cx, cy = w // 2, h // 2
     radius = min(cx, cy)
 
+    thetas = []
+    for split_index in range(pieces):
+        if split_lines[split_index]:
+            # find next break line
+            end_split_line_index = split_index + 1
+            while end_split_line_index <= 7 and (not split_lines[end_split_line_index]):
+                end_split_line_index += 1
+
+            # Create attendance list
+            attendance_list = [False for _ in range(8)]
+            for i in range(split_index, end_split_line_index):
+                attendance_list[i] = True
+
+            thetas.append((
+                index_to_radians(split_index, pieces), 
+                index_to_radians(end_split_line_index, pieces), 
+                attendance_list
+            ))
+
+
     wedges = []
-    for i in range(pieces):
-        theta1 = math.radians(i * (360.0 / pieces) - 90)
-        theta2 = math.radians((i + 1) * (360.0 / pieces) - 90)
+    for (theta_start, theta_end, attendance_list) in thetas:
 
         # Build polygon points: center + points along arc from theta1 to theta2
         center = (cx, cy)
 
         # Create arc
         arc = []
-        steps = max(2, int(radius * (theta2 - theta1) / 8))
+        steps = max(2, int(radius * (theta_end - theta_start) / 8))
         for s in range(steps + 1):
-            t = theta1 + (theta2 - theta1) * (s / steps)
+            t = theta_start + (theta_end - theta_start) * (s / steps)
             x = cx + radius * math.cos(t)
             y = cy + radius * math.sin(t)
             arc.append((int(x), int(y)))
 
-        polygons = []
-        if do_break(i, split_lines, side=LEFT):
-            polygons.append(create_polygon_points(theta1, center, radius, w, h, 1))
-        if do_break(i, split_lines, side=RIGHT):
-            polygons.append(create_polygon_points(theta2, center, radius, w, h, -1))
+        # Create broken break line
+        gold_glues = []
+        for side, theta in [(LEFT, theta_start), (RIGHT, theta_end)]:
+            direction = 1 if side == LEFT else -1
 
-        if len(polygons) > 0:
             golden_mask = pygame.Surface((w, h), pygame.SRCALPHA)
             golden_mask.fill((0, 0, 0, 0))
             inverse_golden_mask = pygame.Surface((w, h), pygame.SRCALPHA)
             inverse_golden_mask.fill((255, 255, 255, 255))
 
-            for polygon_points in polygons:
-                pygame.draw.polygon(golden_mask, (255, 255, 255, 255), polygon_points)
-                pygame.draw.polygon(inverse_golden_mask, (0, 0, 0, 0), polygon_points)
+            polygon_points = create_polygon_points(theta, center, radius, w, h, direction)
 
-            plate_minus_golden = surface.copy()
+            pygame.draw.polygon(golden_mask, (255, 255, 255, 255), polygon_points)
+            pygame.draw.polygon(inverse_golden_mask, (0, 0, 0, 0), polygon_points)
+
             # Multiply RGB/alpha by mask; polygon area becomes transparent
-            plate_minus_golden.blit(inverse_golden_mask, (0, 0), special_flags=pygame.BLEND_RGBA_MULT)
-
-        else:
-            plate_minus_golden = surface
+            surface.blit(inverse_golden_mask, (0, 0), special_flags=pygame.BLEND_RGBA_MULT)
+            
+            # Create gold glue
+            golden_glue = pygame.Surface((w, h), pygame.SRCALPHA)
+            golden_glue.fill((255, 215, 0, 255)) # Gold Color
+            golden_glue.blit(golden_mask, (0, 0), special_flags=pygame.BLEND_RGBA_MULT)
+            gold_glues.append(golden_glue)
 
         mask_points = [center] + arc
 
@@ -113,10 +136,10 @@ def shatter_surface(surface, pieces=8):
 
         # Copy original and multiply by mask so outside becomes transparent
         piece = pygame.Surface((w, h), pygame.SRCALPHA)
-        piece.blit(plate_minus_golden, (0, 0))
+        piece.blit(surface, (0, 0))
         piece.blit(mask, (0, 0), special_flags=pygame.BLEND_RGBA_MULT)
 
-        wedges.append(piece)
+        wedges.append((gold_glues[0], piece, gold_glues[1], attendance_list, (cx, cy), theta_start, theta_end))
+        # attendance_list: where this fragment exists (in the list of the entire plate)
         
     return wedges
-
