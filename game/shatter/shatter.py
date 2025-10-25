@@ -102,29 +102,26 @@ def shatter_plate(surface, split_lines: list[bool], pieces=8):
         # Create broken break line
         gold_glues = []
         for side, theta in [(LEFT, theta_start), (RIGHT, theta_end)]:
-            # if do_break(i, split_lines, side=side):
-                direction = 1 if side == LEFT else -1
+            direction = 1 if side == LEFT else -1
 
-                golden_mask = pygame.Surface((w, h), pygame.SRCALPHA)
-                golden_mask.fill((0, 0, 0, 0))
-                inverse_golden_mask = pygame.Surface((w, h), pygame.SRCALPHA)
-                inverse_golden_mask.fill((255, 255, 255, 255))
+            golden_mask = pygame.Surface((w, h), pygame.SRCALPHA)
+            golden_mask.fill((0, 0, 0, 0))
+            inverse_golden_mask = pygame.Surface((w, h), pygame.SRCALPHA)
+            inverse_golden_mask.fill((255, 255, 255, 255))
 
-                polygon_points = create_polygon_points(theta, center, radius, w, h, direction)
+            polygon_points = create_polygon_points(theta, center, radius, w, h, direction)
 
-                pygame.draw.polygon(golden_mask, (255, 255, 255, 255), polygon_points)
-                pygame.draw.polygon(inverse_golden_mask, (0, 0, 0, 0), polygon_points)
+            pygame.draw.polygon(golden_mask, (255, 255, 255, 255), polygon_points)
+            pygame.draw.polygon(inverse_golden_mask, (0, 0, 0, 0), polygon_points)
 
-                # Multiply RGB/alpha by mask; polygon area becomes transparent
-                surface.blit(inverse_golden_mask, (0, 0), special_flags=pygame.BLEND_RGBA_MULT)
-                
-                # Create gold glue
-                golden_glue = pygame.Surface((w, h), pygame.SRCALPHA)
-                golden_glue.fill((255, 215, 0, 255)) # Gold Color
-                golden_glue.blit(golden_mask, (0, 0), special_flags=pygame.BLEND_RGBA_MULT)
-                gold_glues.append(golden_glue)
-            # else:
-            #     gold_glues.append(None)
+            # Multiply RGB/alpha by mask; polygon area becomes transparent
+            surface.blit(inverse_golden_mask, (0, 0), special_flags=pygame.BLEND_RGBA_MULT)
+            
+            # Create gold glue
+            golden_glue = pygame.Surface((w, h), pygame.SRCALPHA)
+            golden_glue.fill((255, 215, 0, 255)) # Gold Color
+            golden_glue.blit(golden_mask, (0, 0), special_flags=pygame.BLEND_RGBA_MULT)
+            gold_glues.append(golden_glue)
 
         mask_points = [center] + arc
 
