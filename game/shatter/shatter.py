@@ -139,8 +139,7 @@ def shatter_plate(surface, split_lines: list[bool], pieces=8):
         piece.blit(surface, (0, 0))
         piece.blit(mask, (0, 0), special_flags=pygame.BLEND_RGBA_MULT)
 
-        wedges.append((gold_glues[0], piece, gold_glues[1], attendance_list))
+        wedges.append((gold_glues[0], piece, gold_glues[1], attendance_list, (cx, cy), theta_start, theta_end))
         # attendance_list: where this fragment exists (in the list of the entire plate)
         
     return wedges
-
