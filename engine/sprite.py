@@ -39,19 +39,19 @@ class Sprite():
             if align_x == "left":
                 position = (0, position[1])
             elif align_x == "center":
-                position = (500 - (width // 2), position[1])
+                position = (640 - (width // 2), position[1])
             elif align_x == "right":
-                position = (1000 - width, position[1])
+                position = (1280 - width, position[1])
 
         if align_y:
             if align_y == "top":
                 position = (position[0], 0)
             elif align_y == "center":
-                position = (position[0], 300 - (height // 2))
+                position = (position[0], 360 - (height // 2))
             elif align_y == "bottom":
-                position = (position[0], 600 - height)
-        
-            
+                position = (position[0], 720 - height)
+
+
         self.position = position
         self.true_position = position
 
