@@ -30,8 +30,9 @@ class Sprite():
             height = image.get_height()
             width = image.get_width()
         
-        self.image = pygame.transform.scale(image, (width, height))   
-
+        self.src_image = pygame.transform.scale(image, (width, height))   
+        self.image = self.src_image
+        
         self.true_width = width
         self.true_height = height
 
@@ -39,19 +40,19 @@ class Sprite():
             if align_x == "left":
                 position = (0, position[1])
             elif align_x == "center":
-                position = (640 - (width // 2), position[1])
+                position = (engine.DISPLAY_W/2 - (width // 2), position[1])
             elif align_x == "right":
-                position = (1280 - width, position[1])
+                position = (engine.DISPLAY_W - width, position[1])
 
         if align_y:
             if align_y == "top":
                 position = (position[0], 0)
             elif align_y == "center":
-                position = (position[0], 360 - (height // 2))
+                position = (position[0], engine.DISPLAY_H/2 - (height // 2))
             elif align_y == "bottom":
-                position = (position[0], 720 - height)
-
-
+                position = (position[0], engine.DISPLAY_H - height)
+        
+            
         self.position = position
         self.true_position = position
 
@@ -66,7 +67,7 @@ class Sprite():
 
     def scale(self, width, height):
         """Scales the sprite by the given factors."""
-        self.image = pygame.transform.scale(self.image, (int(width), int(height)))
+        self.image = pygame.transform.scale(self.src_image, (int(width), int(height)))
         self.position = (self.true_position[0] - ((width - self.true_width) / 2), self.true_position[1] - ((height - self.true_height) / 2))
 
         self.rect = self.image.get_rect(topleft=self.position)

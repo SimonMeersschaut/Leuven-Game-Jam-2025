@@ -1,6 +1,7 @@
 from engine import engine 
 import pygame
 
+
 class Hond:
     def __init__(self):
         self.hond_image = engine.get_image('resources/images/test2.png')
