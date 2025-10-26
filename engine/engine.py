@@ -1,6 +1,6 @@
 import pygame
 from enum import Enum, auto
-from .pointers import Pointers
+from .pointers import pointers
 
 class Modes(Enum):
     main_menu = auto()
@@ -32,8 +32,6 @@ class Engine:
         self.mode = Modes.main_menu
 
         self.width, self.height = 1920, 1080
-        
-        self.pointers_handler = Pointers()
     
     def get_font(self, fontname, fontsize):
         path = f"resources/fonts/{fontname}.ttf"
@@ -74,7 +72,7 @@ class Engine:
                     self.real_width, self.real_height = event.size
                     self.real_screen = pygame.display.set_mode((self.real_width, self.real_height), pygame.RESIZABLE)
                 elif event.type == pygame.MOUSEBUTTONDOWN or event.type == pygame.MOUSEBUTTONUP or event.type == pygame.MOUSEMOTION or event.type == pygame.FINGERDOWN or event.type == pygame.FINGERUP or event.type == pygame.FINGERMOTION:
-                   self.pointers_handler.handle_pointer_input(event, self)
+                   pointers.handle_pointer_input(event, self)
 
                         
             # Update and draw active scene
@@ -147,38 +145,26 @@ class Engine:
     def is_pressed(self, key) -> bool:
         return self.get_pressed_keys()[key]
 
-    def get_scaled_mouse_pos(self) -> tuple[int, int]:
-        """Returns the mouse position scaled to the internal 1920x1080 resolution."""
-        mx, my = pygame.mouse.get_pos()
-        scale_x = self.real_width / self._base_width
-        scale_y = self.real_height / self._base_height
-        scale = min(scale_x, scale_y)
+    def scale_position(self, position: tuple[int, int]) -> tuple[int, int]:
+        mx, my = position
 
-        # compute offsets due to letter/pillar boxing
-        offset_x = (self.real_width - (self._base_width * scale)) / 2
-        offset_y = (self.real_height - (self._base_height * scale)) / 2
+        base_w, base_h = self._base_width, self._base_height
+        real_w, real_h = self.real_width, self.real_height
 
-        # scale mouse position back to internal resolution
-        scaled_mx = (mx - offset_x) / scale
-        scaled_my = (my - offset_y) / scale
+        # compute the scale used to render the internal surface
+        scale = min(real_w / base_w, real_h / base_h)
+        scaled_w = max(1, int(base_w * scale))
+        scaled_h = max(1, int(base_h * scale))
+        dest_x = (real_w - scaled_w) // 2
+        dest_y = (real_h - scaled_h) // 2
 
-        return int(scaled_mx), int(scaled_my)
+        # map from window coords into internal surface coords
+        ix = (mx - dest_x) / scale
+        iy = (my - dest_y) / scale
 
-    def get_scaled_pointer_position(self, pos: tuple[int, int]) -> tuple[int, int]:
-        """Scales a position from real window coordinates to internal 1920x1080 coordinates."""
-        mx, my = pos
-        scale_x = self.real_width / self._base_width
-        scale_y = self.real_height / self._base_height
-        scale = min(scale_x, scale_y)
-
-        # compute offsets due to letter/pillar boxing
-        offset_x = (self.real_width - (self._base_width * scale)) / 2
-        offset_y = (self.real_height - (self._base_height * scale)) / 2
-
-        # scale position back to internal resolution
-        scaled_mx = (mx - offset_x) / scale
-        scaled_my = (my - offset_y) / scale
-
-        return int(scaled_mx), int(scaled_my)
-
+        # clamp to internal bounds
+        ix = int(max(0, min(base_w - 1, ix)))
+        iy = int(max(0, min(base_h - 1, iy)))
+        return (ix, iy)
+    
 engine = Engine()
