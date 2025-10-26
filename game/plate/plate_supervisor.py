@@ -195,6 +195,7 @@ class PlateSupervisor:
                         if pointer_id not in self.held_plates:
                             self.held_plates[pointer_id] = fragment
                             fragment.holding = True
+                            fragment.ever_held = True
                             fragment.holding_index = pointer_id
                             
             fragment.update(delta_t, events, self.falling_multiplier)
@@ -218,9 +219,8 @@ class PlateSupervisor:
 
         # Check glue
         for held_fragment in self.fragments:
-            if held_fragment.ever_held:
                 for fragment in self.fragments:
-                    if fragment.ever_held:
+                    if fragment.ever_held or held_fragment.ever_held:
                         if is_combineable(held_fragment.attendance_list, fragment.attendance_list):
                             if is_within_distance(held_fragment.get_center_pos(), fragment.get_center_pos(), 70):
                                 held_fragment.combine_with(fragment)
