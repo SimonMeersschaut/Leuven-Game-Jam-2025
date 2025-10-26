@@ -8,9 +8,9 @@ class Credits:
         self.back_button = Button('resources/buttons/main_menu.png', (-1, 600), height=100, align_x="center")
         self.main_menu = main_menu
         
-        self.credits_text = Sprite('resources/buttons/credits_list_paper.png', (-1, 200), 2448/6, align_x="center")
+        self.credits_text = Sprite('resources/images/credits.png', (-1, 100), 2448/6, align_x="center")
 
-        self.paper_background = pygame.transform.scale(engine.get_image('resources/buttons/paper_background.jpeg'), (1920, 1080))
+        self.credits_background = pygame.transform.scale(pygame.transform.rotate(engine.get_image('resources/images/splash_screen.jpg'),-90), (engine.DISPLAY_W, engine.DISPLAY_H))
 
 
     def update(self):        
@@ -21,7 +21,7 @@ class Credits:
     def render(self):
         engine.fill((60, 60, 60))
         
-        engine.render_image(self.paper_background, (0, 0))
+        engine.render_image(self.credits_background, (0, 0))
 
         self.back_button.render()
         

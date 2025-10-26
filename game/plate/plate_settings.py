@@ -99,12 +99,12 @@ PLATE_IMAGES = [
 # define the price of each colored plate (per eighth of a plate)
 COLOR_PRICES = {
     "blue": 1,
-    "black": 2,
+    "red": 2,
     "green": 4,
-    "red": 8,
+    "black": 8,
 }
 
-COLOR_ORDER = ["blue", "black", "green", "red"]
+COLOR_ORDER = ["blue", "red", "green", "black"]
 
 
 def calculate_price_of_plate(plate) -> int:
