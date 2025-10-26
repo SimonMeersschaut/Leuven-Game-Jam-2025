@@ -10,6 +10,7 @@ from .game_over_screen import Gameoverscreen
 
 class Game:
     def __init__(self):
+        self.wave_number = 0        
         # self.hond = Hond()
         self.slang = Snake()
         self.repeating_cupboard=3
@@ -20,8 +21,9 @@ class Game:
         self.stats = Stats(1)
         self.loading_bar = Loadingbar()
         self.gameoverscreen = Gameoverscreen()
-        self.plate_supervisor = PlateSupervisor(self.loading_bar)
+        self.plate_supervisor = PlateSupervisor(self, self.loading_bar, self.stats)
         self.plate_supervisor.spawn_plate()
+        
 
     def update(self, delta_t: float, events: list):
         # self.hond.update(delta_t, events)
@@ -36,6 +38,8 @@ class Game:
     def render(self):
         engine.fill((0, 0, 0))
         # self.hond.render()
+        # self.slang.render()
+        self.plate_supervisor.prerender()
         for cupboard_nr in range(self.repeating_cupboard):
             engine.render_image(self.cupboard_game_background,(cupboard_nr*engine.DISPLAY_W/self.repeating_cupboard,0))
         engine.render_image(self.elephant_ass,(engine.DISPLAY_W/2-self.width_elephant_ass/2,engine.DISPLAY_H-self.length_elephant_ass-50))

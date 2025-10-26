@@ -1,5 +1,6 @@
 import pygame
 from enum import Enum, auto
+from .pointers import pointers
 from .particles import ParticleSystem
 
 class Modes(Enum):
@@ -14,6 +15,8 @@ class Engine:
         pygame.display.set_caption("Game Jam 2025")
 
         self.DISPLAY_W, self.DISPLAY_H = 1280, 720
+        self.scaled_w, self.scaled_h = self.DISPLAY_W, self.DISPLAY_H
+        
         self._screen = pygame.Surface((self.DISPLAY_W, self.DISPLAY_H))
         # make the real window resizable so we can auto-scale the internal 1080p surface
         self.real_screen = pygame.display.set_mode((self.DISPLAY_W, self.DISPLAY_H), pygame.RESIZABLE) #, pygame.FULLSCREEN)
@@ -76,7 +79,10 @@ class Engine:
                     # update tracked real window size and recreate the display surface
                     self.real_width, self.real_height = event.size
                     self.real_screen = pygame.display.set_mode((self.real_width, self.real_height), pygame.RESIZABLE)
+                elif event.type == pygame.MOUSEBUTTONDOWN or event.type == pygame.MOUSEBUTTONUP or event.type == pygame.MOUSEMOTION or event.type == pygame.FINGERDOWN or event.type == pygame.FINGERUP or event.type == pygame.FINGERMOTION:
+                   pointers.handle_pointer_input(event, self)
 
+                        
             # Update and draw active scene
             if self.mode == Modes.main_menu:
                 menu.update(delta_t, events)
@@ -94,8 +100,8 @@ class Engine:
             scale_x = self.real_width / self._base_width
             scale_y = self.real_height / self._base_height
             scale = min(scale_x, scale_y)
-            scaled_w = max(1, int(self._base_width * scale))
-            scaled_h = max(1, int(self._base_height * scale))
+            self.scaled_w = max(1, int(self._base_width * scale))
+            self.scaled_h = max(1, int(self._base_height * scale))
 
             # update and render transient particles on the internal screen
             # (particle coordinates are in the engine's internal resolution)
@@ -103,10 +109,10 @@ class Engine:
             self.particles.render(self._screen)
             
             # create scaled surface and center it, fill background black for letter/pillar boxing
-            scaled_surface = pygame.transform.smoothscale(self._screen, (scaled_w, scaled_h))
+            scaled_surface = pygame.transform.smoothscale(self._screen, (self.scaled_w, self.scaled_h))
             self.real_screen.fill((0, 0, 0))
-            dest_x = (self.real_width - scaled_w) // 2
-            dest_y = (self.real_height - scaled_h) // 2
+            dest_x = (self.real_width - self.scaled_w) // 2
+            dest_y = (self.real_height - self.scaled_h) // 2
             self.real_screen.blit(scaled_surface, (dest_x, dest_y))
             pygame.display.flip()
     
@@ -156,26 +162,18 @@ class Engine:
 
     def get_scaled_mouse_pos(self) -> tuple[int, int]:
         """Returns the mouse position scaled to the internal 1920x1080 resolution."""
-        mx, my = pygame.mouse.get_pos()
-        scale_x = self.real_width / self._base_width
-        scale_y = self.real_height / self._base_height
-        scale = min(scale_x, scale_y)
-
-        # compute offsets due to letter/pillar boxing
-        offset_x = (self.real_width - (self._base_width * scale)) / 2
-        offset_y = (self.real_height - (self._base_height * scale)) / 2
-
-        # scale mouse position back to internal resolution
-        scaled_mx = (mx - offset_x) / scale
-        scaled_my = (my - offset_y) / scale
-
-        return int(scaled_mx), int(scaled_my)
-
-    def spawn_particles(self, pos: tuple[int, int], count: int = 20, color: tuple[int, int, int] = (255, 215, 0), spread: float = 60.0, speed: float = 200.0, lifetime: float = 1.0, radius: float = 4.0) -> None:
+        return self.scale_position(pygame.mouse.get_pos())
+        
+    
+    def scale_position(self, position: tuple[int, int]) -> tuple[int, int]:
+        return (position[0]*1280/self.scaled_w, position[1]*720/self.scaled_h)
+    
+    def spawn_particles(self, pos: tuple[int, int], count: int = 20, color: tuple[int, int, int] = (255, 215, 0), spread: float = 60.0, speed: float = 200.0, lifetime: float = 1.0, radius: float = 4.0, angle_min: float | None = None, angle_max: float | None = None, gravity: float = 700.0) -> None:
         """Spawn particles in internal (unscaled) coordinates.
 
         Example: engine.spawn_particles((x, y), count=30)
         """
-        self.particles.spawn(pos, count=count, color=color, spread=spread, speed=speed, lifetime=lifetime, radius=radius)
+        # forward optional angle range and gravity to ParticleSystem.spawn so callers can bias particle direction
+        self.particles.spawn(pos, count=count, color=color, spread=spread, speed=speed, lifetime=lifetime, radius=radius, angle_min=angle_min, angle_max=angle_max, gravity=gravity)
 
 engine = Engine()
