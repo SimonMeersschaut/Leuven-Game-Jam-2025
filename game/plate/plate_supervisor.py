@@ -16,9 +16,28 @@ def is_within_distance(pos1, pos2, dist: int) -> bool:
         return (pos1[0] - pos2[0])**2 + (pos1[1] - pos2[1])**2 <= dist**2
 
 def is_combineable(attendance_1: list[bool], attendance_2: list[bool]) -> bool:
+    def get_first_and_last_index(attendance):
+        found = False
+        start_index = None
+        end_index = None
+        for index in range(len(attendance)):
+            if not found:
+                if attendance[index]:
+                    found = True
+                    start_index = index
+            else:
+                if not attendance[index]:
+                    end_index = index
+                    break
+        if not end_index:
+            end_index = index
+        return (start_index, end_index)
+
     # fragments are combineable iff they dont intersect AND there edges align (so no void)
     intersect = any([(attendance_1[i] and attendance_2[i]) for i in range(8)])
-    edges_align = True
+    start_1, end_1 = get_first_and_last_index(attendance_1)
+    start_2, end_2 = get_first_and_last_index(attendance_2)
+    edges_align = (end_1 - start_2 == 1) or (end_2 - start_1 == 1)
     return (not intersect) and edges_align
 
 def create_split_lines(n: int, split_lines = None, start_index = 0, end_index = 7):
@@ -116,7 +135,7 @@ class PlateSupervisor:
             self.color_index += 1
         elif self.game.wave_number % 4 == 1:
             # Falling Faster
-            self.falling_multiplier += 0.25
+            self.falling_multiplier += 0.5
         elif self.game.wave_number % 4 == 2:
             # more pieces
             self.average_pieces += 1

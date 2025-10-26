@@ -17,6 +17,7 @@ class Stats:
         self.width_money_image,self.length_money_image=self.money_image.get_size()
 
         self.lives=1
+        self.max_lives = 1
 
     def lose_life(self):
         if self.lives>0:
@@ -28,13 +29,13 @@ class Stats:
         self.width_money_image,self.length_money_image=self.money_image.get_size()
     
     def update(self, delta_t: float, events: list):
-        self.money_image=engine.render_text('birthstone',80,f'€{self.money}',(0,255,0))
+        self.money_image=engine.render_text('birthstone',70,f'€{self.money}',(0,255,0))
 
     def render(self):
         for live in range(self.lives):
             engine.render_image(self.lives_image,(50+1.5*live*self.width_lives_image,50))
 
-        for lost_live in range(5-self.lives):
+        for lost_live in range(self.max_lives-self.lives):
             engine.render_image(self.lost_lives_image,(50+1.5*(self.lives*self.width_lives_image)+self.width_lost_lives_image*lost_live*1.5,50))
 
-        engine.render_image(self.money_image,(engine.DISPLAY_W-self.width_money_image-30,30))
+        engine.render_image(self.money_image,(engine.DISPLAY_W-self.width_money_image-40,30))
