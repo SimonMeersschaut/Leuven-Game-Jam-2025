@@ -4,47 +4,42 @@ import math
 import random
 
 def find_glue_side(attendance_1, attendance_2) -> tuple[bool, bool]:
-    # Determine on which side(s) of attendance_1 glue must be applied
-    # relative to attendance_2. Returns (glue_left_for_1, glue_right_for_1).
-    def get_first_and_last_index(attendance: list[bool]):
-        found = False
-        start_index = None
-        end_index = None
-        for index in range(len(attendance)):
-            if not found:
-                if attendance[index]:
-                    found = True
-                    start_index = index
-            else:
-                if not attendance[index]:
-                    end_index = index
-                    break
-        if start_index is None:
-            return (None, None)
-        if not end_index:
-            # If we never found a False after the run, end_index is the last index
-            end_index = index
-        return (start_index, end_index)
-
-    start_1, end_1 = get_first_and_last_index(attendance_1)
-    start_2, end_2 = get_first_and_last_index(attendance_2)
-
-    # If one of the fragments has no attendance, no glue is needed
-    if start_1 is None or start_2 is None:
+    """
+    Determine on which sides of attendance_1 glue must be applied relative to
+    attendance_2. Both attendance lists represent presence at discrete radial
+    indices around a circle. We consider a glue needed on the left side of a
+    fragment when there exists a boundary where attendance_1 has a True cell
+    whose previous index (counter-clockwise) is False in attendance_1 but True
+    in attendance_2. Similarly for the right side using the next index
+    (clockwise). This uses modulo indexing so the circular wrap-around is
+    handled correctly.
+    Returns (glue_left_for_1, glue_right_for_1).
+    """
+    n = len(attendance_1)
+    if n == 0:
         return (False, False)
 
-    # Normalize to indices modulo length (handles wrap-around)
-    n = len(attendance_1)
     glue_left = False
     glue_right = False
 
-    # If attendance_2's run ends exactly where attendance_1 starts, glue on left of 1
-    if (end_2 % n) == (start_1 % n):
-        glue_left = True
+    for i in range(n):
+        if not attendance_1[i]:
+            continue
 
-    # If attendance_2's run starts exactly where attendance_1 ends, glue on right of 1
-    if (start_2 % n) == (end_1 % n):
-        glue_right = True
+        prev_i = (i - 1) % n
+        next_i = (i + 1) % n
+
+        # left boundary: prev is empty on self but occupied on other
+        if (not attendance_1[prev_i]) and attendance_2[prev_i]:
+            glue_left = True
+
+        # right boundary: next is empty on self but occupied on other
+        if (not attendance_1[next_i]) and attendance_2[next_i]:
+            glue_right = True
+
+        # early exit if both found
+        if glue_left and glue_right:
+            break
 
     return (glue_left, glue_right)
 
@@ -66,8 +61,12 @@ class Fragment(DraggableSprite):
             width=None,
             is_loading = True
         ):
-        self.fragment_colors = fragment_colors # ["red" for _ in range(8)] # TODO
-        self.fragment_symbols = fragment_symbols # ["bird" for _ in range(8)] # TODO
+        assert fragment_colors is not None
+        assert fragment_symbols is not None
+
+        self.ever_held = False
+        self.fragment_colors = fragment_colors
+        self.fragment_symbols = fragment_symbols
         self.left_gold_glue = left_gold_glue
         self.right_gold_glue = right_gold_glue
         self.attendance_list = attendance_list
@@ -78,40 +77,10 @@ class Fragment(DraggableSprite):
         self.is_loading = is_loading
         self.is_playing_finished_animation = False
         self.finished_animation_start_time = None
-        self.my_falling_speed = max(40, random.normalvariate(90, 40))
+        self.my_falling_speed = max(70, random.normalvariate(100, 40))
         super().__init__(surface, position, height, width)
         if self.is_loading:
             self.scale_factor(.25)
-    
-    # def is_hovered(self):
-    #     # First quick rectangle check to avoid expensive math when not necessary
-    #     mouse_pos = engine.get_scaled_mouse_pos()
-    #     if not self.rect.collidepoint(mouse_pos):
-    #         return False
-
-    #     # Detailed polar check relative to the fragment center
-    #     cx, cy = self.get_center_pos()
-    #     mx, my = mouse_pos
-    #     dx = mx - cx
-    #     dy = my - cy
-    #     dist = math.hypot(dx, dy)
-    #     if dist > self.radius:
-    #         return False
-
-    #     # Convert angles to [0, 2*pi) to make comparisons robust
-    #     angle = math.atan2(dy, dx)
-    #     two_pi = math.tau if hasattr(math, 'tau') else 2 * math.pi
-    #     angle = angle % two_pi
-    #     start = (self.angle_start) % two_pi
-    #     stop = (self.angle_stop) % two_pi
-
-    #     # handle wrap-around (e.g., start=5.2rad, stop=1.0rad)
-    #     if start <= stop:
-    #         inside = (start <= angle <= stop)
-    #     else:
-    #         inside = (angle >= start or angle <= stop)
-
-        # return inside
 
     def set_not_loading(self):
         if self.is_loading:
@@ -131,8 +100,13 @@ class Fragment(DraggableSprite):
         super().render()
     
     def combine_with(self, fragment: object) -> None:
+        self.ever_held = False
         glue_left_me, glue_right_me = find_glue_side(self.attendance_list, fragment.attendance_list)
         glue_left_other, glue_right_other = find_glue_side(fragment.attendance_list, self.attendance_list)
+        # Note: we intentionally draw glue from both fragments so the seam
+        # visually shows both sides. Do not suppress mirrored glue flags;
+        # overlapping visuals are handled by the art (or can be adjusted
+        # later if they look too intense).
         self.attendance_list = [(self.attendance_list[i] or fragment.attendance_list[i]) for i in range(8)]
         # Combine images
         self.src_image.blit(fragment.src_image, (0, 0))
@@ -144,5 +118,15 @@ class Fragment(DraggableSprite):
             self.src_image.blit(fragment.left_gold_glue, (0, 0))
         if glue_right_other:
             self.src_image.blit(fragment.right_gold_glue, (0, 0))
+        
+        # Calculate symbols and colors
+        self.fragment_colors = [
+            self.fragment_colors[i] if self.attendance_list[i] else fragment.fragment_colors[i]
+            for i in range(len(self.attendance_list))
+        ]
+        self.fragment_symbols = [
+            self.fragment_symbols[i] if self.attendance_list[i] else fragment.fragment_symbols[i]
+            for i in range(len(self.attendance_list))
+        ]
         
         self.reset_scale()

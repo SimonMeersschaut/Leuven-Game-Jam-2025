@@ -26,6 +26,7 @@ class Menu:
         else:
             if self.play_button.update_and_check_clicked():
                 engine.mode = Modes.game
+                engine.start_game()
             elif self.shop_button.update_and_check_clicked():
                 self.state = "shop"
             elif self.credits_button.update_and_check_clicked():

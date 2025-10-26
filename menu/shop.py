@@ -26,19 +26,19 @@ class Shop:
         if self.back_button.update_and_check_clicked():
             self.main_menu.state = "main_menu"
         elif self.buy_multiplier.update_and_check_clicked():
-            if self.game.stats.money >= self.multiplier_price:
-                self.game.stats.money -= self.multiplier_price
+            if self.game.stats.total_money >= self.multiplier_price:
+                self.game.stats.total_money -= self.multiplier_price
                 self.game.stats.multiplier *= 2
                 self.multiplier_price *= 3
         elif self.buy_kak.update_and_check_clicked():
-            if self.game.stats.money >= self.kak_price:
+            if self.game.stats.total_money >= self.kak_price:
                 if not self.kak_disabled:
-                    self.game.stats.money -= self.kak_price
+                    self.game.stats.total_money -= self.kak_price
                     self.game.stats.kak = True
                     self.kak_disabled = True
         elif self.buy_extra_leven.update_and_check_clicked():
-            if self.game.stats.money >= self.extra_leven_price:
-                self.game.stats.money -= self.extra_leven_price
+            if self.game.stats.total_money >= self.extra_leven_price:
+                self.game.stats.total_money -= self.extra_leven_price
                 self.game.stats.max_lives += 1
 
     def render(self):
@@ -53,7 +53,7 @@ class Shop:
         self.buy_extra_leven.render()
 
 
-        self.money_image=engine.render_text('birthstone',80,f'€{self.game.stats.money}',(0,255,0))
+        self.money_image=engine.render_text('birthstone',80,f'€{self.game.stats.total_money}',(0,255,0))
         self.width_money_image,self.length_money_image=self.money_image.get_size()
         engine.render_image(self.money_image,(engine.DISPLAY_W-self.width_money_image-30,30))
 
@@ -61,7 +61,7 @@ class Shop:
         self.width_multiplier_image,self.length_multiplier_image=self.multiplier_image.get_size()
         engine.render_image(self.multiplier_image,((engine.DISPLAY_W - self.width_multiplier_image)/2,225))
 
-        if self.game.stats.money >= self.multiplier_price:
+        if self.game.stats.total_money >= self.multiplier_price:
             self.multiplier_price_image=engine.render_text('birthstone',40,f'€{self.multiplier_price}',(50,200,50))
         else:
             self.multiplier_price_image=engine.render_text('birthstone',40,f'€{self.multiplier_price}',(200,50,50))
@@ -75,7 +75,7 @@ class Shop:
 
         if self.kak_disabled:
             self.kak_price_image=engine.render_text('birthstone',40,f'out of stock',(50,50,150))
-        elif self.game.stats.money >= self.kak_price:
+        elif self.game.stats.total_money >= self.kak_price:
             self.kak_price_image=engine.render_text('birthstone',40,f'€{self.kak_price}',(50,200,50))
         else:
             self.kak_price_image=engine.render_text('birthstone',40,f'€{self.kak_price}',(200,50,50))
@@ -88,7 +88,7 @@ class Shop:
         engine.render_image(self.extra_leven_image,(engine.DISPLAY_W*4/5 - self.width_extra_leven_image/2,225))
 
         self.extra_leven_price_image=engine.render_text('birthstone',40,f'out of stock',(50,50,150))
-        if self.game.stats.money >= self.extra_leven_price:
+        if self.game.stats.total_money >= self.extra_leven_price:
             self.extra_leven_price_image=engine.render_text('birthstone',40,f'€{self.extra_leven_price}',(50,200,50))
         else:
             self.extra_leven_price_image=engine.render_text('birthstone',40,f'€{self.extra_leven_price}',(200,50,50))

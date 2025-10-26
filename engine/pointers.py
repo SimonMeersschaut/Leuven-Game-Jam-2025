@@ -49,8 +49,8 @@ class Pointers:
         return engine.get_scaled_pos(pos)
 
     def converted_relative_position(self, pos):
-        scaled_x = pos[0] * 1920 // 1
-        scaled_y = pos[1] * 1080 // 1
+        scaled_x = pos[0] * 1280 // 1
+        scaled_y = pos[1] * 720 // 1
         return (scaled_x, scaled_y)
 
 pointers = Pointers()
