@@ -1,5 +1,6 @@
 import resources
 from engine import Engine, engine, Modes
+from engine.pointers import pointers
 from engine.sprite import Sprite
 import pygame
 
@@ -8,20 +9,22 @@ class DraggableSprite(Sprite):
         super().__init__(image_path, position, height, width)
         
         self.holding = False
+        self.holding_index = -1
         self.hovering = False
         self.previously_holding = False
         self.previously_hovering = False
 
     def update(self):
         # Holding logic is in plate_supervisor
-        if self.holding:
+
+        if self.holding and self.holding_index != -1:
             if not self.previously_holding:
                 self.scale_factor(1.1)
-            self.move(engine.get_scaled_mouse_pos()[0] - self.true_width*1.1 // 2, engine.get_scaled_mouse_pos()[1] - self.true_height*1.1 // 2)
-        elif self.previously_holding:
+            self.move(pointers.all_pointers[self.holding_index][0] - self.true_width*1.1 // 2, pointers.all_pointers[self.holding_index][1] - self.true_height*1.1 // 2)
+        elif self.previously_holding and self.holding_index != -1:
             self.reset_scale()
-            self.move(engine.get_scaled_mouse_pos()[0] - self.true_width // 2, engine.get_scaled_mouse_pos()[1] - self.true_height // 2)
-            
+            self.move(pointers.all_pointers[self.holding_index][0] - self.true_width // 2, pointers.all_pointers[self.holding_index][1] - self.true_height // 2)
+
     def render(self):
         if self.holding and not self.previously_holding:
             pygame.mouse.set_cursor(*pygame.cursors.diamond)

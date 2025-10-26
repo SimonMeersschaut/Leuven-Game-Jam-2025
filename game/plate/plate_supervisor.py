@@ -1,3 +1,4 @@
+from engine.pointers import pointers
 from .fragment import Fragment
 import pygame
 from ..shatter import shatter_plate
@@ -51,8 +52,12 @@ def create_split_lines(n: int, split_lines = None, start_index = 0, end_index = 
     
 
 class PlateSupervisor:
-    ANGRY_ANIMATION_DURATION = 1
+  ANGRY_ANIMATION_DURATION = 1
+
     def __init__(self, game, loading_bar, stats):
+        self.plates = []
+        self.held_plates = {}
+   
         self.fragments = []
         self.held_fragment = None
         
@@ -152,6 +157,33 @@ class PlateSupervisor:
                 self.spawn_plate()
 
         self.hovered_plate = None
+        
+#         for plate in self.plates:
+#             plate.previously_holding = plate.holding
+#             plate.previously_hovering = plate.hovering
+
+#             intersecting_pointers = plate.get_intersecting_pointers()
+#             if plate.holding: 
+#                 holding_pointer_ids = [pid for pid, p in self.held_plates.items() if p == plate]
+#                 print(holding_pointer_ids)
+#                 still_holding = False
+#                 for pointer_id in holding_pointer_ids:
+#                     if pointer_id in intersecting_pointers:
+#                         still_holding = True
+#                     else:
+#                         del self.held_plates[pointer_id]
+#                 if not still_holding:
+#                     plate.holding = False
+#                     plate.holding_index = -1
+                
+#             else:
+#                 if intersecting_pointers != []:
+#                     for pointer_id in intersecting_pointers:
+#                         if pointer_id not in self.held_plates:
+#                             self.held_plates[pointer_id] = plate
+#                             plate.holding = True
+#                             plate.holding_index = pointer_id
+
 
         if self.held_fragment and pygame.mouse.get_pressed()[0]:
             self.held_fragment.holding = True
