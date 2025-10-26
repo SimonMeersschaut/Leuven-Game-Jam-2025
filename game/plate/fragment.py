@@ -14,7 +14,7 @@ class Fragment(DraggableSprite):
  
     def update(self, delta_t: float, events: list, falling_multiplier: float):
         if not self.is_playing_finished_animation:
-            self.move(self.position[0], self.position[1] + delta_t*50*falling_multiplier)
+            self.move(self.position[0], self.position[1] + delta_t*70*falling_multiplier)
 
             super().update()
     

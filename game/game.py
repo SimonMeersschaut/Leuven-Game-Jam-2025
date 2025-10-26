@@ -10,17 +10,16 @@ from .game_over_screen import Gameoverscreen
 
 class Game:
     def __init__(self):
-        # self.hond = Hond()
-        # self.slang = Snake()
-        
+        self.wave_number = 0        
         self.elephant_ass=engine.get_image("resources/images/elephant_ass.png")
         self.elephant_ass=pygame.transform.scale_by(self.elephant_ass,0.2)
         self.width_elephant_ass,self.length_elephant_ass=self.elephant_ass.get_size()
         self.stats = Stats(1)
         self.loading_bar = Loadingbar()
         self.gameoverscreen = Gameoverscreen()
-        self.plate_supervisor = PlateSupervisor(self.loading_bar)
+        self.plate_supervisor = PlateSupervisor(self, self.loading_bar, self.stats)
         self.plate_supervisor.spawn_plate()
+        self.loading_bar.start_wave(self.wave_number)
 
     def update(self, delta_t: float, events: list):
         # self.hond.update(delta_t, events)
@@ -37,10 +36,10 @@ class Game:
         # self.hond.render()
         # self.slang.render()
         
+        engine.render_image(self.elephant_ass,(engine.DISPLAY_W/2-self.width_elephant_ass/2,engine.DISPLAY_H-self.length_elephant_ass-50))
         self.plate_supervisor.render()
         self.stats.render()
         self.loading_bar.render()
-        engine.render_image(self.elephant_ass,(engine.DISPLAY_W/2-self.width_elephant_ass/2,engine.DISPLAY_H-self.length_elephant_ass-50))
         if self.stats.lives <=0:
             self.gameoverscreen.render()
 
