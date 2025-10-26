@@ -133,136 +133,136 @@ class PlateSupervisor:
         return random.choice([setting for setting in PLATE_IMAGES if setting["color"] == COLOR_ORDER[color_index]])
     
     def update(self, delta_t: float, events: list):
-        # Update Fragments
         for fragment in self.fragments:
-            fragment.update(delta_t, events, self.falling_multiplier)
+            fragment.previously_holding = fragment.holding
+            fragment.previously_hovering = fragment.hovering
 
-        if self.loading_bar.wave_is_done():
-            # wait for all fragments to dissappear
-            if len(self.fragments) == 0:
-                # Show angry animation, then go to next wave
-                if self.angry_animation_start_t is not None:
-                    # animation is playing
-                    render_angry_animation(self.game.wave_number, (time.time() - self.angry_animation_start_t) / PlateSupervisor.ANGRY_ANIMATION_DURATION)
-                    if time.time() - self.angry_animation_start_t >= PlateSupervisor.ANGRY_ANIMATION_DURATION:
-                        # go to next wave
-                        self.apply_next_wave()
-                else:
-                    self.angry_animation_start_t = time.time()
+            intersecting_pointers = fragment.get_intersecting_pointers()
+            if fragment.holding: 
+                holding_pointer_ids = [pid for pid, p in self.held_plates.items() if p == fragment]
+                print(holding_pointer_ids)
+                still_holding = False
+                for pointer_id in holding_pointer_ids:
+                    if pointer_id in intersecting_pointers:
+                        still_holding = True
+                    else:
+                        del self.held_plates[pointer_id]
+                if not still_holding:
+                    fragment.holding = False
+                    fragment.holding_index = -1
+
+            else:
+                if intersecting_pointers != []:
+                    for pointer_id in intersecting_pointers:
+                        if pointer_id not in self.held_plates:
+                            self.held_plates[pointer_id] = fragment
+                            fragment.holding = True
+                            fragment.holding_index = pointer_id
+            intersecting_pointers = fragment.get_intersecting_pointers()
+            if fragment.holding: 
+                holding_pointer_ids = [pid for pid, p in self.held_plates.items() if p == fragment]
+                still_holding = False
+                for pointer_id in holding_pointer_ids:
+                    if pointer_id in intersecting_pointers:
+                        still_holding = True
+                    else:
+                        del self.held_plates[pointer_id]
+                if not still_holding:
+                    fragment.holding = False
+                    fragment.holding_index = -1
+
+            else:
+                if intersecting_pointers != []:
+                    for pointer_id in intersecting_pointers:
+                        if pointer_id not in self.held_plates:
+                            self.held_plates[pointer_id] = fragment
+                            fragment.holding = True
+                            fragment.holding_index = pointer_id
+
+        # # Update Fragments
+        # for fragment in self.fragments:
+        #     fragment.update(delta_t, events, self.falling_multiplier)
+
+        # if self.loading_bar.wave_is_done():
+        #     # wait for all fragments to dissappear
+        #     if len(self.fragments) == 0:
+        #         # Show angry animation, then go to next wave
+        #         if self.angry_animation_start_t is not None:
+        #             # animation is playing
+        #             render_angry_animation(self.game.wave_number, (time.time() - self.angry_animation_start_t) / PlateSupervisor.ANGRY_ANIMATION_DURATION)
+        #             if time.time() - self.angry_animation_start_t >= PlateSupervisor.ANGRY_ANIMATION_DURATION:
+        #                 # go to next wave
+        #                 self.apply_next_wave()
+        #         else:
+        #             self.angry_animation_start_t = time.time()
             
-        # Check for spawning
-        if self.time_until_next_spawn is not None and not self.time_until_next_spawn is None:
-            self.time_until_next_spawn -= delta_t
-            if self.time_until_next_spawn <= 0 and not self.loading_bar.wave_is_done():
-                self.spawn_plate()
+        # # Check for spawning
+        # if self.time_until_next_spawn is not None and not self.time_until_next_spawn is None:
+        #     self.time_until_next_spawn -= delta_t
+        #     if self.time_until_next_spawn <= 0 and not self.loading_bar.wave_is_done():
+        #         self.spawn_plate()
 
-        self.hovered_plate = None
-        
-#         for plate in self.plates:
-#             plate.previously_holding = plate.holding
-#             plate.previously_hovering = plate.hovering
-
-#             intersecting_pointers = plate.get_intersecting_pointers()
-#             if plate.holding: 
-#                 holding_pointer_ids = [pid for pid, p in self.held_plates.items() if p == plate]
-#                 print(holding_pointer_ids)
-#                 still_holding = False
-#                 for pointer_id in holding_pointer_ids:
-#                     if pointer_id in intersecting_pointers:
-#                         still_holding = True
-#                     else:
-#                         del self.held_plates[pointer_id]
-#                 if not still_holding:
-#                     plate.holding = False
-#                     plate.holding_index = -1
-                
-#             else:
-#                 if intersecting_pointers != []:
-#                     for pointer_id in intersecting_pointers:
-#                         if pointer_id not in self.held_plates:
-#                             self.held_plates[pointer_id] = plate
-#                             plate.holding = True
-#                             plate.holding_index = pointer_id
+        # self.hovered_plate = None
 
 
-        if self.held_fragment and pygame.mouse.get_pressed()[0]:
-            self.held_fragment.holding = True
-            self.held_fragment.update(delta_t, events, self.falling_multiplier)
+        # if self.held_fragment and pygame.mouse.get_pressed()[0]:
+        #     self.held_fragment.holding = True
+        #     self.held_fragment.update(delta_t, events, self.falling_multiplier)
             
-            if fragment.finished_animation_start_time is not None:
-                if time.time() - fragment.finished_animation_start_time > 2:
-                    self.fragments.remove(fragment)
-        else:
-            # check if 'glueable'
-            if self.held_fragment:
-                for fragment in self.fragments:
-                    if is_combineable(self.held_fragment.attendance_list, fragment.attendance_list):
-                        if is_within_distance(self.held_fragment.get_center_pos(), fragment.get_center_pos(), 70):
-                            self.held_fragment.combine_with(fragment)
-                            self.fragments.remove(fragment)
-                            # Test full plate
-                            if all(self.held_fragment.attendance_list) and not self.held_fragment.is_playing_finished_animation:
-                                # Success!
-                                engine.spawn_particles(self.held_fragment.get_center_pos(), count=400, color=(255,200,60), spread=10, speed=500, lifetime=4, radius=4)
-                                self.held_fragment.is_playing_finished_animation = True
-                                if self.is_frozen: # was frozen
-                                    self.unfreeze()
-                                self.held_fragment.finished_animation_start_time = time.time()
-                                if len(self.fragments) == 1 and not self.loading_bar.wave_is_done() and self.time_until_next_spawn is not None:
-                                    self.spawn_plate()
-                                # Give money
+        #     if fragment.finished_animation_start_time is not None:
+        #         if time.time() - fragment.finished_animation_start_time > 2:
+        #             self.fragments.remove(fragment)
+        # else:
+        #     # check if 'glueable'
+        #     if self.held_fragment:
+        #         for fragment in self.fragments:
+        #             if is_combineable(self.held_fragment.attendance_list, fragment.attendance_list):
+        #                 if is_within_distance(self.held_fragment.get_center_pos(), fragment.get_center_pos(), 70):
+        #                     self.held_fragment.combine_with(fragment)
+        #                     self.fragments.remove(fragment)
+        #                     # Test full plate
+        #                     if all(self.held_fragment.attendance_list) and not self.held_fragment.is_playing_finished_animation:
+        #                         # Success!
+        #                         engine.spawn_particles(self.held_fragment.get_center_pos(), count=400, color=(255,200,60), spread=10, speed=500, lifetime=4, radius=4)
+        #                         self.held_fragment.is_playing_finished_animation = True
+        #                         if self.is_frozen: # was frozen
+        #                             self.unfreeze()
+        #                         self.held_fragment.finished_animation_start_time = time.time()
+        #                         if len(self.fragments) == 1 and not self.loading_bar.wave_is_done() and self.time_until_next_spawn is not None:
+        #                             self.spawn_plate()
+        #                         # Give money
                                 
             
-            self.held_fragment = None
+        #     self.held_fragment = None
         
-            for fragment in self.fragments:
-                fragment.previously_holding = fragment.holding
-                fragment.previously_hovering = fragment.hovering
+        #     for fragment in self.fragments:
+        #         fragment.previously_holding = fragment.holding
+        #         fragment.previously_hovering = fragment.hovering
 
-            # intersecting_pointers = plate.get_intersecting_pointers()
-            # if plate.holding: 
-            #     holding_pointer_ids = [pid for pid, p in self.held_plates.items() if p == plate]
-            #     print(holding_pointer_ids)
-            #     still_holding = False
-            #     for pointer_id in holding_pointer_ids:
-            #         if pointer_id in intersecting_pointers:
-            #             still_holding = True
-            #         else:
-            #             del self.held_plates[pointer_id]
-            #     if not still_holding:
-            #         plate.holding = False
-            #         plate.holding_index = -1
+
+
+        #         if fragment.is_clicked() and self.held_fragment is None:
+        #             fragment.holding = True
+        #             self.held_fragment = fragment
+        #         elif not self.held_fragment == fragment:
+        #             fragment.holding = False
+
+        #         if fragment.is_hovered() and self.hovered_plate is None:
+        #             fragment.hovering = True
+        #             self.hovered_plate = fragment
+        #         else:
+        #             fragment.hovering = False
+
+        #         if fragment.finished_animation_start_time is not None:
+        #             if time.time() - fragment.finished_animation_start_time > 2:
+        #                 self.fragments.remove(fragment)
                 
-            # else:
-            #     if intersecting_pointers != []:
-            #         for pointer_id in intersecting_pointers:
-            #             if pointer_id not in self.held_plates:
-            #                 self.held_plates[pointer_id] = plate
-            #                 plate.holding = True
-            #                 plate.holding_index = pointer_id
-
-                if fragment.is_clicked() and self.held_fragment is None:
-                    fragment.holding = True
-                    self.held_fragment = fragment
-                elif not self.held_fragment == fragment:
-                    fragment.holding = False
-
-                if fragment.is_hovered() and self.hovered_plate is None:
-                    fragment.hovering = True
-                    self.hovered_plate = fragment
-                else:
-                    fragment.hovering = False
-
-                if fragment.finished_animation_start_time is not None:
-                    if time.time() - fragment.finished_animation_start_time > 2:
-                        self.fragments.remove(fragment)
-                
-                if fragment.get_center_pos()[1] >= 600:
-                    # break on ground
-                    # spawn an upward splash of particles to emphasise the breaking
-                    engine.spawn_particles(fragment.get_center_pos(), count=50, color=(220, 220, 220), spread=30, speed=200, lifetime=1.2, radius=5, angle_min=-math.pi, angle_max=-math.tau)
-                    self.fragments.remove(fragment)
-                    self.stats.lose_life()
+        #         if fragment.get_center_pos()[1] >= 600:
+        #             # break on ground
+        #             # spawn an upward splash of particles to emphasise the breaking
+        #             engine.spawn_particles(fragment.get_center_pos(), count=50, color=(220, 220, 220), spread=30, speed=200, lifetime=1.2, radius=5, angle_min=-math.pi, angle_max=-math.tau)
+        #             self.fragments.remove(fragment)
+        #             self.stats.lose_life()
 
     def render(self):
         for plate in reversed(self.fragments):

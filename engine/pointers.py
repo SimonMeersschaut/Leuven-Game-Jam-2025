@@ -25,8 +25,7 @@ class Pointers:
         
         elif event.type == pygame.MOUSEMOTION:
             if "__mouse__" in self.all_pointers:
-                self.all_pointers["__mouse__"] = engine.scale_position(pygame.mouse.get_pos())
-        
+                self.all_pointers["__mouse__"] = engine.scale_position(pygame.mouse.get_pos())        
         
     def add_pointer(self, finger_id, position):
         self.all_pointers[finger_id] = position
@@ -36,9 +35,12 @@ class Pointers:
     
     def get_intersecting_pointers(self, rect):
         output = []
+        
+        # print(self.all_pointers)
         for pointer in self.all_pointers:
             if rect.collidepoint(self.all_pointers[pointer]):
                 output.append(pointer)
+       
         print(output)
         return output
 

@@ -97,22 +97,23 @@ class Sprite():
         engine.render_image(self.image, self.position)
 
     def is_hovered(self):
-        return self.rect.collidepoint(engine.scale_position(pygame.mouse.get_pos()))  # check if mouse is over the button
+        return self.rect.collidepoint(engine.get_scaled_mouse_pos())  # check if mouse is over the button
     
     def is_clicked(self):
         return self.is_hovered() and pygame.mouse.get_pressed()[0]  # left mouse button
 
     def just_unclicked(self):
         return (not self.is_clicked()) and self.previously_clicked
-            
+    
     def get_intersecting_pointers(self):
         return pointers.get_intersecting_pointers(self.rect)
-    
+        
 class Button(Sprite):
     def __init__(self, image_path, position=(0, 0), height=None, width=None, align_x=None, align_y=None):
         super().__init__(image_path, position, height, width, align_x, align_y)
     
     def update(self):
+        
         if self.is_hovered() and not self.is_clicked():
             if self.just_unclicked():
                 click_sound = pygame.mixer.Sound('resources/sounds/paper_twist_short_loud.wav')
@@ -124,7 +125,7 @@ class Button(Sprite):
             self.previously_clicked = False         
         elif self.is_hovered() and not self.previously_hovered:
             self.scale_factor(1.1)
-            self.previously_hovered = True
+            self.previously_hovered = False
             self.previously_clicked = False
     
         elif self.is_clicked() and self.previously_hovered:

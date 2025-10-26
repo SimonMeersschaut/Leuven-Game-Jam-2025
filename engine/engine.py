@@ -15,6 +15,8 @@ class Engine:
         pygame.display.set_caption("Game Jam 2025")
 
         self.DISPLAY_W, self.DISPLAY_H = 1280, 720
+        self.scaled_w, self.scaled_h = self.DISPLAY_W, self.DISPLAY_H
+        
         self._screen = pygame.Surface((self.DISPLAY_W, self.DISPLAY_H))
         # make the real window resizable so we can auto-scale the internal 1080p surface
         self.real_screen = pygame.display.set_mode((self.DISPLAY_W, self.DISPLAY_H), pygame.RESIZABLE) #, pygame.FULLSCREEN)
@@ -98,8 +100,8 @@ class Engine:
             scale_x = self.real_width / self._base_width
             scale_y = self.real_height / self._base_height
             scale = min(scale_x, scale_y)
-            scaled_w = max(1, int(self._base_width * scale))
-            scaled_h = max(1, int(self._base_height * scale))
+            self.scaled_w = max(1, int(self._base_width * scale))
+            self.scaled_h = max(1, int(self._base_height * scale))
 
             # update and render transient particles on the internal screen
             # (particle coordinates are in the engine's internal resolution)
@@ -107,10 +109,10 @@ class Engine:
             self.particles.render(self._screen)
             
             # create scaled surface and center it, fill background black for letter/pillar boxing
-            scaled_surface = pygame.transform.smoothscale(self._screen, (scaled_w, scaled_h))
+            scaled_surface = pygame.transform.smoothscale(self._screen, (self.scaled_w, self.scaled_h))
             self.real_screen.fill((0, 0, 0))
-            dest_x = (self.real_width - scaled_w) // 2
-            dest_y = (self.real_height - scaled_h) // 2
+            dest_x = (self.real_width - self.scaled_w) // 2
+            dest_y = (self.real_height - self.scaled_h) // 2
             self.real_screen.blit(scaled_surface, (dest_x, dest_y))
             pygame.display.flip()
     
@@ -177,26 +179,7 @@ class Engine:
         return (scaled_mx, scaled_my)
     
     def scale_position(self, position: tuple[int, int]) -> tuple[int, int]:
-        mx, my = position
-
-        base_w, base_h = self._base_width, self._base_height
-        real_w, real_h = self.real_width, self.real_height
-
-        # compute the scale used to render the internal surface
-        scale = min(real_w / base_w, real_h / base_h)
-        scaled_w = max(1, int(base_w * scale))
-        scaled_h = max(1, int(base_h * scale))
-        dest_x = (real_w - scaled_w) // 2
-        dest_y = (real_h - scaled_h) // 2
-
-        # map from window coords into internal surface coords
-        ix = (mx - dest_x) / scale
-        iy = (my - dest_y) / scale
-
-        # clamp to internal bounds
-        ix = int(max(0, min(base_w - 1, ix)))
-        iy = int(max(0, min(base_h - 1, iy)))
-        return (ix, iy)
+        return (position[0]*1920/self.scaled_w, position[1]*1080/self.scaled_h)
     
     def spawn_particles(self, pos: tuple[int, int], count: int = 20, color: tuple[int, int, int] = (255, 215, 0), spread: float = 60.0, speed: float = 200.0, lifetime: float = 1.0, radius: float = 4.0, angle_min: float | None = None, angle_max: float | None = None, gravity: float = 700.0) -> None:
         """Spawn particles in internal (unscaled) coordinates.
