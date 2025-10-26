@@ -6,17 +6,20 @@ class Pointers:
         
     def handle_pointer_input(self, event, engine):
         if event.type == pygame.FINGERDOWN:
-            self.add_pointer(event.finger_id, (event.x, event.y))
+            self.add_pointer(event.finger_id, self.converted_relative_position((event.x, event.y)))
             
         elif event.type == pygame.FINGERUP:
             self.remove_pointer(event.finger_id)
             
         elif event.type == pygame.FINGERMOTION:
-            self.pointers[event.finger_id] = (event.x, event.y)
-        
+            self.pointers[event.finger_id] = self.converted_relative_position((event.x, event.y))
+            
         elif event.type == pygame.MOUSEBUTTONDOWN:
+            
             if event.button == 1:  # Left click
                 self.add_pointer("__mouse__", engine.get_scaled_mouse_pos())
+                print(engine.get_scaled_mouse_pos(), pygame.mouse.get_pos())
+                print(engine.get_scaled_pointer_pos(pygame.mouse.get_pos()))
                 
         elif event.type == pygame.MOUSEBUTTONUP:
             if event.button == 1:  # Left click
@@ -25,7 +28,8 @@ class Pointers:
         elif event.type == pygame.MOUSEMOTION:
             if "__mouse__" in self.pointers:
                 self.pointers["__mouse__"] = engine.get_scaled_mouse_pos()
-
+        # print(self.pointers)
+        
         
     def add_pointer(self, finger_id, position):
         self.pointers[finger_id] = position
@@ -47,5 +51,10 @@ class Pointers:
             return engine.get_scaled_mouse_pos()
         pos = self.pointers.get(finger_id)
         return engine.get_scaled_pos(pos)
+
+    def converted_relative_position(self, pos):
+        scaled_x = pos[0] * 1920 // 1
+        scaled_y = pos[1] * 1080 // 1
+        return (scaled_x, scaled_y)
 
 pointers = Pointers()
