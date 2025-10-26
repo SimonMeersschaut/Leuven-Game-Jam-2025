@@ -19,7 +19,7 @@ class Game:
         self.gameoverscreen = Gameoverscreen()
         self.plate_supervisor = PlateSupervisor(self, self.loading_bar, self.stats)
         self.plate_supervisor.spawn_plate()
-        self.loading_bar.start_wave(self.wave_number)
+        
 
     def update(self, delta_t: float, events: list):
         # self.hond.update(delta_t, events)

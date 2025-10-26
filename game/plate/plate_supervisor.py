@@ -58,16 +58,28 @@ class PlateSupervisor:
         self.loading_bar = loading_bar
         self.stats = stats
 
-        self.time_until_next_spawn = 1
-        self.angry_animation_start_t = None
+        self.time_until_next_spawn:float = None
+        self.angry_animation_start_t: float = None
 
         # wave settings
         self.falling_multiplier = 1
         self.average_pieces = 1 # will still cut in 2 pieces on average
-        self.average_time_between_plates = 5
+        self.average_time_between_plates = 10
+
+        # Spawn first frozen plates
+        self.falling_multiplier = 0
+        split_lines = [True, False, False, False, True, False, False, False]
+
+        pieces = shatter_plate("resources/images/plate.png", split_lines)
+        plates = []
+        for position, piece in zip([(800, 300), (200, 50)], pieces):
+            self.fragments.append(Fragment(
+                *piece, # where this fragment exists (in the list of the entire plate)
+                position=position
+            ))
 
     def spawn_plate(self):
-        self.time_until_next_spawn = max(0, random.normalvariate(self.average_time_between_plates, 5))
+        self.time_until_next_spawn = max(0, random.normalvariate(self.average_time_between_plates, 3))
 
         pieces_to_split = round(random.normalvariate(self.average_pieces, 1))
         split_lines = create_split_lines(n=pieces_to_split)
@@ -77,9 +89,13 @@ class PlateSupervisor:
         for piece in pieces:
             self.fragments.append(Fragment(
                 *piece, # where this fragment exists (in the list of the entire plate)
-                position=(random.randint(0, 1000), -400)
+                position=(random.randint(0, 1000),  -random.randint(400, 800))
             ))
-        return plates
+    
+    def unfreeze(self):
+        self.falling_multiplier = 1
+        self.time_until_next_spawn = 1
+        self.loading_bar.start_wave(self.game.wave_number)
     
     def apply_next_wave(self):
         # apply special
@@ -121,8 +137,8 @@ class PlateSupervisor:
         # Check for spawning
         if len(self.fragments) == 0 and not self.loading_bar.wave_is_done():
             self.spawn_plate()
-        
-        self.time_until_next_spawn -= delta_t
+        if self.time_until_next_spawn is not None:
+            self.time_until_next_spawn -= delta_t
         if self.time_until_next_spawn <= 0 and not self.loading_bar.wave_is_done():
             self.spawn_plate()
 
@@ -145,9 +161,13 @@ class PlateSupervisor:
                             self.fragments.remove(fragment)
                             # Test full plate
                             if all(self.held_fragment.attendance_list) and not self.held_fragment.is_playing_finished_animation:
+                                # Success!
                                 engine.spawn_particles(self.held_fragment.get_center_pos(), count=200, color=(255,200,60), spread=160, speed=200, lifetime=2, radius=2)
                                 self.held_fragment.is_playing_finished_animation = True
                                 self.held_fragment.finished_animation_start_time = time.time()
+                                if self.time_until_next_spawn is None: # was frozen
+                                    print("Unfreeze")
+                                    self.unfreeze()
             
             self.held_fragment = None
         
