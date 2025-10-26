@@ -7,7 +7,7 @@ import random
 import time
 from engine import engine
 from .angry_animation import render_angry_animation
-from .plate_settings import PLATE_IMAGES, COLOR_PRICES, COLOR_ORDER
+from .plate_settings import PLATE_IMAGES, COLOR_PRICES, COLOR_ORDER, calculate_price_of_plate
 
 def is_within_distance(pos1, pos2, dist: int) -> bool:
     # Manhattan distance
@@ -71,7 +71,7 @@ def create_split_lines(n: int, split_lines = None, start_index = 0, end_index = 
     
 
 class PlateSupervisor:
-    ANGRY_ANIMATION_DURATION = 1
+    ANGRY_ANIMATION_DURATION = 3
 
     def __init__(self, game, loading_bar, stats):
         self.plates = []
@@ -119,6 +119,8 @@ class PlateSupervisor:
         for piece in pieces:
             self.fragments.append(Fragment(
                 *piece, # where this fragment exists (in the list of the entire plate)
+                fragment_colors=plate_settings["color"],
+                fragment_symbols=plate_settings["symbol"],
                 position=(random.randint(0, 1000),  -random.randint(200, 800))
             ))
     
@@ -231,6 +233,7 @@ class PlateSupervisor:
                                 if len(self.fragments) == 1 and not self.loading_bar.wave_is_done() and self.time_until_next_spawn is not None:
                                     self.spawn_plate()
                                 # Give money
+                                # self.stats.add_money(calculate_price_of_plate(self.held_fragment))
                                 
             
             self.held_fragment = None
