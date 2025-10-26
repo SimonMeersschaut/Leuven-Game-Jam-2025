@@ -8,6 +8,7 @@ import time
 from engine import engine
 from .angry_animation import render_angry_animation
 from .plate_settings import PLATE_IMAGES, COLOR_PRICES, COLOR_ORDER, calculate_price_of_plate
+from .plate_loading_fragments_supervisor import PlateLoadingFragmentSupervisor
 
 def is_within_distance(pos1, pos2, dist: int) -> bool:
     # Manhattan distance
@@ -74,9 +75,8 @@ class PlateSupervisor:
     ANGRY_ANIMATION_DURATION = 3
 
     def __init__(self, game, loading_bar, stats):
-        self.trunk = engine.get_image("resources/images/trunk.png")
-
-        self.loading_fragments = []
+        self.loading_supervisor = PlateLoadingFragmentSupervisor()
+        
         self.plates = []
         self.held_plates = {}
    
@@ -122,15 +122,18 @@ class PlateSupervisor:
         plate_settings = self.choose_random_plate()
         
         pieces = shatter_plate("resources/images/plates/"+plate_settings["image"], split_lines)
+        pos = (random.randint(0, 1000),  -random.randint(200, 800))
         for piece in pieces:
             fragment = Fragment(
                 *piece, # where this fragment exists (in the list of the entire plate)
                 fragment_colors=[plate_settings["color"] for _  in range(8)],
                 fragment_symbols=[plate_settings["symbol"] for _  in range(8)],
-                position=(random.randint(0, 1000),  -random.randint(200, 800)),
+                position=pos,
                 is_loading=False
             )
             self.fragments.append(fragment)
+            
+            self.loading_supervisor.aim_trunk(pos)
     
     def unfreeze(self):
         self.is_frozen = False
@@ -163,13 +166,7 @@ class PlateSupervisor:
     
     def update(self, delta_t: float, events: list):
         # preLoading fragments
-        for fragment in self.loading_fragments:
-            fragment.update()
-            if fragment.get_center_pos()[1] < -100:
-                # move to real fragment
-                self.loading_fragments.remove(fragment)
-                self.fragments.append(fragment)
-                fragment.set_not_loading()
+        self.loading_supervisor.update()
         
         if self.loading_bar.wave_is_done():
             # wait for all fragments to dissappear
@@ -249,17 +246,12 @@ class PlateSupervisor:
                                         self.spawn_plate()
                                     # Give money
                                     self.stats.add_money(calculate_price_of_plate(held_fragment))
-            
-
+          
     def prerender(self):
-        # render trunk
-        if len(self.loading_fragments) > 0:
-            ... # TODO
-        # render fragments
-        for fragment in self.loading_fragments:
-            fragment.render()
+        self.loading_supervisor.prerender()
 
     def render(self):
+        self.loading_supervisor.render()
         for fragment in reversed(self.fragments):
             fragment.render()
         if self.angry_animation_start_t is not None:
