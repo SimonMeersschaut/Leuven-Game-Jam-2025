@@ -46,7 +46,6 @@ class Loadingbar:
         self.width_elephant_head_image, self.length_elephant_head_image=self.elephant_head_image.get_size()
 
     def start_wave(self,wave_level):
-        
         self.wave_level=wave_level
         self.wave_started=True
         self.start_wave_time=time.time()

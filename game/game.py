@@ -77,12 +77,12 @@ class Game:
         for cupboard_nr in range(self.repeating_cupboard):
             engine.render_image(self.cupboard_game_background,(cupboard_nr*engine.DISPLAY_W/self.repeating_cupboard,0))
         engine.render_image(self.elephant_ass,(engine.DISPLAY_W/2-self.width_elephant_ass/2,engine.DISPLAY_H-self.length_elephant_ass-50))
-        self.plate_supervisor.render()
         self.stats.render()
         self.loading_bar.render()
         if self.stats.lives <=0:
             self.gameoverscreen.render()
             self.stats.gouden_kak_bought = False
+        self.plate_supervisor.render()
         self.golden_poop.render()
 
     

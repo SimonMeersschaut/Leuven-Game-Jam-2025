@@ -140,16 +140,17 @@ class PlateSupervisor:
     
     def apply_next_wave(self):
         # apply special
-        if self.game.wave_number % 4 == 0:
+        wave_number = self.game.wave_number - 1
+        if wave_number % 4 == 0:
             # More colors
             self.color_index += 1
-        elif self.game.wave_number % 4 == 1:
+        elif wave_number % 4 == 1:
             # Falling Faster
             self.falling_multiplier += 1
-        elif self.game.wave_number % 4 == 2:
+        elif wave_number % 4 == 2:
             # more pieces
             self.average_pieces += 1
-        elif self.game.wave_number % 4 == 3:
+        elif wave_number % 4 == 3:
             # More plates (more frequent)
             self.average_time_between_plates /= .5
 
@@ -269,4 +270,4 @@ class PlateSupervisor:
         if self.angry_animation_start_t is not None:
             if time.time() - self.angry_animation_start_t <= PlateSupervisor.ANGRY_ANIMATION_DURATION:
                 # animation is playing
-                render_angry_animation(self.game.wave_number, (time.time() - self.angry_animation_start_t) / PlateSupervisor.ANGRY_ANIMATION_DURATION)
+                render_angry_animation(self.game.wave_number-1, (time.time() - self.angry_animation_start_t) / PlateSupervisor.ANGRY_ANIMATION_DURATION)
