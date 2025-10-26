@@ -16,7 +16,7 @@ class Game:
         self.repeating_cupboard=3
         self.cupboard_game_background=pygame.transform.scale(engine.get_image('resources/images/cupboard.png'),(engine.DISPLAY_W/self.repeating_cupboard,0.6*engine.DISPLAY_H))
         self.elephant_ass=engine.get_image("resources/images/elephant_ass.png")
-        # self.elephant_ass=pygame.transform.scale_by(self.elephant_ass,0.2)
+        self.elephant_ass=pygame.transform.scale_by(self.elephant_ass,0.2)
         self.width_elephant_ass, self.length_elephant_ass=self.elephant_ass.get_size()
         self.stats = Stats()
         self.loading_bar = Loadingbar()
@@ -30,8 +30,8 @@ class Game:
         self.time_until_gouden_kak = 0 #random.normalvariate(10, 5)
         self.wave_number = 0
         self.repeating_cupboard=3
-        self.elephant_ass=pygame.transform.scale_by(self.elephant_ass,0.2)
-        self.width_elephant_ass, self.length_elephant_ass=self.elephant_ass.get_size()
+        # self.elephant_ass=pygame.transform.scale_by(self.elephant_ass,0.2)
+        # self.width_elephant_ass, self.length_elephant_ass=self.elephant_ass.get_size()
         self.stats.play_again()
         self.loading_bar = Loadingbar()
         self.gameoverscreen = Gameoverscreen(self)
@@ -52,11 +52,13 @@ class Game:
         if self.golden_poop.captured:
             # CAPTURED
             self.golden_poop.captured = False
-            self.golden_poop.y_goldenpoop = 1000 # out of screen
+            self.stats.add_money(1000)
             # Effects
             self.plate_supervisor.fragments = []
             for i in range(12):
-                engine.spawn_particles((i*100, 50), 20, color=(255,200,60), spread=30, speed=200, lifetime=4, radius=5)
+                engine.spawn_particles((i*100, 50), count=20, color=(255,200,60), spread=30, speed=200, lifetime=4, radius=5)
+            engine.spawn_particles((self.golden_poop.x_goldenpoop, self.golden_poop.y_goldenpoop), count=100, color=(255,200,60), spread=30, speed=200, lifetime=5, radius=5, gravity=0)
+            self.golden_poop.y_goldenpoop = 1000 # out of screen
         
         
         if self.stats.lives > 0:

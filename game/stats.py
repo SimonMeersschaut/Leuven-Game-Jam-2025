@@ -1,6 +1,5 @@
 from engine import engine 
 import pygame
-import random
 
 class Stats:
     def __init__(self):
@@ -23,7 +22,7 @@ class Stats:
         self.lives=1
         self.max_lives = 1
 
-        self.gouden_kak_bought = True # Set by shop
+        self.gouden_kak_bought = False # Set by shop
         self.plates_merged = 0
     
     def play_again(self):
