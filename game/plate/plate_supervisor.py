@@ -240,7 +240,7 @@ class PlateSupervisor:
                                 # Test full plate
                                 if all(held_fragment.attendance_list) and not held_fragment.is_playing_finished_animation:
                                     # Success!
-                                    engine.spawn_particles(held_fragment.get_center_pos(), count=400, color=(255,200,60), spread=10, speed=500, lifetime=4, radius=4)
+                                    engine.spawn_particles(held_fragment.get_center_pos(), count=100, color=(255,200,60), spread=10, speed=500, lifetime=4, radius=4)
                                     held_fragment.is_playing_finished_animation = True
                                     if self.is_frozen: # was frozen
                                         self.unfreeze()
