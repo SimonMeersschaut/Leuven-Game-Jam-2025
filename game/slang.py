@@ -1,6 +1,7 @@
 from engine import engine 
 import pygame
 import random
+from .golden_poop import Goldenpoop
 
 class Snake:
     def __init__(self):
@@ -10,7 +11,7 @@ class Snake:
         self.y=random.randint(100,500)
         self.slang_image_button=self.slang_image.get_rect(topleft=(self.x,self.y))
 
-    def update(self, delta_t: float, events: list,loading_bar,stats):
+    def update(self, delta_t: float, events: list,loading_bar,stats,golden_poop):
         mouse_pos = pygame.mouse.get_pos()
         # print(mouse_pos)
         if self.slang_image_button.collidepoint(mouse_pos):
@@ -23,6 +24,8 @@ class Snake:
                     stats.lose_life()
                     stats.add_money(1)
                     loading_bar.start_wave(2)
+                    golden_poop.golden_poop_appears()
+                    
 
     def render(self):
         engine.render_image(self.slang_image,(self.x,self.y))
