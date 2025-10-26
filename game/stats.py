@@ -15,7 +15,8 @@ class Stats:
         self.money_image=engine.render_text('pixel',80,f'€{self.money}',(0,255,0))
         self.width_money_image,self.length_money_image=self.money_image.get_size()
 
-        self.lives=5
+        self.lives=1
+        self.plates_merged = 12 # temp.
 
     def lose_life(self):
         if self.lives>0:
