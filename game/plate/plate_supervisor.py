@@ -138,7 +138,7 @@ class PlateSupervisor:
             fragment.previously_hovering = fragment.hovering
 
             if fragment.holding: 
-                if (fragment.holding_index == "__mouse__" and pygame.mouse.get_pressed()[0]) or (not fragment.holding_index in pointers.all_pointers):
+                if (fragment.holding_index == "__mouse__" and not pygame.mouse.get_pressed()[0]) or (not fragment.holding_index in pointers.all_pointers):
                     del self.held_plates[fragment.holding_index]
                     fragment.holding = False
                     fragment.holding_index = -1
