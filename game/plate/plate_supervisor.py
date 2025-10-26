@@ -171,6 +171,19 @@ class PlateSupervisor:
                 self.fragments.append(fragment)
                 fragment.set_not_loading()
         
+        if self.loading_bar.wave_is_done():
+            # wait for all fragments to dissappear
+            if len(self.fragments) == 0:
+                # Show angry animation, then go to next wave
+                if self.angry_animation_start_t is not None:
+                    # animation is playing
+                    render_angry_animation(self.game.wave_number, (time.time() - self.angry_animation_start_t) / PlateSupervisor.ANGRY_ANIMATION_DURATION)
+                    if time.time() - self.angry_animation_start_t >= PlateSupervisor.ANGRY_ANIMATION_DURATION:
+                        # go to next wave
+                        self.apply_next_wave()
+                else:
+                    self.angry_animation_start_t = time.time()
+        
         # Update Fragments
         for fragment in self.fragments:
             fragment.previously_holding = fragment.holding
