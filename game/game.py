@@ -1,7 +1,5 @@
 from engine import engine 
 import pygame
-# from .hond import Hond
-# from .slang import Snake
 from .plate.fragment import Fragment
 from .plate.plate_supervisor import PlateSupervisor
 from .stats import Stats

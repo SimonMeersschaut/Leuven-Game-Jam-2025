@@ -145,13 +145,13 @@ class PlateSupervisor:
             self.color_index += 1
         elif self.game.wave_number % 4 == 1:
             # Falling Faster
-            self.falling_multiplier += 0.5
+            self.falling_multiplier += 1
         elif self.game.wave_number % 4 == 2:
             # more pieces
             self.average_pieces += 1
         elif self.game.wave_number % 4 == 3:
             # More plates (more frequent)
-            self.average_time_between_plates /= .25
+            self.average_time_between_plates /= .5
 
         # go to next
         self.game.wave_number += 1
@@ -269,3 +269,6 @@ class PlateSupervisor:
     def render(self):
         for fragment in reversed(self.fragments):
             fragment.render()
+        if self.angry_animation_start_t is not None:
+            # animation is playing
+            render_angry_animation(self.game.wave_number, (time.time() - self.angry_animation_start_t) / PlateSupervisor.ANGRY_ANIMATION_DURATION)
