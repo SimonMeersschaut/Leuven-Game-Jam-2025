@@ -24,11 +24,12 @@ class Game:
         self.plate_supervisor = PlateSupervisor(self, self.loading_bar, self.stats)
         self.plate_supervisor.spawn_plate()
         self.golden_poop = Goldenpoop()
-        self.time_until_gouden_kak = 1 # random.normalvariate(10, 5)
+        self.time_until_gouden_kak = random.normalvariate(10, 5)
     
     def play_again(self):
         audio_manager.unpause_music()
-        self.time_until_gouden_kak = 1 #random.normalvariate(10, 5)
+        self.golden_poop = Goldenpoop()
+        self.time_until_gouden_kak = random.normalvariate(10, 5)
         self.wave_number = 0
         self.repeating_cupboard=3
         # self.elephant_ass=pygame.transform.scale_by(self.elephant_ass,0.2)
@@ -50,9 +51,10 @@ class Game:
         if self.time_until_gouden_kak <= 0 and not(self.plate_supervisor.is_frozen):
             # spawn
             self.golden_poop.golden_poop_appears()
-        if self.time_until_gouden_kak <= -1:
+            self.time_until_gouden_kak = random.normalvariate(30, 5)
+        if self.time_until_gouden_kak <= -5:
             # set new poop
-            self.golden_poop.y_goldenpoop = 1000 # out of screen
+            self.golden_poop = Goldenpoop()
             self.time_until_gouden_kak = random.normalvariate(10, 5)
         if self.golden_poop.captured:
             # CAPTURED

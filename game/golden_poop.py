@@ -13,7 +13,7 @@ class Goldenpoop:
 
     def update(self, delta_t: float, events: list):
         if self.golden_poop:
-            self.y_goldenpoop+=self.speed*delta_t
+            self.y_goldenpoop += self.speed*delta_t
             self.golden_poop_button.move(engine.DISPLAY_W/2,self.y_goldenpoop)
             if self.golden_poop_button.update_and_check_clicked():
                 self.captured=True
