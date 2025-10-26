@@ -74,6 +74,9 @@ class PlateSupervisor:
     ANGRY_ANIMATION_DURATION = 3
 
     def __init__(self, game, loading_bar, stats):
+        self.trunk = engine.get_image("resources/images/trunk.png")
+
+        self.loading_fragments = []
         self.plates = []
         self.held_plates = {}
    
@@ -103,7 +106,8 @@ class PlateSupervisor:
         for position, piece in zip([(800, 300), (200, 50)], pieces):
             self.fragments.append(Fragment(
                 *piece, # where this fragment exists (in the list of the entire plate)
-                position=position
+                position=position,
+                is_loading=False
             ))
 
     def spawn_plate(self):
@@ -117,12 +121,14 @@ class PlateSupervisor:
         
         pieces = shatter_plate("resources/images/plates/"+plate_settings["image"], split_lines)
         for piece in pieces:
-            self.fragments.append(Fragment(
+            fragment = Fragment(
                 *piece, # where this fragment exists (in the list of the entire plate)
                 fragment_colors=plate_settings["color"],
                 fragment_symbols=plate_settings["symbol"],
-                position=(random.randint(0, 1000),  -random.randint(200, 800))
-            ))
+                position=(random.randint(0, 1000),  -random.randint(200, 800)),
+                is_loading=True
+            )
+            self.fragments.append(fragment)
     
     def unfreeze(self):
         self.is_frozen = False
@@ -154,6 +160,13 @@ class PlateSupervisor:
         return random.choice([setting for setting in PLATE_IMAGES if setting["color"] == COLOR_ORDER[color_index]])
     
     def update(self, delta_t: float, events: list):
+        for fragment in self.loading_fragments:
+            fragment.update()
+            if fragment.get_center_pos()[1] < -100:
+                # move to real fragment
+                self.loading_fragments.remove(fragment)
+                self.fragments.append(fragment)
+                fragment.set_not_loading()
         # Update Fragments
         for fragment in self.fragments:
             fragment.update(delta_t, events, self.falling_multiplier)
@@ -265,6 +278,14 @@ class PlateSupervisor:
                     self.fragments.remove(fragment)
                     self.stats.lose_life()
 
+    def prerender(self):
+        # render trunk
+        if len(self.loading_fragments) > 0:
+            ... # TODO
+        # render fragments
+        for fragment in self.loading_fragments:
+            fragment.render()
+
     def render(self):
-        for plate in reversed(self.fragments):
-            plate.render()
+        for fragment in reversed(self.fragments):
+            fragment.render()

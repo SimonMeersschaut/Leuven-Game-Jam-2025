@@ -35,7 +35,7 @@ class Game:
         engine.fill((0, 0, 0))
         # self.hond.render()
         # self.slang.render()
-        
+        self.plate_supervisor.prerender()
         engine.render_image(self.elephant_ass,(engine.DISPLAY_W/2-self.width_elephant_ass/2,engine.DISPLAY_H-self.length_elephant_ass-50))
         self.plate_supervisor.render()
         self.stats.render()

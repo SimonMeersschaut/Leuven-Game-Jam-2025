@@ -63,7 +63,8 @@ class Fragment(DraggableSprite):
             fragment_colors=None,
             fragment_symbols=None,
             height=None,
-            width=None
+            width=None,
+            is_loading = True
         ):
         self.fragment_colors = fragment_colors # ["red" for _ in range(8)] # TODO
         self.fragment_symbols = fragment_symbols # ["bird" for _ in range(8)] # TODO
@@ -74,10 +75,13 @@ class Fragment(DraggableSprite):
         self.angle_start = angle_start # radians
         self.angle_stop = angle_stop # radians
         self.radius = 500
+        self.is_loading = is_loading
         self.is_playing_finished_animation = False
         self.finished_animation_start_time = None
         self.my_falling_speed = max(40, random.normalvariate(90, 40))
         super().__init__(surface, position, height, width)
+        if self.is_loading:
+            self.scale_factor(.25)
     
     def is_hovered(self):
         # First quick rectangle check to avoid expensive math when not necessary
@@ -108,6 +112,11 @@ class Fragment(DraggableSprite):
             inside = (angle >= start or angle <= stop)
 
         return inside
+
+    def set_not_loading(self):
+        if self.is_loading:
+            self.scale_factor(4)
+            self.is_loading = False
  
     def update(self, delta_t: float, events: list, falling_multiplier: float):
         if not self.is_playing_finished_animation:
