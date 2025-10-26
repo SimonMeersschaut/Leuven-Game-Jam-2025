@@ -9,8 +9,6 @@ from .game_over_screen import Gameoverscreen
 class Game:
     def __init__(self):
         self.wave_number = 0        
-        # self.hond = Hond()
-        # self.slang = Snake()
         self.repeating_cupboard=3
         self.cupboard_game_background=pygame.transform.scale(engine.get_image('resources/images/cupboard.png'),(engine.DISPLAY_W/self.repeating_cupboard,0.75*engine.DISPLAY_H))
         self.elephant_ass=engine.get_image("resources/images/elephant_ass.png")
@@ -26,6 +24,7 @@ class Game:
     def update(self, delta_t: float, events: list):
         # self.hond.update(delta_t, events)
         # self.slang.update(delta_t,events,self.loading_bar,self.stats)
+        
         if self.stats.lives > 0:
             self.plate_supervisor.update(delta_t, events)
         
@@ -47,5 +46,7 @@ class Game:
         self.loading_bar.render()
         if self.stats.lives <=0:
             self.gameoverscreen.render()
+        self.slang.render()
+
     
 game = Game()
