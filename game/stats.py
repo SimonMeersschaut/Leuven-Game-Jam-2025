@@ -12,7 +12,7 @@ class Stats:
         self.lost_lives_image=pygame.transform.scale_by(self.lost_lives_image,0.03)
         self.width_lost_lives_image, self.length_lost_lives_image=self.lost_lives_image.get_size()
 
-    self.lifes_background=pygame.transform.scale(engine.get_image('resources/images/lifes_background.png'),(430,100))
+        self.lifes_background=pygame.transform.scale(engine.get_image('resources/images/lifes_background.png'),(430,100))
 
         self.total_money = 50
         self.money=0
@@ -20,10 +20,10 @@ class Stats:
         self.money_image=engine.render_text('birthstone',60,f'€{self.money}',(255,255,255))
         self.width_money_image,self.length_money_image=self.money_image.get_size()
 
-        self.lives=2
-        self.max_lives = 2
+        self.lives=1
+        self.max_lives = 1
 
-        self.kak = False
+        self.gouden_kak_bought = True # Set by shop
         self.plates_merged = 0
     
     def play_again(self):
@@ -32,9 +32,8 @@ class Stats:
         self.money_image=engine.render_text('birthstone',60,f'€{self.money}',(255,255,255))
         self.width_money_image,self.length_money_image=self.money_image.get_size()
 
-        self.lives=2
+        self.lives=self.max_lives
 
-        self.kak = False
         self.plates_merged = 0
 
     def lose_life(self):

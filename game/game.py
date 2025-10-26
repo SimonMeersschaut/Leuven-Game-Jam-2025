@@ -6,6 +6,7 @@ from .stats import Stats
 from .loading_bar import Loadingbar
 from .game_over_screen import Gameoverscreen
 from .golden_poop import Goldenpoop
+import random
 
 class Game:
     def __init__(self):
@@ -23,8 +24,10 @@ class Game:
         self.plate_supervisor = PlateSupervisor(self, self.loading_bar, self.stats)
         self.plate_supervisor.spawn_plate()
         self.golden_poop = Goldenpoop()
+        self.time_until_gouden_kak = 0 # random.normalvariate(10, 5)
     
     def play_again(self):
+        self.time_until_gouden_kak = 0 #random.normalvariate(10, 5)
         self.wave_number = 0
         self.repeating_cupboard=3
         self.elephant_ass=pygame.transform.scale_by(self.elephant_ass,0.2)
@@ -38,6 +41,24 @@ class Game:
         engine.mode = Modes.main_menu
 
     def update(self, delta_t: float, events: list):
+        if self.stats.gouden_kak_bought:
+            self.time_until_gouden_kak -= delta_t
+        if self.time_until_gouden_kak <= 0:
+            # spawn
+            self.golden_poop.golden_poop_appears()
+        if self.time_until_gouden_kak <= 3:
+            # set new poop
+            self.time_until_gouden_kak = random.normalvariate(10, 5)
+        if self.golden_poop.captured:
+            # CAPTURED
+            self.golden_poop.captured = False
+            self.golden_poop.y_goldenpoop = 1000 # out of screen
+            # Effects
+            self.plate_supervisor.fragments = []
+            for i in range(12):
+                engine.spawn_particles((i*100, 50), 20, color=(255,200,60), spread=30, speed=200, lifetime=4, radius=5)
+        
+        
         if self.stats.lives > 0:
             self.plate_supervisor.update(delta_t, events)
         
@@ -59,6 +80,7 @@ class Game:
         self.loading_bar.render()
         if self.stats.lives <=0:
             self.gameoverscreen.render()
+            self.stats.gouden_kak_bought = False
         self.golden_poop.render()
 
     

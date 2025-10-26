@@ -34,7 +34,7 @@ class Shop:
             if self.game.stats.total_money >= self.kak_price:
                 if not self.kak_disabled:
                     self.game.stats.total_money -= self.kak_price
-                    self.game.stats.kak = True
+                    self.game.stats.gouden_kak_bought = True
                     self.kak_disabled = True
         elif self.buy_extra_leven.update_and_check_clicked():
             if self.game.stats.total_money >= self.extra_leven_price:
