@@ -6,17 +6,17 @@ import pygame
 class Shop:
     def __init__(self, main_menu):
         self.state = "main_menu"
-        self.back_button = Button('resources/buttons/back_paper.jpeg', (-1, 600), height=100, align_x="center")
+        self.back_button = Button('resources/buttons/main_menu.png', (-1, 600), height=100, align_x="center")
         self.main_menu = main_menu
 
-        self.buy_multiplier = Button('resources/buttons/back_paper.jpeg', (-1, 300), height=100, align_x="center")
+        self.buy_multiplier = Button('resources/buttons/multiplier.png', (-1, 300), height=100, align_x="center")
         self.multiplier_price = 30
 
-        self.buy_kak = Button('resources/buttons/back_paper.jpeg', (engine.DISPLAY_W/6 - 55, 300), height=100)
+        self.buy_kak = Button('resources/buttons/golden_poop.png', (engine.DISPLAY_W/6+5, 300), height=100)
         self.kak_price = 500
         self.kak_disabled = False
 
-        self.buy_extra_leven = Button('resources/buttons/back_paper.jpeg', (engine.DISPLAY_W*5/6 - 145, 300), height=100)
+        self.buy_extra_leven = Button('resources/buttons/extra_life.png', (engine.DISPLAY_W*5/6 - 85, 300), height=100)
         self.extra_leven_price = 500
 
         self.paper_background = pygame.transform.scale(engine.get_image('resources/buttons/paper_background.jpeg'),
