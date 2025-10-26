@@ -113,12 +113,12 @@ class Stats:
     def render(self):
         engine.render_image(self.lifes_background,(10,10))
 
-        calc_x = lambda lost_live:50+1.5*(lost_live*self.width_lives_image)
+        calc_x = lambda lost_live:50+1.3*(lost_live*self.width_lives_image)
 
-        for lost_live in range(self.max_lives):
+        for lost_live in range(min(5, self.max_lives)):
             engine.render_image(self.lost_lives_image,(calc_x(lost_live),30))
 
-        for live in range(int(self.lives)):
+        for live in range(int(min(5, self.lives))):
             engine.render_image(self.lives_image,(calc_x(live),30))
         
         # draw last partial live
