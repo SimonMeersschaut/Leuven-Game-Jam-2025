@@ -22,7 +22,7 @@ class Goldenpoop:
 
     def golden_poop_appears(self):
         self.x_goldenpoop=engine.DISPLAY_W/2
-        self.y_goldenpoop=engine.DISPLAY_H/2 - 70
+        self.y_goldenpoop=engine.DISPLAY_H/2
         self.golden_poop=True
 
     def render(self):

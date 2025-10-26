@@ -113,7 +113,7 @@ class Stats:
     def render(self):
         engine.render_image(self.lifes_background,(10,10))
 
-        calc_x = lambda lost_live:50+1.3*(lost_live*self.width_lives_image)
+        calc_x = lambda lost_live:30+1.3*(lost_live*self.width_lives_image)
 
         for lost_live in range(min(5, self.max_lives)):
             engine.render_image(self.lost_lives_image,(calc_x(lost_live),30))
