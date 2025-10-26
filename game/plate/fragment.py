@@ -82,7 +82,7 @@ class Fragment(DraggableSprite):
         self.is_loading = is_loading
         self.is_playing_finished_animation = False
         self.finished_animation_start_time = None
-        self.my_falling_speed = max(40, random.normalvariate(100, 40))
+        self.my_falling_speed = max(70, random.normalvariate(100, 40))
         super().__init__(surface, position, height, width)
         if self.is_loading:
             self.scale_factor(.25)
@@ -122,11 +122,11 @@ class Fragment(DraggableSprite):
         
         # Calculate symbols and colors
         self.fragment_colors = [
-            self.fragment_colors[i] if self.attendance_list[i] else fragment.fragment_colors
+            self.fragment_colors[i] if self.attendance_list[i] else fragment.fragment_colors[i]
             for i in range(len(self.attendance_list))
         ]
         self.fragment_symbols = [
-            self.fragment_symbols[i] if self.attendance_list[i] else fragment.fragment_symbols
+            self.fragment_symbols[i] if self.attendance_list[i] else fragment.fragment_symbols[i]
             for i in range(len(self.attendance_list))
         ]
         
