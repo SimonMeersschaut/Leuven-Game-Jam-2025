@@ -19,9 +19,9 @@ class DraggableSprite(Sprite):
         # Holding logic is in plate_supervisor
         if self.holding and self.holding_index != -1:
             if not self.previously_holding:
-                self.scale_factor(1.1)
                 self.dragging_offset = (pointers.all_pointers[self.holding_index][0] - self.position[0],
                                         pointers.all_pointers[self.holding_index][1] - self.position[1])
+                self.scale_factor(1.1)
             self.move(pointers.all_pointers[self.holding_index][0] - self.dragging_offset[0], pointers.all_pointers[self.holding_index][1] - self.dragging_offset[1])
         elif self.previously_holding and self.holding_index != -1:
             self.reset_scale()
