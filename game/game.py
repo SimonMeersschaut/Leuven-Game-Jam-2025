@@ -46,7 +46,7 @@ class Game:
         self.loading_bar.render()
         if self.stats.lives <=0:
             self.gameoverscreen.render()
-        self.slang.render()
+        # self.slang.render()
 
     
 game = Game()
