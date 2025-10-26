@@ -49,7 +49,6 @@ class Game:
         
     def render(self):
         engine.fill((0, 0, 0))
-        self.plate_supervisor.prerender()
         engine.render_image(self.floor_image,(0,engine.DISPLAY_H*0.58))
         for cupboard_nr in range(self.repeating_cupboard):
             engine.render_image(self.cupboard_game_background,(cupboard_nr*engine.DISPLAY_W/self.repeating_cupboard,0))

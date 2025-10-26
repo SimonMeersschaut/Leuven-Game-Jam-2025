@@ -8,7 +8,6 @@ import time
 from engine import engine
 from .angry_animation import render_angry_animation
 from .plate_settings import PLATE_IMAGES, COLOR_PRICES, COLOR_ORDER, calculate_price_of_plate
-from .plate_loading_fragments_supervisor import loading_supervisor
 
 def is_within_distance(pos1, pos2, dist: int) -> bool:
     # Manhattan distance
@@ -131,8 +130,6 @@ class PlateSupervisor:
                 is_loading=False
             )
             self.fragments.append(fragment)
-            
-            loading_supervisor.aim_trunk(pos)
     
     def unfreeze(self):
         self.is_frozen = False
@@ -164,8 +161,6 @@ class PlateSupervisor:
         return random.choice([setting for setting in PLATE_IMAGES if setting["color"] == COLOR_ORDER[color_index]])
     
     def update(self, delta_t: float, events: list):
-        # preLoading fragments
-        loading_supervisor.update()
         
         if self.loading_bar.wave_is_done():
             # wait for all fragments to dissappear
@@ -209,6 +204,8 @@ class PlateSupervisor:
                     engine.spawn_particles(fragment.get_center_pos(), count=50, color=(220, 220, 220), spread=30, speed=200, lifetime=1.2, radius=5, angle_min=-math.pi, angle_max=-math.tau)
                     self.fragments.remove(fragment)
                     self.stats.lose_life()
+                    shatter_sound = pygame.mixer.Sound('resources/sounds/glass_shatter.wav')
+                    pygame.mixer.Sound.play(shatter_sound)
 
             # Check for removal
             # Complete plate, remove after 2 seconds
@@ -249,11 +246,8 @@ class PlateSupervisor:
                                     self.stats.plates_merged += 1
             
 
-    def prerender(self):
-        loading_supervisor.prerender()
 
     def render(self):
-        loading_supervisor.render()
         for fragment in reversed(self.fragments):
             fragment.render()
         if self.angry_animation_start_t is not None:
