@@ -70,8 +70,8 @@ class Fragment(DraggableSprite):
         assert fragment_symbols is not None
 
         self.ever_held = False
-        self.fragment_colors = fragment_colors # ["red" for _ in range(8)] # TODO
-        self.fragment_symbols = fragment_symbols # ["bird" for _ in range(8)] # TODO
+        self.fragment_colors = fragment_colors
+        self.fragment_symbols = fragment_symbols
         self.left_gold_glue = left_gold_glue
         self.right_gold_glue = right_gold_glue
         self.attendance_list = attendance_list
@@ -119,5 +119,15 @@ class Fragment(DraggableSprite):
             self.src_image.blit(fragment.left_gold_glue, (0, 0))
         if glue_right_other:
             self.src_image.blit(fragment.right_gold_glue, (0, 0))
+        
+        # Calculate symbols and colors
+        self.fragment_colors = [
+            self.fragment_colors[i] if self.attendance_list[i] else fragment.fragment_colors
+            for i in range(len(self.attendance_list))
+        ]
+        self.fragment_symbols = [
+            self.fragment_symbols[i] if self.attendance_list[i] else fragment.fragment_symbols
+            for i in range(len(self.attendance_list))
+        ]
         
         self.reset_scale()
