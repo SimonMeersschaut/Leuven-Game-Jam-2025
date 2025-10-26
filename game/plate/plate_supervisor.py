@@ -199,6 +199,8 @@ class PlateSupervisor:
 
             if fragment.get_center_pos()[1] >= 600:
                 if not self.is_frozen:
+                    shatter_sound = pygame.mixer.Sound('resources/sounds/glass_shatter.wav')
+                    pygame.mixer.Sound.play(shatter_sound)
                     # break on ground
                     # spawn an upward splash of particles to emphasise the breaking
                     engine.spawn_particles(fragment.get_center_pos(), count=50, color=(220, 220, 220), spread=30, speed=200, lifetime=1.2, radius=5, angle_min=-math.pi, angle_max=-math.tau)
