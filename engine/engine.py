@@ -162,24 +162,11 @@ class Engine:
 
     def get_scaled_mouse_pos(self) -> tuple[int, int]:
         """Returns the mouse position scaled to the internal 1920x1080 resolution."""
-
-        mx, my = pygame.mouse.get_pos()
-        scale_x = self.real_width / self._base_width
-        scale_y = self.real_height / self._base_height
-        scale = min(scale_x, scale_y)
+        return self.scale_position(pygame.mouse.get_pos())
         
-        # compute offsets due to letter/pillar boxing
-        offset_x = (self.real_width - (self._base_width * scale)) / 2
-        offset_y = (self.real_height - (self._base_height * scale)) / 2
-        
-        # scale mouse position back to internal resolution
-        scaled_mx = (mx - offset_x) / scale
-        scaled_my = (my - offset_y) / scale
-
-        return (scaled_mx, scaled_my)
     
     def scale_position(self, position: tuple[int, int]) -> tuple[int, int]:
-        return (position[0]*1920/self.scaled_w, position[1]*1080/self.scaled_h)
+        return (position[0]*1280/self.scaled_w, position[1]*720/self.scaled_h)
     
     def spawn_particles(self, pos: tuple[int, int], count: int = 20, color: tuple[int, int, int] = (255, 215, 0), spread: float = 60.0, speed: float = 200.0, lifetime: float = 1.0, radius: float = 4.0, angle_min: float | None = None, angle_max: float | None = None, gravity: float = 700.0) -> None:
         """Spawn particles in internal (unscaled) coordinates.
