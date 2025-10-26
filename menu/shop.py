@@ -69,7 +69,7 @@ class Shop:
         engine.render_image(self.multiplier_price_image,((engine.DISPLAY_W - self.width_multiplier_price_image)/2,400))
 
 
-        self.kak_image=engine.render_text('birthstone',60,f'GOUDEN KAK',(50,50,150))
+        self.kak_image=engine.render_text('birthstone',60,f'GOLDEN POOP',(50,50,150))
         self.width_kak_image,self.length_kak_image=self.kak_image.get_size()
         engine.render_image(self.kak_image,(engine.DISPLAY_W/5 - self.width_kak_image/2,225))
 
@@ -83,7 +83,7 @@ class Shop:
         engine.render_image(self.kak_price_image,(engine.DISPLAY_W/5 - self.width_kak_price_image/2,400))
 
 
-        self.extra_leven_image=engine.render_text('birthstone',60,f'EXTRA LEVEN',(50,50,150))
+        self.extra_leven_image=engine.render_text('birthstone',60,f'EXTRA LIFE',(50,50,150))
         self.width_extra_leven_image,self.length_extra_leven_image=self.extra_leven_image.get_size()
         engine.render_image(self.extra_leven_image,(engine.DISPLAY_W*4/5 - self.width_extra_leven_image/2,225))
 
