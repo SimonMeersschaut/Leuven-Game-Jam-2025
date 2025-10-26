@@ -18,8 +18,8 @@ class Stats:
         self.money_image=engine.render_text('birthstone',60,f'€{self.money}',(255,255,255))
         self.width_money_image,self.length_money_image=self.money_image.get_size()
 
-        self.lives=5
-        self.max_lives = 1
+        self.lives=2
+        self.max_lives = 2
 
         self.kak = False
         self.plates_merged = 0
@@ -30,8 +30,7 @@ class Stats:
         self.money_image=engine.render_text('birthstone',60,f'€{self.money}',(255,255,255))
         self.width_money_image,self.length_money_image=self.money_image.get_size()
 
-        self.lives=5
-        self.max_lives = 1
+        self.lives=2
 
         self.kak = False
         self.plates_merged = 0
@@ -43,7 +42,7 @@ class Stats:
     def add_money(self,amount):
         self.money += amount*self.multiplier
         self.total_money += amount*self.multiplier
-        
+
         self.money_image=engine.render_text('birthstone',80,f'€{self.money}',(0,255,0))
         self.width_money_image,self.length_money_image=self.money_image.get_size()
     
