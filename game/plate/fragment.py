@@ -122,11 +122,11 @@ class Fragment(DraggableSprite):
         
         # Calculate symbols and colors
         self.fragment_colors = [
-            self.fragment_colors[i] if self.attendance_list[i] else fragment.fragment_colors
+            self.fragment_colors[i] if self.attendance_list[i] else fragment.fragment_colors[i]
             for i in range(len(self.attendance_list))
         ]
         self.fragment_symbols = [
-            self.fragment_symbols[i] if self.attendance_list[i] else fragment.fragment_symbols
+            self.fragment_symbols[i] if self.attendance_list[i] else fragment.fragment_symbols[i]
             for i in range(len(self.attendance_list))
         ]
         

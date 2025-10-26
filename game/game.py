@@ -28,12 +28,13 @@ class Game:
     def update(self, delta_t: float, events: list):
         # self.hond.update(delta_t, events)
         # self.slang.update(delta_t,events,self.loading_bar,self.stats)
+        if self.stats.lives > 0:
+            self.plate_supervisor.update(delta_t, events)
         
-        self.plate_supervisor.update(delta_t, events)
-        
-        self.stats.update(delta_t,events)
-        self.loading_bar.update(delta_t,events)
-        self.gameoverscreen.update(delta_t,events,self.stats,self.loading_bar)
+            self.stats.update(delta_t,events)
+            self.loading_bar.update(delta_t,events)
+        else:
+            self.gameoverscreen.update(delta_t,events,self.stats,self.loading_bar)
 
     def render(self):
         engine.fill((0, 0, 0))

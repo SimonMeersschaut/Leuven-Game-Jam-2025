@@ -50,7 +50,7 @@ COLOR_ORDER = ["blue", "black", "green", "red"]
 def calculate_price_of_plate(plate) -> int:
     price = 0
     for color_of_eighth in plate.fragment_colors:
-        price += COLOR_PRICES[color_of_eighth]
+        price += COLOR_PRICES[color_of_eighth] # TypeError: unhashable type: 'list'
     
     # bonus?
     if len(set(plate.fragment_colors)) == 1:

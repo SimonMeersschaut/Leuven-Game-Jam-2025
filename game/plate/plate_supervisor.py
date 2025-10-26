@@ -235,8 +235,6 @@ class PlateSupervisor:
 
         self.hovered_plate = None
 
-        
-
         # Check glue
         for held_fragment in self.fragments:
                 for fragment in self.fragments:
