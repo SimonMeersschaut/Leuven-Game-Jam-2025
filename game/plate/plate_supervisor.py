@@ -6,6 +6,7 @@ import random
 import time
 from engine import engine
 from .angry_animation import render_angry_animation
+from .plate_settings import PLATE_IMAGES, COLOR_PRICES, COLOR_ORDER
 
 def is_within_distance(pos1, pos2, dist: int) -> bool:
     # Manhattan distance
@@ -68,13 +69,13 @@ class PlateSupervisor:
         self.falling_multiplier = 1
         self.average_pieces = 1 # will still cut in 2 pieces on average
         self.average_time_between_plates = 10
+        self.color_index = 0 # which indices of COLOR_ORDER are unlocked
 
         # Spawn first frozen plates
         self.falling_multiplier = 0
         split_lines = [True, False, False, False, True, False, False, False]
 
         pieces = shatter_plate("resources/images/plate.png", split_lines)
-        plates = []
         for position, piece in zip([(800, 300), (200, 50)], pieces):
             self.fragments.append(Fragment(
                 *piece, # where this fragment exists (in the list of the entire plate)
@@ -87,12 +88,14 @@ class PlateSupervisor:
         pieces_to_split = round(random.normalvariate(self.average_pieces, 1))
         split_lines = create_split_lines(n=pieces_to_split)
 
-        pieces = shatter_plate("resources/images/plate.png", split_lines)
-        plates = []
+        # Choose color
+        plate_settings = self.choose_random_plate()
+        
+        pieces = shatter_plate("resources/images/plates/"+plate_settings["image"], split_lines)
         for piece in pieces:
             self.fragments.append(Fragment(
                 *piece, # where this fragment exists (in the list of the entire plate)
-                position=(random.randint(0, 1000),  -random.randint(400, 800))
+                position=(random.randint(0, 1000),  -random.randint(200, 800))
             ))
     
     def unfreeze(self):
@@ -105,7 +108,7 @@ class PlateSupervisor:
         # apply special
         if self.game.wave_number % 4 == 0:
             # More colors
-            ...
+            self.color_index += 1
         elif self.game.wave_number % 4 == 1:
             # Falling Faster
             self.falling_multiplier += 0.25
@@ -119,6 +122,10 @@ class PlateSupervisor:
         # go to next
         self.game.wave_number += 1
         self.loading_bar.start_wave(self.game.wave_number)
+    
+    def choose_random_plate(self) -> dict:
+        color_index = random.randint(0, min(self.color_index, len(COLOR_ORDER)))
+        return random.choice([setting for setting in PLATE_IMAGES if setting["color"] == COLOR_ORDER[color_index]])
     
     def update(self, delta_t: float, events: list):
         # Update Fragments
@@ -171,6 +178,8 @@ class PlateSupervisor:
                                 self.held_fragment.finished_animation_start_time = time.time()
                                 if len(self.fragments) == 1 and not self.loading_bar.wave_is_done() and self.time_until_next_spawn is not None:
                                     self.spawn_plate()
+                                # Give money
+                                
             
             self.held_fragment = None
         

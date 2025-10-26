@@ -1,6 +1,8 @@
 from engine import engine
 from engine.draggable_sprite import DraggableSprite
 import math
+import random
+
 
 class Fragment(DraggableSprite):
     def __init__(self, left_gold_glue, surface, right_gold_glue, attendance_list: list[bool], center_offset: tuple[int], angle_start, angle_stop, position, height=None, width=None):
@@ -11,6 +13,7 @@ class Fragment(DraggableSprite):
         self.radius = 500
         self.is_playing_finished_animation = False
         self.finished_animation_start_time = None
+        self.my_falling_speed = max(10, random.normalvariate(90, 40))
         super().__init__(surface, position, height, width)
     
     def is_hovered(self):
@@ -45,7 +48,7 @@ class Fragment(DraggableSprite):
  
     def update(self, delta_t: float, events: list, falling_multiplier: float):
         if not self.is_playing_finished_animation:
-            self.move(self.position[0], self.position[1] + delta_t*70*falling_multiplier)
+            self.move(self.position[0], self.position[1] + delta_t*self.my_falling_speed*falling_multiplier)
 
             super().update()
     
