@@ -21,14 +21,9 @@ class PlateSupervisor:
             plate.previously_hovering = plate.hovering
 
             intersecting_pointers = plate.get_intersecting_pointers()
-            if not plate.holding: 
-                if intersecting_pointers != []:
-                    for pointer_id in intersecting_pointers:
-                        if pointer_id not in self.held_plates:
-                            self.held_plates[pointer_id] = plate
-                            plate.holding = True
-            else:
+            if plate.holding: 
                 holding_pointer_ids = [pid for pid, p in self.held_plates.items() if p == plate]
+                print(holding_pointer_ids)
                 still_holding = False
                 for pointer_id in holding_pointer_ids:
                     if pointer_id in intersecting_pointers:
@@ -37,6 +32,15 @@ class PlateSupervisor:
                         del self.held_plates[pointer_id]
                 if not still_holding:
                     plate.holding = False
+                    plate.holding_index = -1
+                
+            else:
+                if intersecting_pointers != []:
+                    for pointer_id in intersecting_pointers:
+                        if pointer_id not in self.held_plates:
+                            self.held_plates[pointer_id] = plate
+                            plate.holding = True
+                            plate.holding_index = pointer_id
 
 
             if plate.is_hovered() and self.hovered_plate is None:

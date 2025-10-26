@@ -16,14 +16,12 @@ class DraggableSprite(Sprite):
 
     def update(self):
         # Holding logic is in plate_supervisor
-        print(pointers)
-        print(pointers.all_pointers)
 
         if self.holding and self.holding_index != -1:
             if not self.previously_holding:
                 self.scale_factor(1.1)
             self.move(pointers.all_pointers[self.holding_index][0] - self.true_width*1.1 // 2, pointers.all_pointers[self.holding_index][1] - self.true_height*1.1 // 2)
-        elif self.previously_holding and self.holding_index == -1:
+        elif self.previously_holding and self.holding_index != -1:
             self.reset_scale()
             self.move(pointers.all_pointers[self.holding_index][0] - self.true_width // 2, pointers.all_pointers[self.holding_index][1] - self.true_height // 2)
 

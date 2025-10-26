@@ -25,7 +25,7 @@ class Pointers:
         
         elif event.type == pygame.MOUSEMOTION:
             if "__mouse__" in self.all_pointers:
-                self.pointers["__mouse__"] = engine.scale_position(pygame.mouse.get_pos())
+                self.all_pointers["__mouse__"] = engine.scale_position(pygame.mouse.get_pos())
         
         
     def add_pointer(self, finger_id, position):
