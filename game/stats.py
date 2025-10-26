@@ -17,7 +17,7 @@ class Stats:
         self.money_image=engine.render_text('birthstone',60,f'€{self.money}',(255,255,255))
         self.width_money_image,self.length_money_image=self.money_image.get_size()
 
-        self.lives=1
+        self.lives=5
         self.plates_merged = 12 # temp.
 
     def lose_life(self):

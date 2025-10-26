@@ -34,7 +34,7 @@ class Gameoverscreen:
 
     def render(self):
         x_game_over_screen=engine.DISPLAY_W/2-self.width_game_over_screen_image/2
-        y_game_over_screen=150
+        y_game_over_screen=85
         engine.render_image(self.game_over_screen_image,(x_game_over_screen,y_game_over_screen))
         x_line2=x_game_over_screen+0.66*self.width_game_over_screen_image
         y_line2=y_game_over_screen+0.36*self.length_game_over_screen_image
