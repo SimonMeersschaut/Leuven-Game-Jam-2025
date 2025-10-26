@@ -12,7 +12,8 @@ class Game:
     def __init__(self):
         # self.hond = Hond()
         # self.slang = Snake()
-        
+        self.repeating_cupboard=3
+        self.cupboard_game_background=pygame.transform.scale(engine.get_image('resources/images/cupboard.png'),(engine.DISPLAY_W/self.repeating_cupboard,0.75*engine.DISPLAY_H))
         self.elephant_ass=engine.get_image("resources/images/elephant_ass.png")
         self.elephant_ass=pygame.transform.scale_by(self.elephant_ass,0.2)
         self.width_elephant_ass,self.length_elephant_ass=self.elephant_ass.get_size()
@@ -36,13 +37,13 @@ class Game:
         engine.fill((0, 0, 0))
         # self.hond.render()
         # self.slang.render()
-        
+        for cupboard_nr in range(self.repeating_cupboard):
+            engine.render_image(self.cupboard_game_background,(cupboard_nr*engine.DISPLAY_W/self.repeating_cupboard,0))
+        engine.render_image(self.elephant_ass,(engine.DISPLAY_W/2-self.width_elephant_ass/2,engine.DISPLAY_H-self.length_elephant_ass-50))
         self.plate_supervisor.render()
         self.stats.render()
         self.loading_bar.render()
-        engine.render_image(self.elephant_ass,(engine.DISPLAY_W/2-self.width_elephant_ass/2,engine.DISPLAY_H-self.length_elephant_ass-50))
         if self.stats.lives <=0:
             self.gameoverscreen.render()
-
     
 game = Game()

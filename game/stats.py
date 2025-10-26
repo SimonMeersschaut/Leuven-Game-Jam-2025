@@ -1,5 +1,6 @@
 from engine import engine 
 import pygame
+import random
 
 class Stats:
     def __init__(self, multiplier):
@@ -13,7 +14,7 @@ class Stats:
 
         self.money=10000000
         self.multiplier=multiplier
-        self.money_image=engine.render_text('birthstone',80,f'€{self.money}',(0,255,0))
+        self.money_image=engine.render_text('birthstone',60,f'€{self.money}',(255,255,255))
         self.width_money_image,self.length_money_image=self.money_image.get_size()
 
         self.lives=1
@@ -25,11 +26,11 @@ class Stats:
     
     def update_money(self,amount):
         self.money+=amount*self.multiplier
-        self.money_image=engine.render_text('birthstone',80,f'€{self.money}',(0,255,0))
+        self.money_image=engine.render_text('birthstone',60,f'€{self.money}',(255,255,255))
         self.width_money_image,self.length_money_image=self.money_image.get_size()
     
     def update(self, delta_t: float, events: list):
-        self.money_image=engine.render_text('birthstone',80,f'€{self.money}',(0,255,0))
+        self.money_image=engine.render_text('birthstone',60,f'€{self.money}',(255,255,255))
 
     def render(self):
         for live in range(self.lives):
