@@ -20,6 +20,8 @@ class Snake:
                     self.x=random.randint(1,1000)
                     self.y=random.randint(1,600)
                     self.slang_image_button=self.slang_image.get_rect(topleft=(self.x,self.y))
+                    stats.lose_life()
+                    stats.update_money(1)
 
     def render(self):
         engine.render_image(self.slang_image,(self.x,self.y))

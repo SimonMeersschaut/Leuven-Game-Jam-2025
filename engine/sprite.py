@@ -20,7 +20,11 @@ class Sprite():
         self.previously_hovered = False
         self.previously_clicked = False
         
-        image = engine.get_image(image_path)
+        if isinstance(image_path, str): 
+            image = engine.get_image(image_path)
+        else:
+            image = image_path # can be a surface already
+        
         if height and width:
             pass
         elif height:
@@ -31,8 +35,8 @@ class Sprite():
             height = image.get_height()
             width = image.get_width()
         
-        self.src_image = pygame.transform.scale(image, (width, height))   
-        self.image = self.src_image
+        self.src_image = image
+        self.image = pygame.transform.scale(image, (width, height))   
         
         self.true_width = width
         self.true_height = height
@@ -85,8 +89,8 @@ class Sprite():
         self.position = self.true_position
         self.rect = self.image.get_rect(topleft=self.position)
         
-        image = engine.get_image(self.image_path)
-        self.image = pygame.transform.scale(image, (self.true_width,  self.true_height))
+        # image = engine.get_image(self.image_path)
+        self.image = pygame.transform.scale(self.src_image, (self.true_width,  self.true_height))
         
     def render(self):
         """Renders the sprite on the screen at its position."""
