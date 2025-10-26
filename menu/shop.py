@@ -87,9 +87,9 @@ class Shop:
         self.width_extra_leven_image,self.length_extra_leven_image=self.extra_leven_image.get_size()
         engine.render_image(self.extra_leven_image,(engine.DISPLAY_W*4/5 - self.width_extra_leven_image/2,225))
 
-        if self.extra_leven_disabled:
-            self.extra_leven_price_image=engine.render_text('birthstone',40,f'out of stock',(50,50,150))
-        elif self.game.stats.money >= self.extra_leven_price:
+        # if self.extra_leven_disabled:
+        self.extra_leven_price_image=engine.render_text('birthstone',40,f'out of stock',(50,50,150))
+        if self.game.stats.money >= self.extra_leven_price:
             self.extra_leven_price_image=engine.render_text('birthstone',40,f'€{self.extra_leven_price}',(50,200,50))
         else:
             self.extra_leven_price_image=engine.render_text('birthstone',40,f'€{self.extra_leven_price}',(200,50,50))
