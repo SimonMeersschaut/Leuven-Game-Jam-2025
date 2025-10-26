@@ -26,6 +26,11 @@ class Game:
         self.golden_poop = Goldenpoop()
         self.time_until_gouden_kak = random.normalvariate(10, 5)
     
+        self.background_plate=pygame.transform.scale_by(engine.get_image('resources/images/background_plates.png'),0.03)
+        brighten=100
+        self.background_plate.fill((brighten, brighten, brighten),special_flags=pygame.BLEND_RGB_MULT)
+        self.width_background_plate,self.length_background_plate=self.background_plate.get_size()
+
     def play_again(self):
         audio_manager.unpause_music()
         self.golden_poop = Goldenpoop()
@@ -83,6 +88,12 @@ class Game:
         engine.render_image(self.floor_image,(0,engine.DISPLAY_H*0.58))
         for cupboard_nr in range(self.repeating_cupboard):
             engine.render_image(self.cupboard_game_background,(cupboard_nr*engine.DISPLAY_W/self.repeating_cupboard,0))
+        for background_plate in range(5):
+            engine.render_image(self.background_plate,(20+background_plate*1.2*self.width_background_plate,130))
+        for background_plate in range(5):
+            engine.render_image(self.background_plate,(875+background_plate*1.12*self.width_background_plate,335))
+        for background_plate in range(3):
+            engine.render_image(self.background_plate,(890+background_plate*2.3*self.width_background_plate,30))
         engine.render_image(self.elephant_ass,(engine.DISPLAY_W/2-self.width_elephant_ass/2,engine.DISPLAY_H-self.length_elephant_ass-50))
         self.stats.render()
         self.loading_bar.render()
