@@ -107,20 +107,25 @@ class Stats:
         self.width_money_image,self.length_money_image=self.money_image.get_size()
     
     def update(self, delta_t: float, events: list):
+        print(self.lives)
         self.money_image=engine.render_text('birthstone',60,f'€{self.money}',(255,255,255))
 
     def render(self):
         engine.render_image(self.lifes_background,(10,10))
 
+        calc_x = lambda lost_live:50+1.5*(lost_live*self.width_lives_image)
+
         for lost_live in range(self.max_lives):
-            engine.render_image(self.lost_lives_image,(50+1.5*(self.lives*self.width_lives_image)+self.width_lost_lives_image*lost_live*1.5,50))
+            engine.render_image(self.lost_lives_image,(calc_x(lost_live),30))
 
         for live in range(int(self.lives)):
-            engine.render_image(self.lives_image,(25+1.3*live*self.width_lives_image,30))
+            engine.render_image(self.lives_image,(calc_x(live),30))
         
         # draw last partial live
-        pos_x = 25+1.3*(live+1)*self.width_lives_image
+        pos_x = calc_x(int(self.lives))
+        # pos_x = 50+1.5*(int(self.lives)+1)*self.width_lives_image
         part = self.lives - int(self.lives)
         im = get_partial_live_im(part)
+        engine.render_image(im, (pos_x, 30))
 
         engine.render_image(self.money_image,(engine.DISPLAY_W-self.width_money_image-30,30))

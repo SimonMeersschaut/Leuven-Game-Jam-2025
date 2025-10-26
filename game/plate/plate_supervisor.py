@@ -127,7 +127,7 @@ class PlateSupervisor:
                 *piece, # where this fragment exists (in the list of the entire plate)
                 fragment_colors=[plate_settings["color"] for _  in range(8)],
                 fragment_symbols=[plate_settings["symbol"] for _  in range(8)],
-                position=(random.randint(0, 1000),  -random.randint(200, 800)),
+                position=(random.randint(0, 1000),  -150),
                 is_loading=False
             )
             self.fragments.append(fragment)
@@ -212,7 +212,7 @@ class PlateSupervisor:
                     # spawn an upward splash of particles to emphasise the breaking
                     engine.spawn_particles(fragment.get_center_pos(), count=50, color=(220, 220, 220), spread=30, speed=200, lifetime=1.2, radius=5, angle_min=-math.pi, angle_max=-math.tau)
                     self.fragments.remove(fragment)
-                    self.stats.lose_life()
+                    self.stats.lose_life(fragment.get_amount())
 
             # Check for removal
             # Complete plate, remove after 2 seconds
