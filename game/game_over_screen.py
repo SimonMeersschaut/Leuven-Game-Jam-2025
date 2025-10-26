@@ -3,7 +3,8 @@ from engine.sprite import Button, Sprite
 import pygame
 
 class Gameoverscreen:
-    def __init__(self):
+    def __init__(self, game):
+        self.game = game
         self.prev_wave_level=0
         self.wave_level=0
         self.prev_money_amount=0
@@ -18,7 +19,7 @@ class Gameoverscreen:
         self.game_over_screen_line3_image=engine.render_text('birthstone',30,f'€{self.money_amount}',(0,0,0))
         self.game_over_screen_line1_image=engine.render_text('birthstone',30,f'{self.plates_merged}',(0,0,0))
 
-        self. x_game_over_screen=engine.DISPLAY_W/2-self.width_game_over_screen_image/2
+        self.x_game_over_screen=engine.DISPLAY_W/2-self.width_game_over_screen_image/2
 
         self.y_game_over_screen=85
         self.back_to_menu_button=Button('resources/buttons/main_menu.png',(self.x_game_over_screen + 0.5*self.width_game_over_screen_image,self.y_game_over_screen+ 0.85*self.length_game_over_screen_image),height=50,align_x='center')
@@ -26,6 +27,11 @@ class Gameoverscreen:
         self.play_again_button=Button('resources/buttons/play_again.png',(self.x_game_over_screen + 0.5*self.width_game_over_screen_image,self.y_game_over_screen+ 0.75*self.length_game_over_screen_image),height=50,align_x='center')
 
     def update(self, delta_t: float, events: list,stats,loadingbar): #plate_merger
+        if self.play_again_button.just_unclicked():
+            self.game.play_again()
+        elif self.back_to_menu_button.just_unclicked():
+            self.game.back_to_main_menu()
+        
         self.wave_level=loadingbar.wave_level
         self.money_amount=stats.money
         self.plates_merged=stats.plates_merged
