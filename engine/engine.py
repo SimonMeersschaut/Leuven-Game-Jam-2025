@@ -14,12 +14,12 @@ class Engine:
         self.game = None
         
         pygame.init()
-        pygame.display.set_caption("Game Jam 2025")
+        pygame.display.set_caption("Porcelain Panic")
 
         self.DISPLAY_W, self.DISPLAY_H = 1280, 720
         self.scaled_w, self.scaled_h = self.DISPLAY_W, self.DISPLAY_H
         
-        self._screen = pygame.Surface((self.DISPLAY_W, self.DISPLAY_H))
+        self._screen = pygame.Surface((self.DISPLAY_W, self.DISPLAY_H), pygame.FULLSCREEN)
         # make the real window resizable so we can auto-scale the internal 1080p surface
         self.real_screen = pygame.display.set_mode((self.DISPLAY_W, self.DISPLAY_H), pygame.RESIZABLE) #, pygame.FULLSCREEN)
         # track real window size
