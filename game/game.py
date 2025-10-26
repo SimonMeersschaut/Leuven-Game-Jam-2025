@@ -10,12 +10,8 @@ from .golden_poop import Goldenpoop
 class Game:
     def __init__(self):
         self.wave_number = 0        
-<<<<<<< HEAD
-=======
         # self.hond = Hond()
-        self.slang = Snake()
         self.floor_image=pygame.transform.scale(engine.get_image('resources/images/Floor.png'),(engine.DISPLAY_W,0.42*engine.DISPLAY_H))
->>>>>>> dae20cf8b33e61f29d8331208dcee10adafa11d2
         self.repeating_cupboard=3
         self.cupboard_game_background=pygame.transform.scale(engine.get_image('resources/images/cupboard.png'),(engine.DISPLAY_W/self.repeating_cupboard,0.6*engine.DISPLAY_H))
         self.elephant_ass=engine.get_image("resources/images/elephant_ass.png")
