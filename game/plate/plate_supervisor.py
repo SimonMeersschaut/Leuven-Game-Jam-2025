@@ -138,9 +138,10 @@ class PlateSupervisor:
             fragment.previously_hovering = fragment.hovering
 
             intersecting_pointers = fragment.get_intersecting_pointers()
+            print(intersecting_pointers)
             if fragment.holding: 
                 holding_pointer_ids = [pid for pid, p in self.held_plates.items() if p == fragment]
-                print(holding_pointer_ids)
+                # print(holding_pointer_ids)
                 still_holding = False
                 for pointer_id in holding_pointer_ids:
                     if pointer_id in intersecting_pointers:
@@ -178,6 +179,8 @@ class PlateSupervisor:
                             self.held_plates[pointer_id] = fragment
                             fragment.holding = True
                             fragment.holding_index = pointer_id
+                            
+            fragment.update(delta_t, events, self.falling_multiplier)
 
         # # Update Fragments
         # for fragment in self.fragments:
