@@ -137,28 +137,28 @@ class PlateSupervisor:
             fragment.previously_holding = fragment.holding
             fragment.previously_hovering = fragment.hovering
 
-            intersecting_pointers = fragment.get_intersecting_pointers()
-            print(intersecting_pointers)
-            if fragment.holding: 
-                holding_pointer_ids = [pid for pid, p in self.held_plates.items() if p == fragment]
-                # print(holding_pointer_ids)
-                still_holding = False
-                for pointer_id in holding_pointer_ids:
-                    if pointer_id in intersecting_pointers:
-                        still_holding = True
-                    else:
-                        del self.held_plates[pointer_id]
-                if not still_holding:
-                    fragment.holding = False
-                    fragment.holding_index = -1
+            # intersecting_pointers = fragment.get_intersecting_pointers()
+            # print(intersecting_pointers)
+            # if fragment.holding: 
+            #     holding_pointer_ids = [pid for pid, p in self.held_plates.items() if p == fragment]
+            #     # print(holding_pointer_ids)
+            #     still_holding = False
+            #     for pointer_id in holding_pointer_ids:
+            #         if pointer_id in intersecting_pointers:
+            #             still_holding = True
+            #         else:
+            #             del self.held_plates[pointer_id]
+            #     if not still_holding:
+            #         fragment.holding = False
+            #         fragment.holding_index = -1
 
-            else:
-                if intersecting_pointers != []:
-                    for pointer_id in intersecting_pointers:
-                        if pointer_id not in self.held_plates:
-                            self.held_plates[pointer_id] = fragment
-                            fragment.holding = True
-                            fragment.holding_index = pointer_id
+            # else:
+            #     if intersecting_pointers != []:
+            #         for pointer_id in intersecting_pointers:
+            #             if pointer_id not in self.held_plates:
+            #                 self.held_plates[pointer_id] = fragment
+            #                 fragment.holding = True
+            #                 fragment.holding_index = pointer_id
             intersecting_pointers = fragment.get_intersecting_pointers()
             if fragment.holding: 
                 holding_pointer_ids = [pid for pid, p in self.held_plates.items() if p == fragment]
