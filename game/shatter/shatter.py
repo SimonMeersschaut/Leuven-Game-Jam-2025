@@ -58,7 +58,7 @@ def shatter_plate(surface, split_lines: list[bool], pieces=8):
         raise ValueError("A plate splits in at least two pieces.")
 
     if isinstance(surface, str):
-        surface = pygame.transform.scale(pygame.image.load(surface),(400, 400))
+        surface = pygame.transform.scale(pygame.image.load(surface),(150, 150))
 
     # Ensure pygame initialized
     if not pygame.get_init():

@@ -1,6 +1,7 @@
 from .fragment import Fragment
 import pygame
 from ..shatter import shatter_plate
+import math
 import random
 import time
 from engine import engine
@@ -163,7 +164,7 @@ class PlateSupervisor:
                             # Test full plate
                             if all(self.held_fragment.attendance_list) and not self.held_fragment.is_playing_finished_animation:
                                 # Success!
-                                engine.spawn_particles(self.held_fragment.get_center_pos(), count=200, color=(255,200,60), spread=160, speed=200, lifetime=2, radius=2)
+                                engine.spawn_particles(self.held_fragment.get_center_pos(), count=400, color=(255,200,60), spread=10, speed=500, lifetime=4, radius=4)
                                 self.held_fragment.is_playing_finished_animation = True
                                 if self.is_frozen: # was frozen
                                     self.unfreeze()
@@ -193,8 +194,10 @@ class PlateSupervisor:
                     if time.time() - fragment.finished_animation_start_time > 2:
                         self.fragments.remove(fragment)
                 
-                if fragment.get_center_pos()[1] >= 1000:
+                if fragment.get_center_pos()[1] >= 600:
                     # break on ground
+                    # spawn an upward splash of particles to emphasise the breaking
+                    engine.spawn_particles(fragment.get_center_pos(), count=50, color=(220, 220, 220), spread=30, speed=200, lifetime=1.2, radius=5, angle_min=-math.pi, angle_max=-math.tau)
                     self.fragments.remove(fragment)
                     self.stats.lose_life()
 
