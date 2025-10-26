@@ -44,7 +44,7 @@ class Gameoverscreen:
         self.plates_merged=stats.plates_merged
         #self.plates_merged=plate_merger.give_plates_merged()
         if self.prev_total_money!=self.total_money:
-            self.game_over_screen_line4_image=engine.render_text('birthstone',30,f'{self.total_money}',(0,0,0))
+            self.game_over_screen_line4_image=engine.render_text('birthstone',30,f'€{self.total_money}',(0,0,0))
         if self.prev_wave_level!=self.wave_level:
             self.game_over_screen_line2_image=engine.render_text('birthstone',30,f'{self.wave_level}',(0,0,0))
             self.prev_wave_level=self.wave_level
