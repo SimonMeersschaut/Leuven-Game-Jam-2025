@@ -79,11 +79,11 @@ class Game:
         engine.render_image(self.elephant_ass,(engine.DISPLAY_W/2-self.width_elephant_ass/2,engine.DISPLAY_H-self.length_elephant_ass-50))
         self.stats.render()
         self.loading_bar.render()
+        self.plate_supervisor.render()
+        self.golden_poop.render()
         if self.stats.lives <=0:
             self.gameoverscreen.render()
             self.stats.gouden_kak_bought = False
-        self.plate_supervisor.render()
-        self.golden_poop.render()
 
     
 game = Game()
