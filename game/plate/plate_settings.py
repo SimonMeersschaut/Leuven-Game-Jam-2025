@@ -25,7 +25,14 @@ PLATE_IMAGES = [
     {
         "color": "blue",
         "symbol": "bird",
-        "image": "flower_blue.png"
+        "image": "bird_blue.png"
+    },
+
+    # Fish plates
+    {
+        "color": "blue",
+        "symbol": "fish",
+        "image": "fish_blue.png"
     },
 ]
 

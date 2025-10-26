@@ -216,29 +216,28 @@ class PlateSupervisor:
 
         self.hovered_plate = None
 
+        # Check glue
         for held_fragment in self.fragments:
-            # if held_fragment.holding:
-            #     ...
-            # elif held_fragment.previously_holding:
-                # Check glue
+            if held_fragment.ever_held:
                 for fragment in self.fragments:
-                    if is_combineable(held_fragment.attendance_list, fragment.attendance_list):
-                        if is_within_distance(held_fragment.get_center_pos(), fragment.get_center_pos(), 70):
-                            held_fragment.combine_with(fragment)
-                            self.fragments.remove(fragment)
-                            engine.spawn_particles(held_fragment.get_center_pos(), count=100, color=(255,200,60), spread=2, speed=50, lifetime=2, radius=2)
-                            # Test full plate
-                            if all(held_fragment.attendance_list) and not held_fragment.is_playing_finished_animation:
-                                # Success!
-                                engine.spawn_particles(held_fragment.get_center_pos(), count=400, color=(255,200,60), spread=10, speed=500, lifetime=4, radius=4)
-                                held_fragment.is_playing_finished_animation = True
-                                if self.is_frozen: # was frozen
-                                    self.unfreeze()
-                                held_fragment.finished_animation_start_time = time.time()
-                                if len(self.fragments) == 1 and not self.loading_bar.wave_is_done() and self.time_until_next_spawn is not None:
-                                    self.spawn_plate()
-                                # Give money
-                                self.stats.add_money(calculate_price_of_plate(held_fragment))
+                    if fragment.ever_held:
+                        if is_combineable(held_fragment.attendance_list, fragment.attendance_list):
+                            if is_within_distance(held_fragment.get_center_pos(), fragment.get_center_pos(), 70):
+                                held_fragment.combine_with(fragment)
+                                self.fragments.remove(fragment)
+                                engine.spawn_particles(held_fragment.get_center_pos(), count=100, color=(255,200,60), spread=2, speed=50, lifetime=2, radius=2)
+                                # Test full plate
+                                if all(held_fragment.attendance_list) and not held_fragment.is_playing_finished_animation:
+                                    # Success!
+                                    engine.spawn_particles(held_fragment.get_center_pos(), count=400, color=(255,200,60), spread=10, speed=500, lifetime=4, radius=4)
+                                    held_fragment.is_playing_finished_animation = True
+                                    if self.is_frozen: # was frozen
+                                        self.unfreeze()
+                                    held_fragment.finished_animation_start_time = time.time()
+                                    if len(self.fragments) == 1 and not self.loading_bar.wave_is_done() and self.time_until_next_spawn is not None:
+                                        self.spawn_plate()
+                                    # Give money
+                                    self.stats.add_money(calculate_price_of_plate(held_fragment))
             
 
     def prerender(self):
