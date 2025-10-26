@@ -61,6 +61,7 @@ class Gameoverscreen:
         x_line1=self.x_game_over_screen+0.6*self.width_game_over_screen_image
         y_line1=self.y_game_over_screen+0.32*self.length_game_over_screen_image
         engine.render_image(self.game_over_screen_line1_image,(x_line1,y_line1))
+        # Robbe, use stats.total_money!
         self.back_to_menu_button.render()
         self.play_again_button.render()
         

@@ -12,7 +12,8 @@ class Stats:
         self.lost_lives_image=pygame.transform.scale_by(self.lost_lives_image,0.03)
         self.width_lost_lives_image, self.length_lost_lives_image=self.lost_lives_image.get_size()
 
-        self.money=50
+        self.total_money = 50
+        self.money=0
         self.multiplier=1
         self.money_image=engine.render_text('birthstone',60,f'€{self.money}',(255,255,255))
         self.width_money_image,self.length_money_image=self.money_image.get_size()
@@ -24,7 +25,7 @@ class Stats:
         self.plates_merged = 0
     
     def play_again(self):
-        self.money=50
+        self.money=0
         self.multiplier=1
         self.money_image=engine.render_text('birthstone',60,f'€{self.money}',(255,255,255))
         self.width_money_image,self.length_money_image=self.money_image.get_size()
@@ -41,6 +42,8 @@ class Stats:
     
     def add_money(self,amount):
         self.money += amount*self.multiplier
+        self.total_money += amount*self.multiplier
+        
         self.money_image=engine.render_text('birthstone',80,f'€{self.money}',(0,255,0))
         self.width_money_image,self.length_money_image=self.money_image.get_size()
     
