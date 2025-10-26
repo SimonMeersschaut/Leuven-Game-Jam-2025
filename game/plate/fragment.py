@@ -99,6 +99,9 @@ class Fragment(DraggableSprite):
     def render(self):
         super().render()
     
+    def get_amount(self) -> float:
+        return len([True for i in range(len(self.attendance_list)) if self.attendance_list[i]]) / len(self.attendance_list)
+    
     def combine_with(self, fragment: object) -> None:
         self.ever_held = False
         glue_left_me, glue_right_me = find_glue_side(self.attendance_list, fragment.attendance_list)

@@ -126,7 +126,7 @@ class PlateSupervisor:
                 *piece, # where this fragment exists (in the list of the entire plate)
                 fragment_colors=[plate_settings["color"] for _  in range(8)],
                 fragment_symbols=[plate_settings["symbol"] for _  in range(8)],
-                position=pos,
+                position=(random.randint(0, 1000),  -150),
                 is_loading=False
             )
             self.fragments.append(fragment)
@@ -203,9 +203,7 @@ class PlateSupervisor:
                     # spawn an upward splash of particles to emphasise the breaking
                     engine.spawn_particles(fragment.get_center_pos(), count=50, color=(220, 220, 220), spread=30, speed=200, lifetime=1.2, radius=5, angle_min=-math.pi, angle_max=-math.tau)
                     self.fragments.remove(fragment)
-                    self.stats.lose_life()
-                    shatter_sound = pygame.mixer.Sound('resources/sounds/glass_shatter.wav')
-                    pygame.mixer.Sound.play(shatter_sound)
+                    self.stats.lose_life(fragment.get_amount())
 
             # Check for removal
             # Complete plate, remove after 2 seconds
@@ -233,7 +231,7 @@ class PlateSupervisor:
                                 # Test full plate
                                 if all(held_fragment.attendance_list) and not held_fragment.is_playing_finished_animation:
                                     # Success!
-                                    engine.spawn_particles(held_fragment.get_center_pos(), count=400, color=(255,200,60), spread=10, speed=500, lifetime=4, radius=4)
+                                    engine.spawn_particles(held_fragment.get_center_pos(), count=100, color=(255,200,60), spread=10, speed=500, lifetime=4, radius=4)
                                     held_fragment.is_playing_finished_animation = True
                                     if self.is_frozen: # was frozen
                                         self.unfreeze()

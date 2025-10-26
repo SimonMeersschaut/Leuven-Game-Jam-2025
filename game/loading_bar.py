@@ -46,7 +46,6 @@ class Loadingbar:
         self.width_elephant_head_image, self.length_elephant_head_image=self.elephant_head_image.get_size()
 
     def start_wave(self,wave_level):
-        print(wave_level)
         self.wave_level=wave_level
         self.wave_started=True
         self.start_wave_time=time.time()
@@ -80,7 +79,7 @@ class Loadingbar:
         if self.wave_started and self.current_icon is not None:
             x_rectangle=x_loading_bar_image+0.03*self.width_loading_bar_image
             y_rectangle=y_loading_bar_image+0.25*self.length_loading_bar_image
-            pygame.draw.rect(engine._screen,(255,0,0),(x_rectangle,y_rectangle,self.width_progression_bar,self.length_progression_bar))
+            pygame.draw.rect(engine._screen,(101,67,33),(x_rectangle,y_rectangle,self.width_progression_bar,self.length_progression_bar))
 
         engine.render_image(self.loading_bar_image,(x_loading_bar_image,y_loading_bar_image))
 

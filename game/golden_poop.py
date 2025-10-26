@@ -11,7 +11,6 @@ class Goldenpoop:
         self.y_goldenpoop=0
         self.captured=False
 
-
     def update(self, delta_t: float, events: list):
         if self.golden_poop:
             self.y_goldenpoop+=self.speed*delta_t
@@ -23,7 +22,7 @@ class Goldenpoop:
 
     def golden_poop_appears(self):
         self.x_goldenpoop=engine.DISPLAY_W/2
-        self.y_goldenpoop=engine.DISPLAY_H/2
+        self.y_goldenpoop=engine.DISPLAY_H/2 - 70
         self.golden_poop=True
 
     def render(self):

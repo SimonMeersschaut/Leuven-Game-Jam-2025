@@ -3,6 +3,9 @@ import random
 import pygame
 
 def render_angry_animation(wave_number:int, progress: float):
+    """
+    Progress: getal van nul tot 1. ==> komt overeen met 3 seconden
+    """
     x_shake=random.randint(-2,2)
     y_shake=random.randint(-2,2)
     elephant_sound = pygame.mixer.Sound('resources/sounds/elephant.mp3')
@@ -40,8 +43,4 @@ def render_angry_animation(wave_number:int, progress: float):
         engine.render_image(angry_animation2,(engine.DISPLAY_W/2-width_angry_animation2/2+x_shake,engine.DISPLAY_H/2+0.7*length_angry_animation1+y_shake))
 
 
-    """
-    Progress: getal van nul tot 1. ==> komt overeen met 3 seconden
-    """
-    # print(wave_number)
-    ...
+    
