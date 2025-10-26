@@ -15,7 +15,7 @@ class Game:
         self.repeating_cupboard=3
         self.cupboard_game_background=pygame.transform.scale(engine.get_image('resources/images/cupboard.png'),(engine.DISPLAY_W/self.repeating_cupboard,0.6*engine.DISPLAY_H))
         self.elephant_ass=engine.get_image("resources/images/elephant_ass.png")
-        self.elephant_ass=pygame.transform.scale_by(self.elephant_ass,0.2)
+        # self.elephant_ass=pygame.transform.scale_by(self.elephant_ass,0.2)
         self.width_elephant_ass, self.length_elephant_ass=self.elephant_ass.get_size()
         self.stats = Stats()
         self.loading_bar = Loadingbar()

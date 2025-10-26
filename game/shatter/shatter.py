@@ -124,9 +124,9 @@ def shatter_plate(surface, split_lines: list[bool], pieces=8):
             
             # Create gold glue
             # golden_glue = engine.get_image("resources/images/gold.png")
-            golden_glue = pygame.image.load("../resources/images/gold.png")
+            golden_glue = pygame.image.load("resources/images/gold.png")
             golden_glue = pygame.transform.scale(golden_glue, (w, h))
-            return golden_glue
+            # return golden_glue
             # golden_glue = pygame.Surface((w, h), pygame.SRCALPHA)
             # golden_glue.fill((255, 215, 0, 255)) # Gold Color
             golden_glue.blit(golden_mask, (0, 0), special_flags=pygame.BLEND_RGBA_MULT)
