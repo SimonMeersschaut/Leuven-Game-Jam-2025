@@ -12,6 +12,8 @@ class Stats:
         self.lost_lives_image=pygame.transform.scale_by(self.lost_lives_image,0.03)
         self.width_lost_lives_image, self.length_lost_lives_image=self.lost_lives_image.get_size()
 
+    self.lifes_background=pygame.transform.scale(engine.get_image('resources/images/lifes_background.png'),(430,100))
+
         self.total_money = 50
         self.money=0
         self.multiplier=1
@@ -50,8 +52,9 @@ class Stats:
         self.money_image=engine.render_text('birthstone',60,f'€{self.money}',(255,255,255))
 
     def render(self):
+        engine.render_image(self.lifes_background,(10,10))
         for live in range(self.lives):
-            engine.render_image(self.lives_image,(25+1.3*live*self.width_lives_image,50))
+            engine.render_image(self.lives_image,(25+1.3*live*self.width_lives_image,30))
 
         for lost_live in range(self.max_lives-self.lives):
             engine.render_image(self.lost_lives_image,(50+1.5*(self.lives*self.width_lives_image)+self.width_lost_lives_image*lost_live*1.5,50))
