@@ -249,6 +249,8 @@ class PlateSupervisor:
                                         self.spawn_plate()
                                     # Give money
                                     self.stats.add_money(calculate_price_of_plate(held_fragment))
+                                    # Add stats
+                                    self.stats.plates_merged += 1
             
 
     def prerender(self):
@@ -263,5 +265,6 @@ class PlateSupervisor:
         for fragment in reversed(self.fragments):
             fragment.render()
         if self.angry_animation_start_t is not None:
-            # animation is playing
-            render_angry_animation(self.game.wave_number, (time.time() - self.angry_animation_start_t) / PlateSupervisor.ANGRY_ANIMATION_DURATION)
+            if time.time() - self.angry_animation_start_t <= PlateSupervisor.ANGRY_ANIMATION_DURATION:
+                # animation is playing
+                render_angry_animation(self.game.wave_number, (time.time() - self.angry_animation_start_t) / PlateSupervisor.ANGRY_ANIMATION_DURATION)
