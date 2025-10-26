@@ -53,8 +53,11 @@ def create_split_lines(n: int, split_lines = None, start_index = 0, end_index = 
 
     if n > 1:
         # apply new split
-        split_index = round((start_index + end_index + 1)/2)
-        split_lines[min(len(split_lines), round((start_index + end_index + 1)/2))] = True
+        try:
+            split_index = round((start_index + end_index + 1)/2)
+            split_lines[round((start_index + end_index + 1)/2)] = True
+        except IndexError:
+            return split_lines
         n -= 1
         if n <= 1:
             pass

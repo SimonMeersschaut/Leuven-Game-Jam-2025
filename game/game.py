@@ -42,13 +42,15 @@ class Game:
         
 
     def update(self, delta_t: float, events: list):
-        if self.stats.gouden_kak_bought and not self.plate_supervisor.is_frozen:
+        # print(self.stats.gouden_kak_bought, self.plate_supervisor.is_frozen, self.time_until_gouden_kak)
+        if self.stats.gouden_kak_bought and not(self.plate_supervisor.is_frozen):
             self.time_until_gouden_kak -= delta_t
-        if self.time_until_gouden_kak <= 0 and not self.plate_supervisor.is_frozen:
+        if self.time_until_gouden_kak <= 0 and not(self.plate_supervisor.is_frozen):
             # spawn
             self.golden_poop.golden_poop_appears()
-        if self.time_until_gouden_kak <= 3:
+        if self.time_until_gouden_kak <= -1:
             # set new poop
+            self.golden_poop.y_goldenpoop = 1000 # out of screen
             self.time_until_gouden_kak = random.normalvariate(10, 5)
         if self.golden_poop.captured:
             # CAPTURED
@@ -59,7 +61,7 @@ class Game:
             for i in range(12):
                 engine.spawn_particles((i*100, 50), count=20, color=(255,200,60), spread=30, speed=200, lifetime=4, radius=5)
             engine.spawn_particles((self.golden_poop.x_goldenpoop, self.golden_poop.y_goldenpoop), count=100, color=(255,200,60), spread=30, speed=200, lifetime=5, radius=5, gravity=0)
-            self.golden_poop.y_goldenpoop = 1000 # out of screen
+            
         
         
         if self.stats.lives > 0:
