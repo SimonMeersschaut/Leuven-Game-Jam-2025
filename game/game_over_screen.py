@@ -11,6 +11,10 @@ class Gameoverscreen:
         self.money_amount=0
         self.prev_plates_merged=0
         self.plates_merged=0
+
+        self.total_money=0
+        self.prev_total_money=0
+
         self.game_over_screen_image=engine.get_image('resources/images/game_over_screen.jpg')
         self.game_over_screen_image=pygame.transform.scale_by(self.game_over_screen_image,0.12)
         self.width_game_over_screen_image, self.length_game_over_screen_image=self.game_over_screen_image.get_size()
@@ -18,6 +22,7 @@ class Gameoverscreen:
         self.game_over_screen_line2_image=engine.render_text('birthstone',30,f'{self.wave_level}',(0,0,0))
         self.game_over_screen_line3_image=engine.render_text('birthstone',30,f'€{self.money_amount}',(0,0,0))
         self.game_over_screen_line1_image=engine.render_text('birthstone',30,f'{self.plates_merged}',(0,0,0))
+        self.game_over_screen_line4_image=engine.render_text('birthstone',30,f'{self.total_money}',(0,0,0))
 
         self.x_game_over_screen=engine.DISPLAY_W/2-self.width_game_over_screen_image/2
 
@@ -31,11 +36,15 @@ class Gameoverscreen:
             self.game.play_again()
         elif self.back_to_menu_button.just_unclicked():
             self.game.back_to_main_menu()
-        
+
+
+        self.total_money=stats.total_money
         self.wave_level=loadingbar.wave_level
         self.money_amount=stats.money
         self.plates_merged=stats.plates_merged
         #self.plates_merged=plate_merger.give_plates_merged()
+        if self.prev_total_money!=self.total_money:
+            self.game_over_screen_line4_image=engine.render_text('birthstone',30,f'{self.total_money}',(0,0,0))
         if self.prev_wave_level!=self.wave_level:
             self.game_over_screen_line2_image=engine.render_text('birthstone',30,f'{self.wave_level}',(0,0,0))
             self.prev_wave_level=self.wave_level
@@ -61,6 +70,9 @@ class Gameoverscreen:
         x_line1=self.x_game_over_screen+0.6*self.width_game_over_screen_image
         y_line1=self.y_game_over_screen+0.32*self.length_game_over_screen_image
         engine.render_image(self.game_over_screen_line1_image,(x_line1,y_line1))
+        x_line4=self.x_game_over_screen+0.5*self.width_game_over_screen_image
+        y_line4=self.y_game_over_screen+0.58*self.length_game_over_screen_image
+        engine.render_image(self.game_over_screen_line4_image,(x_line4,y_line4))
         # Robbe, use stats.total_money!
         self.back_to_menu_button.render()
         self.play_again_button.render()
