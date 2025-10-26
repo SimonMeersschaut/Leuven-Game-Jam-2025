@@ -8,9 +8,9 @@ class Menu:
     def __init__(self):
         self.state = "main_menu"
 
-        self.play_button = Button('resources/buttons/play_paper.jpeg', (-1, 160), height=100, align_x="center")
-        self.shop_button = Button('resources/buttons/credits_paper.jpeg', (-1, 300), height=100, align_x="center")
-        self.credits_button = Button('resources/buttons/credits_paper.jpeg', (-1, 440), height=100, align_x="center")
+        self.play_button = Button('resources/buttons/play.png', (-1, 160), height=100, align_x="center")
+        self.shop_button = Button('resources/buttons/shop.png', (-1, 300), height=100, align_x="center")
+        self.credits_button = Button('resources/buttons/credits.png', (-1, 440), height=100, align_x="center")
 
         self.shop = Shop(self)
         self.credits = Credits(self)
@@ -26,6 +26,7 @@ class Menu:
         else:
             if self.play_button.update_and_check_clicked():
                 engine.mode = Modes.game
+                engine.start_game()
             elif self.shop_button.update_and_check_clicked():
                 self.state = "shop"
             elif self.credits_button.update_and_check_clicked():

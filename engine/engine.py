@@ -11,6 +11,8 @@ class Engine:
     """A single instance will controll the entire game rendering process."""
 
     def __init__(self):
+        self.game = None
+        
         pygame.init()
         pygame.display.set_caption("Game Jam 2025")
 
@@ -50,7 +52,7 @@ class Engine:
             return font
     
     def run(self, menu, game):
-        
+        self.game = game
 
         FRAME_RATE = 60 # FPS (Hz)
         FREQUENCY = 1/FRAME_RATE # seconds
@@ -120,6 +122,9 @@ class Engine:
         """Returns a text surface image."""
         font = self.get_font(fontname, fontsize)
         return font.render(text, False, color)
+
+    def start_game(self):
+        self.game.play_again()
 
     def get_image(self, image_path: str, index = 0, tile_size = 128):
         if image_path in self.images_cache:

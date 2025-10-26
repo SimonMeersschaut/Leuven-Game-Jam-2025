@@ -92,9 +92,9 @@ class PlateSupervisor:
         self.is_frozen = True
 
         # wave settings
-        self.falling_multiplier = 1
-        self.average_pieces = 1 # will still cut in 2 pieces on average
-        self.average_time_between_plates = 10
+        self.falling_multiplier = 1.3
+        self.average_pieces = 2 # will still cut in 2 pieces on average
+        self.average_time_between_plates = 4
         self.color_index = 0 # which indices of COLOR_ORDER are unlocked
 
         # Spawn first frozen plates
@@ -245,7 +245,10 @@ class PlateSupervisor:
                                         self.spawn_plate()
                                     # Give money
                                     self.stats.add_money(calculate_price_of_plate(held_fragment))
-          
+                                    # Add stats
+                                    self.stats.plates_merged += 1
+            
+
     def prerender(self):
         loading_supervisor.prerender()
 
@@ -254,5 +257,6 @@ class PlateSupervisor:
         for fragment in reversed(self.fragments):
             fragment.render()
         if self.angry_animation_start_t is not None:
-            # animation is playing
-            render_angry_animation(self.game.wave_number, (time.time() - self.angry_animation_start_t) / PlateSupervisor.ANGRY_ANIMATION_DURATION)
+            if time.time() - self.angry_animation_start_t <= PlateSupervisor.ANGRY_ANIMATION_DURATION:
+                # animation is playing
+                render_angry_animation(self.game.wave_number, (time.time() - self.angry_animation_start_t) / PlateSupervisor.ANGRY_ANIMATION_DURATION)

@@ -4,47 +4,42 @@ import math
 import random
 
 def find_glue_side(attendance_1, attendance_2) -> tuple[bool, bool]:
-    # Determine on which side(s) of attendance_1 glue must be applied
-    # relative to attendance_2. Returns (glue_left_for_1, glue_right_for_1).
-    def get_first_and_last_index(attendance: list[bool]):
-        found = False
-        start_index = None
-        end_index = None
-        for index in range(len(attendance)):
-            if not found:
-                if attendance[index]:
-                    found = True
-                    start_index = index
-            else:
-                if not attendance[index]:
-                    end_index = index
-                    break
-        if start_index is None:
-            return (None, None)
-        if not end_index:
-            # If we never found a False after the run, end_index is the last index
-            end_index = index
-        return (start_index, end_index)
-
-    start_1, end_1 = get_first_and_last_index(attendance_1)
-    start_2, end_2 = get_first_and_last_index(attendance_2)
-
-    # If one of the fragments has no attendance, no glue is needed
-    if start_1 is None or start_2 is None:
+    """
+    Determine on which sides of attendance_1 glue must be applied relative to
+    attendance_2. Both attendance lists represent presence at discrete radial
+    indices around a circle. We consider a glue needed on the left side of a
+    fragment when there exists a boundary where attendance_1 has a True cell
+    whose previous index (counter-clockwise) is False in attendance_1 but True
+    in attendance_2. Similarly for the right side using the next index
+    (clockwise). This uses modulo indexing so the circular wrap-around is
+    handled correctly.
+    Returns (glue_left_for_1, glue_right_for_1).
+    """
+    n = len(attendance_1)
+    if n == 0:
         return (False, False)
 
-    # Normalize to indices modulo length (handles wrap-around)
-    n = len(attendance_1)
     glue_left = False
     glue_right = False
 
-    # If attendance_2's run ends exactly where attendance_1 starts, glue on left of 1
-    if (end_2 % n) == (start_1 % n):
-        glue_left = True
+    for i in range(n):
+        if not attendance_1[i]:
+            continue
 
-    # If attendance_2's run starts exactly where attendance_1 ends, glue on right of 1
-    if (start_2 % n) == (end_1 % n):
-        glue_right = True
+        prev_i = (i - 1) % n
+        next_i = (i + 1) % n
+
+        # left boundary: prev is empty on self but occupied on other
+        if (not attendance_1[prev_i]) and attendance_2[prev_i]:
+            glue_left = True
+
+        # right boundary: next is empty on self but occupied on other
+        if (not attendance_1[next_i]) and attendance_2[next_i]:
+            glue_right = True
+
+        # early exit if both found
+        if glue_left and glue_right:
+            break
 
     return (glue_left, glue_right)
 
@@ -108,6 +103,10 @@ class Fragment(DraggableSprite):
         self.ever_held = False
         glue_left_me, glue_right_me = find_glue_side(self.attendance_list, fragment.attendance_list)
         glue_left_other, glue_right_other = find_glue_side(fragment.attendance_list, self.attendance_list)
+        # Note: we intentionally draw glue from both fragments so the seam
+        # visually shows both sides. Do not suppress mirrored glue flags;
+        # overlapping visuals are handled by the art (or can be adjusted
+        # later if they look too intense).
         self.attendance_list = [(self.attendance_list[i] or fragment.attendance_list[i]) for i in range(8)]
         # Combine images
         self.src_image.blit(fragment.src_image, (0, 0))

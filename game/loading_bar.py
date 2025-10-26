@@ -26,6 +26,11 @@ class Loadingbar:
         self.more_colors_image=pygame.transform.scale_by(self.more_colors_image,more_colors_image_scalar)
         self.width_more_colors_image, self.length_more_colors_image=self.more_colors_image.get_size()
 
+        more_plates_image_scalar=0.18*loading_bar_image_scalar
+        self.more_plates_image=engine.get_image('resources/images/plates/flower_blue.png')
+        self.more_plates_image=pygame.transform.scale_by(self.more_plates_image,more_plates_image_scalar)
+        self.width_more_plates_image, self.length_more_plates_image=self.more_plates_image.get_size()
+
         self.current_icon=None
         self.width_current_icon=None
         self.length_current_icon=None
@@ -41,6 +46,7 @@ class Loadingbar:
         self.width_elephant_head_image, self.length_elephant_head_image=self.elephant_head_image.get_size()
 
     def start_wave(self,wave_level):
+        print(wave_level)
         self.wave_level=wave_level
         self.wave_started=True
         self.start_wave_time=time.time()
@@ -54,8 +60,9 @@ class Loadingbar:
             self.current_icon=self.more_pieces_image
             self.width_current_icon,self.length_current_icon=self.width_more_pieces_image, self.length_more_pieces_image
         elif wave_level % 4 == 3:
-            # more plates
-            ...
+            self.current_icon=self.more_plates_image
+            self.width_current_icon,self.length_current_icon=self.width_more_plates_image,self.length_more_plates_image
+            
         self.width_progression_bar=0   
 
     def wave_is_done(self) -> bool:
