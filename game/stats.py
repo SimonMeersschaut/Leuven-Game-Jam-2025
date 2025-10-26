@@ -1,7 +1,7 @@
 from engine import engine 
 import pygame
 
-def get_partial_live_im(part: float):
+def get_partial_live_im(part: float, lost):
     """Return a Surface showing a partial life plate.
 
     part: float between 0.0 and 1.0 inclusive.
@@ -18,7 +18,6 @@ def get_partial_live_im(part: float):
 
     # Load both images
     life = engine.get_image('resources/images/life.png')
-    lost = engine.get_image('resources/images/lost_life.png')
 
     # Scale to the same display size used elsewhere in Stats (approx 3%)
     # Use transform.scale_by if available, otherwise fallback to smoothscale
@@ -69,6 +68,8 @@ class Stats:
 
         self.lost_lives_image=engine.get_image('resources/images/lost_life.png')
         self.lost_lives_image=pygame.transform.scale_by(self.lost_lives_image,0.03)
+        bright = 128
+        self.lost_lives_image.fill((bright, bright, bright), special_flags=pygame.BLEND_RGB_MULT)
         self.width_lost_lives_image, self.length_lost_lives_image=self.lost_lives_image.get_size()
 
         self.lifes_background=pygame.transform.scale(engine.get_image('resources/images/lifes_background.png'),(430,100))
@@ -107,7 +108,6 @@ class Stats:
         self.width_money_image,self.length_money_image=self.money_image.get_size()
     
     def update(self, delta_t: float, events: list):
-        print(self.lives)
         self.money_image=engine.render_text('birthstone',60,f'€{self.money}',(255,255,255))
 
     def render(self):
@@ -125,7 +125,8 @@ class Stats:
         pos_x = calc_x(int(self.lives))
         # pos_x = 50+1.5*(int(self.lives)+1)*self.width_lives_image
         part = self.lives - int(self.lives)
-        im = get_partial_live_im(part)
+        im = get_partial_live_im(part, lost=self.lost_lives_image)
+        
         engine.render_image(im, (pos_x, 30))
 
         engine.render_image(self.money_image,(engine.DISPLAY_W-self.width_money_image-30,30))
