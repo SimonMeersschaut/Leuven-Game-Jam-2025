@@ -171,11 +171,12 @@ class Engine:
 
         return int(scaled_mx), int(scaled_my)
 
-    def spawn_particles(self, pos: tuple[int, int], count: int = 20, color: tuple[int, int, int] = (255, 215, 0), spread: float = 60.0, speed: float = 200.0, lifetime: float = 1.0, radius: float = 4.0) -> None:
+    def spawn_particles(self, pos: tuple[int, int], count: int = 20, color: tuple[int, int, int] = (255, 215, 0), spread: float = 60.0, speed: float = 200.0, lifetime: float = 1.0, radius: float = 4.0, angle_min: float | None = None, angle_max: float | None = None, gravity: float = 700.0) -> None:
         """Spawn particles in internal (unscaled) coordinates.
 
         Example: engine.spawn_particles((x, y), count=30)
         """
-        self.particles.spawn(pos, count=count, color=color, spread=spread, speed=speed, lifetime=lifetime, radius=radius)
+        # forward optional angle range and gravity to ParticleSystem.spawn so callers can bias particle direction
+        self.particles.spawn(pos, count=count, color=color, spread=spread, speed=speed, lifetime=lifetime, radius=radius, angle_min=angle_min, angle_max=angle_max, gravity=gravity)
 
 engine = Engine()

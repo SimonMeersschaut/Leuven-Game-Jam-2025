@@ -7,7 +7,7 @@ def draw_points(points, surf):
         pygame.draw.circle(surf, (0, 255, 0), point, 5)
 
 def index_to_radians(index, pieces: int) -> float:
-    return math.radians(index * (360.0 / pieces) - 90)
+    return math.radians((index) * (360.0 / pieces) - 90)
 
 def create_polygon_points(theta, center, radius, w, h, direction: int):
     MIN_VERTICES = 20
@@ -58,7 +58,7 @@ def shatter_plate(surface, split_lines: list[bool], pieces=8):
         raise ValueError("A plate splits in at least two pieces.")
 
     if isinstance(surface, str):
-        surface = pygame.transform.scale(pygame.image.load(surface),(400, 400))
+        surface = pygame.transform.scale(pygame.image.load(surface),(150, 150))
 
     # Ensure pygame initialized
     if not pygame.get_init():
@@ -76,7 +76,6 @@ def shatter_plate(surface, split_lines: list[bool], pieces=8):
             end_split_line_index = split_index + 1
             while end_split_line_index <= 7 and (not split_lines[end_split_line_index]):
                 end_split_line_index += 1
-
             # Create attendance list
             attendance_list = [False for _ in range(8)]
             for i in range(split_index, end_split_line_index):
