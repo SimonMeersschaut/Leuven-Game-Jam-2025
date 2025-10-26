@@ -102,12 +102,14 @@ class PlateSupervisor:
         self.falling_multiplier = 0
         split_lines = [True, False, False, False, True, False, False, False]
 
-        pieces = shatter_plate("resources/images/plate.png", split_lines)
+        pieces = shatter_plate("resources/images/plates/flower_blue.png", split_lines)
         for position, piece in zip([(800, 300), (200, 50)], pieces):
             self.fragments.append(Fragment(
                 *piece, # where this fragment exists (in the list of the entire plate)
                 position=position,
-                is_loading=False
+                is_loading=False,
+                fragment_colors=["blue" for _ in range(8)],
+                fragment_symbols=["flower" for _ in range(8)]
             ))
 
     def spawn_plate(self):
@@ -123,8 +125,8 @@ class PlateSupervisor:
         for piece in pieces:
             fragment = Fragment(
                 *piece, # where this fragment exists (in the list of the entire plate)
-                fragment_colors=plate_settings["color"],
-                fragment_symbols=plate_settings["symbol"],
+                fragment_colors=[plate_settings["color"] for _  in range(8)],
+                fragment_symbols=[plate_settings["symbol"] for _  in range(8)],
                 position=(random.randint(0, 1000),  -random.randint(200, 800)),
                 is_loading=False
             )
@@ -215,9 +217,9 @@ class PlateSupervisor:
         self.hovered_plate = None
 
         for held_fragment in self.fragments:
-            if held_fragment.holding:
-                ...
-            elif held_fragment.previously_holding:
+            # if held_fragment.holding:
+            #     ...
+            # elif held_fragment.previously_holding:
                 # Check glue
                 for fragment in self.fragments:
                     if is_combineable(held_fragment.attendance_list, fragment.attendance_list):
@@ -236,7 +238,7 @@ class PlateSupervisor:
                                 if len(self.fragments) == 1 and not self.loading_bar.wave_is_done() and self.time_until_next_spawn is not None:
                                     self.spawn_plate()
                                 # Give money
-                                # self.stats.add_money(calculate_price_of_plate(self.held_fragment))
+                                self.stats.add_money(calculate_price_of_plate(held_fragment))
             
 
     def prerender(self):

@@ -66,6 +66,9 @@ class Fragment(DraggableSprite):
             width=None,
             is_loading = True
         ):
+        assert fragment_colors is not None
+        assert fragment_symbols is not None
+        
         self.fragment_colors = fragment_colors # ["red" for _ in range(8)] # TODO
         self.fragment_symbols = fragment_symbols # ["bird" for _ in range(8)] # TODO
         self.left_gold_glue = left_gold_glue
