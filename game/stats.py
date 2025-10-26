@@ -85,6 +85,7 @@ class Stats:
 
         self.gouden_kak_bought = False # Set by shop
         self.plates_merged = 0
+        self.kak_disabled = True
     
     def play_again(self):
         self.money=0

@@ -32,8 +32,10 @@ class Game:
         self.time_until_gouden_kak = random.normalvariate(10, 5)
         self.wave_number = 0
         self.repeating_cupboard=3
+        # self.stats.
         # self.elephant_ass=pygame.transform.scale_by(self.elephant_ass,0.2)
         # self.width_elephant_ass, self.length_elephant_ass=self.elephant_ass.get_size()
+        self.game.stats.kak_disabled = False
         self.stats.play_again()
         self.loading_bar = Loadingbar()
         self.gameoverscreen = Gameoverscreen(self)

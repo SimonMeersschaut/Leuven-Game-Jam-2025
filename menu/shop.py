@@ -14,7 +14,7 @@ class Shop:
 
         self.buy_kak = Button('resources/buttons/golden_poop.png', (engine.DISPLAY_W/6+5, 300), height=100)
         self.kak_price = 500
-        self.kak_disabled = False
+        self.game.stats.kak_disabled = False
 
         self.buy_extra_leven = Button('resources/buttons/extra_life.png', (engine.DISPLAY_W*5/6 - 85, 300), height=100)
         self.extra_leven_price = 500
@@ -32,10 +32,10 @@ class Shop:
                 self.multiplier_price *= 3
         elif self.buy_kak.update_and_check_clicked():
             if self.game.stats.total_money >= self.kak_price:
-                if not self.kak_disabled:
+                if not self.game.stats.kak_disabled:
                     self.game.stats.total_money -= self.kak_price
                     self.game.stats.gouden_kak_bought = True
-                    self.kak_disabled = True
+                    self.game.stats.kak_disabled = True
         elif self.buy_extra_leven.update_and_check_clicked():
             if self.game.stats.total_money >= self.extra_leven_price:
                 self.game.stats.total_money -= self.extra_leven_price
@@ -73,7 +73,7 @@ class Shop:
         self.width_kak_image,self.length_kak_image=self.kak_image.get_size()
         engine.render_image(self.kak_image,(engine.DISPLAY_W/5 - self.width_kak_image/2,225))
 
-        if self.kak_disabled:
+        if self.game.stats.kak_disabled:
             self.kak_price_image=engine.render_text('birthstone',40,f'out of stock',(50,50,150))
         elif self.game.stats.total_money >= self.kak_price:
             self.kak_price_image=engine.render_text('birthstone',40,f'€{self.kak_price}',(50,200,50))
