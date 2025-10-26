@@ -247,9 +247,7 @@ class PlateSupervisor:
                                     self.stats.add_money(calculate_price_of_plate(held_fragment))
                                     # Add stats
                                     self.stats.plates_merged += 1
-            
-
-
+    
     def render(self):
         for fragment in reversed(self.fragments):
             fragment.render()
