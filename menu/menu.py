@@ -41,8 +41,10 @@ class Menu:
         else:
             engine.fill((60, 60, 60))
             
-            paper_background = pygame.transform.scale(engine.get_image('resources/buttons/paper_background.jpeg'), (1280, 720))
-            engine.render_image(paper_background, (0, 0))
+            start_screen_background = engine.get_image('resources/images/splash_screen.jpg')
+            start_screen_background = pygame.transform.rotate(start_screen_background, -90)
+            start_screen_background = pygame.transform.scale(start_screen_background,(1280,720))
+            engine.render_image(start_screen_background, (0, 0))
 
             self.play_button.render()
             self.shop_button.render()

@@ -18,7 +18,6 @@ class Shop:
 
         self.buy_extra_leven = Button('resources/buttons/back_paper.jpeg', (engine.DISPLAY_W*5/6 - 145, 300), height=100)
         self.extra_leven_price = 500
-        self.extra_leven_disabled = False
 
         self.paper_background = pygame.transform.scale(engine.get_image('resources/buttons/paper_background.jpeg'),
                                                        (1920, 1080))
@@ -28,19 +27,19 @@ class Shop:
             self.main_menu.state = "main_menu"
         elif self.buy_multiplier.update_and_check_clicked():
             if self.game.stats.money >= self.multiplier_price:
+                self.game.stats.money -= self.multiplier_price
                 self.game.stats.multiplier *= 2
                 self.multiplier_price *= 3
-                self.game.stats.money -= self.multiplier_price
         elif self.buy_kak.update_and_check_clicked():
             if self.game.stats.money >= self.kak_price:
-                self.game.stats.money -= self.kak_price
-                self.game.stats.kak = True
-                self.kak_disabled = True
+                if not self.kak_disabled:
+                    self.game.stats.money -= self.kak_price
+                    self.game.stats.kak = True
+                    self.kak_disabled = True
         elif self.buy_extra_leven.update_and_check_clicked():
             if self.game.stats.money >= self.extra_leven_price:
                 self.game.stats.money -= self.extra_leven_price
-                self.game.stats.extra_leven = True
-                self.extra_leven_disabled = True
+                self.game.stats.max_lives += 1
 
     def render(self):
         engine.fill((60, 60, 60))
@@ -88,9 +87,9 @@ class Shop:
         self.width_extra_leven_image,self.length_extra_leven_image=self.extra_leven_image.get_size()
         engine.render_image(self.extra_leven_image,(engine.DISPLAY_W*4/5 - self.width_extra_leven_image/2,225))
 
-        if self.extra_leven_disabled:
-            self.extra_leven_price_image=engine.render_text('birthstone',40,f'out of stock',(50,50,150))
-        elif self.game.stats.money >= self.extra_leven_price:
+        # if self.extra_leven_disabled:
+        self.extra_leven_price_image=engine.render_text('birthstone',40,f'out of stock',(50,50,150))
+        if self.game.stats.money >= self.extra_leven_price:
             self.extra_leven_price_image=engine.render_text('birthstone',40,f'€{self.extra_leven_price}',(50,200,50))
         else:
             self.extra_leven_price_image=engine.render_text('birthstone',40,f'€{self.extra_leven_price}',(200,50,50))

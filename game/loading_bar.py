@@ -54,6 +54,7 @@ class Loadingbar:
             self.current_icon=self.more_pieces_image
             self.width_current_icon,self.length_current_icon=self.width_more_pieces_image, self.length_more_pieces_image
         elif wave_level % 4 == 3:
+            # more plates
             ...
         self.width_progression_bar=0   
 

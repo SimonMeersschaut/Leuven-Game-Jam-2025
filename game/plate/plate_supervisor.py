@@ -7,7 +7,7 @@ import random
 import time
 from engine import engine
 from .angry_animation import render_angry_animation
-from .plate_settings import PLATE_IMAGES, COLOR_PRICES, COLOR_ORDER
+from .plate_settings import PLATE_IMAGES, COLOR_PRICES, COLOR_ORDER, calculate_price_of_plate
 
 def is_within_distance(pos1, pos2, dist: int) -> bool:
     # Manhattan distance
@@ -16,10 +16,29 @@ def is_within_distance(pos1, pos2, dist: int) -> bool:
         return (pos1[0] - pos2[0])**2 + (pos1[1] - pos2[1])**2 <= dist**2
 
 def is_combineable(attendance_1: list[bool], attendance_2: list[bool]) -> bool:
+    def get_first_and_last_index(attendance):
+        found = False
+        start_index = None
+        end_index = None
+        for index in range(len(attendance)):
+            if not found:
+                if attendance[index]:
+                    found = True
+                    start_index = index
+            else:
+                if not attendance[index]:
+                    end_index = index
+                    break
+        if not end_index:
+            end_index = index
+        return (start_index, end_index)
+
     # fragments are combineable iff they dont intersect AND there edges align (so no void)
     intersect = any([(attendance_1[i] and attendance_2[i]) for i in range(8)])
-    edges_align = True
-    return (not intersect) and edges_align
+    start_1, end_1 = get_first_and_last_index(attendance_1)
+    start_2, end_2 = get_first_and_last_index(attendance_2)
+    edges_align = (end_1 - start_2 == 1) or (end_2 - start_1 == 1)
+    return (not intersect) #  and edges_align
 
 def create_split_lines(n: int, split_lines = None, start_index = 0, end_index = 7):
     """
@@ -52,9 +71,12 @@ def create_split_lines(n: int, split_lines = None, start_index = 0, end_index = 
     
 
 class PlateSupervisor:
-    ANGRY_ANIMATION_DURATION = 1
+    ANGRY_ANIMATION_DURATION = 3
 
     def __init__(self, game, loading_bar, stats):
+        self.trunk = engine.get_image("resources/images/trunk.png")
+
+        self.loading_fragments = []
         self.plates = []
         self.held_plates = {}
    
@@ -80,11 +102,14 @@ class PlateSupervisor:
         self.falling_multiplier = 0
         split_lines = [True, False, False, False, True, False, False, False]
 
-        pieces = shatter_plate("resources/images/plate.png", split_lines)
+        pieces = shatter_plate("resources/images/plates/flower_blue.png", split_lines)
         for position, piece in zip([(800, 300), (200, 50)], pieces):
             self.fragments.append(Fragment(
                 *piece, # where this fragment exists (in the list of the entire plate)
-                position=position
+                position=position,
+                is_loading=False,
+                fragment_colors=["blue" for _ in range(8)],
+                fragment_symbols=["flower" for _ in range(8)]
             ))
 
     def spawn_plate(self):
@@ -98,10 +123,14 @@ class PlateSupervisor:
         
         pieces = shatter_plate("resources/images/plates/"+plate_settings["image"], split_lines)
         for piece in pieces:
-            self.fragments.append(Fragment(
+            fragment = Fragment(
                 *piece, # where this fragment exists (in the list of the entire plate)
-                position=(random.randint(0, 1000),  -random.randint(200, 800))
-            ))
+                fragment_colors=[plate_settings["color"] for _  in range(8)],
+                fragment_symbols=[plate_settings["symbol"] for _  in range(8)],
+                position=(random.randint(0, 1000),  -random.randint(200, 800)),
+                is_loading=False
+            )
+            self.fragments.append(fragment)
     
     def unfreeze(self):
         self.is_frozen = False
@@ -116,7 +145,7 @@ class PlateSupervisor:
             self.color_index += 1
         elif self.game.wave_number % 4 == 1:
             # Falling Faster
-            self.falling_multiplier += 0.25
+            self.falling_multiplier += 0.5
         elif self.game.wave_number % 4 == 2:
             # more pieces
             self.average_pieces += 1
@@ -133,6 +162,29 @@ class PlateSupervisor:
         return random.choice([setting for setting in PLATE_IMAGES if setting["color"] == COLOR_ORDER[color_index]])
     
     def update(self, delta_t: float, events: list):
+        # preLoading fragments
+        for fragment in self.loading_fragments:
+            fragment.update()
+            if fragment.get_center_pos()[1] < -100:
+                # move to real fragment
+                self.loading_fragments.remove(fragment)
+                self.fragments.append(fragment)
+                fragment.set_not_loading()
+        
+        if self.loading_bar.wave_is_done():
+            # wait for all fragments to dissappear
+            if len(self.fragments) == 0:
+                # Show angry animation, then go to next wave
+                if self.angry_animation_start_t is not None:
+                    # animation is playing
+                    render_angry_animation(self.game.wave_number, (time.time() - self.angry_animation_start_t) / PlateSupervisor.ANGRY_ANIMATION_DURATION)
+                    if time.time() - self.angry_animation_start_t >= PlateSupervisor.ANGRY_ANIMATION_DURATION:
+                        # go to next wave
+                        self.apply_next_wave()
+                else:
+                    self.angry_animation_start_t = time.time()
+        
+        # Update Fragments
         for fragment in self.fragments:
             fragment.previously_holding = fragment.holding
             fragment.previously_hovering = fragment.hovering
@@ -149,95 +201,66 @@ class PlateSupervisor:
                         if pointer_id not in self.held_plates:
                             self.held_plates[pointer_id] = fragment
                             fragment.holding = True
+                            fragment.ever_held = True
                             fragment.holding_index = pointer_id
                             
             fragment.update(delta_t, events, self.falling_multiplier)
 
-        # # Update Fragments
-        # for fragment in self.fragments:
-        #     fragment.update(delta_t, events, self.falling_multiplier)
+            if fragment.get_center_pos()[1] >= 600:
+                if not self.is_frozen:
+                    # break on ground
+                    # spawn an upward splash of particles to emphasise the breaking
+                    engine.spawn_particles(fragment.get_center_pos(), count=50, color=(220, 220, 220), spread=30, speed=200, lifetime=1.2, radius=5, angle_min=-math.pi, angle_max=-math.tau)
+                    self.fragments.remove(fragment)
+                    self.stats.lose_life()
 
-        # if self.loading_bar.wave_is_done():
-        #     # wait for all fragments to dissappear
-        #     if len(self.fragments) == 0:
-        #         # Show angry animation, then go to next wave
-        #         if self.angry_animation_start_t is not None:
-        #             # animation is playing
-        #             render_angry_animation(self.game.wave_number, (time.time() - self.angry_animation_start_t) / PlateSupervisor.ANGRY_ANIMATION_DURATION)
-        #             if time.time() - self.angry_animation_start_t >= PlateSupervisor.ANGRY_ANIMATION_DURATION:
-        #                 # go to next wave
-        #                 self.apply_next_wave()
-        #         else:
-        #             self.angry_animation_start_t = time.time()
+            # Check for removal
+            # Complete plate, remove after 2 seconds
+            if fragment.finished_animation_start_time is not None:
+                if time.time() - fragment.finished_animation_start_time > 2:
+                    self.fragments.remove(fragment)
             
-        # # Check for spawning
-        # if self.time_until_next_spawn is not None and not self.time_until_next_spawn is None:
-        #     self.time_until_next_spawn -= delta_t
-        #     if self.time_until_next_spawn <= 0 and not self.loading_bar.wave_is_done():
-        #         self.spawn_plate()
+        # Check for spawning
+        if self.time_until_next_spawn is not None and not self.time_until_next_spawn is None:
+            self.time_until_next_spawn -= delta_t
+            if self.time_until_next_spawn <= 0 and not self.loading_bar.wave_is_done():
+                self.spawn_plate()
 
-        # self.hovered_plate = None
+        self.hovered_plate = None
 
-
-        # if self.held_fragment and pygame.mouse.get_pressed()[0]:
-        #     self.held_fragment.holding = True
-        #     self.held_fragment.update(delta_t, events, self.falling_multiplier)
-            
-        #     if fragment.finished_animation_start_time is not None:
-        #         if time.time() - fragment.finished_animation_start_time > 2:
-        #             self.fragments.remove(fragment)
-        # else:
-        #     # check if 'glueable'
-        #     if self.held_fragment:
-        #         for fragment in self.fragments:
-        #             if is_combineable(self.held_fragment.attendance_list, fragment.attendance_list):
-        #                 if is_within_distance(self.held_fragment.get_center_pos(), fragment.get_center_pos(), 70):
-        #                     self.held_fragment.combine_with(fragment)
-        #                     self.fragments.remove(fragment)
-        #                     # Test full plate
-        #                     if all(self.held_fragment.attendance_list) and not self.held_fragment.is_playing_finished_animation:
-        #                         # Success!
-        #                         engine.spawn_particles(self.held_fragment.get_center_pos(), count=400, color=(255,200,60), spread=10, speed=500, lifetime=4, radius=4)
-        #                         self.held_fragment.is_playing_finished_animation = True
-        #                         if self.is_frozen: # was frozen
-        #                             self.unfreeze()
-        #                         self.held_fragment.finished_animation_start_time = time.time()
-        #                         if len(self.fragments) == 1 and not self.loading_bar.wave_is_done() and self.time_until_next_spawn is not None:
-        #                             self.spawn_plate()
-        #                         # Give money
-                                
-            
-        #     self.held_fragment = None
         
-        #     for fragment in self.fragments:
-        #         fragment.previously_holding = fragment.holding
-        #         fragment.previously_hovering = fragment.hovering
 
+        # Check glue
+        for held_fragment in self.fragments:
+                for fragment in self.fragments:
+                    if fragment.ever_held or held_fragment.ever_held:
+                        if is_combineable(held_fragment.attendance_list, fragment.attendance_list):
+                            if is_within_distance(held_fragment.get_center_pos(), fragment.get_center_pos(), 70):
+                                held_fragment.combine_with(fragment)
+                                self.fragments.remove(fragment)
+                                engine.spawn_particles(held_fragment.get_center_pos(), count=100, color=(255,200,60), spread=2, speed=50, lifetime=2, radius=2)
+                                # Test full plate
+                                if all(held_fragment.attendance_list) and not held_fragment.is_playing_finished_animation:
+                                    # Success!
+                                    engine.spawn_particles(held_fragment.get_center_pos(), count=400, color=(255,200,60), spread=10, speed=500, lifetime=4, radius=4)
+                                    held_fragment.is_playing_finished_animation = True
+                                    if self.is_frozen: # was frozen
+                                        self.unfreeze()
+                                    held_fragment.finished_animation_start_time = time.time()
+                                    if len(self.fragments) == 1 and not self.loading_bar.wave_is_done() and self.time_until_next_spawn is not None:
+                                        self.spawn_plate()
+                                    # Give money
+                                    self.stats.add_money(calculate_price_of_plate(held_fragment))
+            
 
-
-        #         if fragment.is_clicked() and self.held_fragment is None:
-        #             fragment.holding = True
-        #             self.held_fragment = fragment
-        #         elif not self.held_fragment == fragment:
-        #             fragment.holding = False
-
-        #         if fragment.is_hovered() and self.hovered_plate is None:
-        #             fragment.hovering = True
-        #             self.hovered_plate = fragment
-        #         else:
-        #             fragment.hovering = False
-
-        #         if fragment.finished_animation_start_time is not None:
-        #             if time.time() - fragment.finished_animation_start_time > 2:
-        #                 self.fragments.remove(fragment)
-                
-        #         if fragment.get_center_pos()[1] >= 600:
-        #             # break on ground
-        #             # spawn an upward splash of particles to emphasise the breaking
-        #             engine.spawn_particles(fragment.get_center_pos(), count=50, color=(220, 220, 220), spread=30, speed=200, lifetime=1.2, radius=5, angle_min=-math.pi, angle_max=-math.tau)
-        #             self.fragments.remove(fragment)
-        #             self.stats.lose_life()
+    def prerender(self):
+        # render trunk
+        if len(self.loading_fragments) > 0:
+            ... # TODO
+        # render fragments
+        for fragment in self.loading_fragments:
+            fragment.render()
 
     def render(self):
-        for plate in reversed(self.fragments):
-            plate.render()
+        for fragment in reversed(self.fragments):
+            fragment.render()
