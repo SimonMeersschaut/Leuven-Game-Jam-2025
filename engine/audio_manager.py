@@ -29,3 +29,11 @@ def play_game_music(fade_ms: int = 800, volume: float = _default_volume):
 
 def set_volume(volume: float):
     pygame.mixer.music.set_volume(max(0.0, min(1.0, volume)))
+
+def pause_music():
+    if pygame.mixer.music.get_busy():
+        pygame.mixer.music.pause()
+
+def unpause_music():
+    if pygame.mixer.music.get_busy():
+        pygame.mixer.music.unpause()

@@ -1,4 +1,4 @@
-from engine import engine, Modes
+from engine import audio_manager, engine, Modes
 import pygame
 from .plate.fragment import Fragment
 from .plate.plate_supervisor import PlateSupervisor
@@ -27,6 +27,7 @@ class Game:
         self.time_until_gouden_kak = 0 # random.normalvariate(10, 5)
     
     def play_again(self):
+        audio_manager.unpause_music()
         self.time_until_gouden_kak = 0 #random.normalvariate(10, 5)
         self.wave_number = 0
         self.repeating_cupboard=3
@@ -38,6 +39,7 @@ class Game:
         self.plate_supervisor = PlateSupervisor(self, self.loading_bar, self.stats)
     
     def back_to_main_menu(self):
+        audio_manager.unpause_music
         engine.mode = Modes.main_menu
         
 
@@ -69,6 +71,7 @@ class Game:
             self.loading_bar.update(delta_t,events)
             self.golden_poop.update(delta_t,events)
         else:
+            audio_manager.pause_music()
             self.gameoverscreen.update(delta_t,events,self.stats,self.loading_bar)
         
     def render(self):
