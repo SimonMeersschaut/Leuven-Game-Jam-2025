@@ -1,5 +1,7 @@
 import pygame
 from enum import Enum, auto
+
+from engine import audio_manager
 from .pointers import pointers
 from .particles import ParticleSystem
 
@@ -57,8 +59,6 @@ class Engine:
         FRAME_RATE = 60 # FPS (Hz)
         FREQUENCY = 1/FRAME_RATE # seconds
 
-        pygame.mixer.music.set_volume(0.5)
-
         menu.shop.game = game
         
         running = True
@@ -89,9 +89,11 @@ class Engine:
                         
             # Update and draw active scene
             if self.mode == Modes.main_menu:
+                audio_manager.play_menu_music()
                 menu.update(delta_t, events)
                 menu.render()
             elif self.mode == Modes.game:
+                audio_manager.play_game_music()
                 game.update(delta_t, events)
                 game.render()
             else:
