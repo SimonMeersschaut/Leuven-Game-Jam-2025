@@ -23,7 +23,7 @@ class Game:
         self.plate_supervisor = PlateSupervisor(self, self.loading_bar, self.stats)
         self.plate_supervisor.spawn_plate()
         self.golden_poop = Goldenpoop()
-    
+
     def play_again(self):
         self.wave_number = 0
         self.repeating_cupboard=3
@@ -36,6 +36,7 @@ class Game:
     
     def back_to_main_menu(self):
         engine.mode = Modes.main_menu
+        
 
     def update(self, delta_t: float, events: list):
         if self.stats.lives > 0:

@@ -1,9 +1,12 @@
 from engine import engine
 import random
+import pygame
 
 def render_angry_animation(wave_number:int, progress: float):
     x_shake=random.randint(-2,2)
     y_shake=random.randint(-2,2)
+    elephant_sound = pygame.mixer.Sound('resources/sounds/elephant.mp3')
+    pygame.mixer.Sound.play(elephant_sound)
     if wave_number%4==1:#Falling faster
         angry_animation1=engine.render_text('birthstone',100,'Elephant is getting angry!',(255,255,255))
         width_angry_animation1,length_angry_animation1=angry_animation1.get_size()

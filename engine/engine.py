@@ -57,6 +57,8 @@ class Engine:
         FRAME_RATE = 60 # FPS (Hz)
         FREQUENCY = 1/FRAME_RATE # seconds
 
+        pygame.mixer.music.set_volume(0.5)
+
         menu.shop.game = game
         
         running = True
