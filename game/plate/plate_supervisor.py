@@ -52,7 +52,7 @@ def create_split_lines(n: int, split_lines = None, start_index = 0, end_index = 
     
 
 class PlateSupervisor:
-  ANGRY_ANIMATION_DURATION = 1
+    ANGRY_ANIMATION_DURATION = 1
 
     def __init__(self, game, loading_bar, stats):
         self.plates = []
