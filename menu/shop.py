@@ -19,8 +19,8 @@ class Shop:
         self.buy_extra_leven = Button('resources/buttons/extra_life.png', (engine.DISPLAY_W*5/6 - 85, 300), height=100)
         self.extra_leven_price = 500
 
-        self.paper_background = pygame.transform.scale(engine.get_image('resources/buttons/paper_background.jpeg'),
-                                                       (1920, 1080))
+        self.shop_background = pygame.transform.scale(pygame.transform.rotate(engine.get_image('resources/images/splash_screen.jpg'),
+                                                       -90),(engine.DISPLAY_W,engine.DISPLAY_H))
 
     def update(self):
         if self.back_button.update_and_check_clicked():
@@ -44,7 +44,7 @@ class Shop:
     def render(self):
         engine.fill((60, 60, 60))
 
-        engine.render_image(self.paper_background, (0, 0))
+        engine.render_image(self.shop_background, (0, 0))
 
         self.back_button.render()
 
