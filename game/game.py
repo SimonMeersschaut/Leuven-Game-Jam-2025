@@ -44,9 +44,9 @@ class Game:
         
 
     def update(self, delta_t: float, events: list):
-        if self.stats.gouden_kak_bought:
+        if self.stats.gouden_kak_bought and not self.plate_supervisor.is_frozen:
             self.time_until_gouden_kak -= delta_t
-        if self.time_until_gouden_kak <= 0:
+        if self.time_until_gouden_kak <= 0 and not self.plate_supervisor.is_frozen:
             # spawn
             self.golden_poop.golden_poop_appears()
         if self.time_until_gouden_kak <= 3:
@@ -82,11 +82,11 @@ class Game:
         engine.render_image(self.elephant_ass,(engine.DISPLAY_W/2-self.width_elephant_ass/2,engine.DISPLAY_H-self.length_elephant_ass-50))
         self.stats.render()
         self.loading_bar.render()
+        self.plate_supervisor.render()
+        self.golden_poop.render()
         if self.stats.lives <=0:
             self.gameoverscreen.render()
             self.stats.gouden_kak_bought = False
-        self.plate_supervisor.render()
-        self.golden_poop.render()
 
     
 game = Game()

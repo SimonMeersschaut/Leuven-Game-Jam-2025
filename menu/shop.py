@@ -28,7 +28,7 @@ class Shop:
         elif self.buy_multiplier.update_and_check_clicked():
             if self.game.stats.total_money >= self.multiplier_price:
                 self.game.stats.total_money -= self.multiplier_price
-                self.game.stats.multiplier *= 2
+                self.game.stats.money_multiplier *= 2
                 self.multiplier_price *= 3
         elif self.buy_kak.update_and_check_clicked():
             if self.game.stats.total_money >= self.kak_price:
@@ -57,7 +57,7 @@ class Shop:
         self.width_money_image,self.length_money_image=self.money_image.get_size()
         engine.render_image(self.money_image,(engine.DISPLAY_W-self.width_money_image-30,30))
 
-        self.multiplier_image=engine.render_text('birthstone',60,f'x{self.game.stats.multiplier*2} MULTIPLIER',(50,50,150))
+        self.multiplier_image=engine.render_text('birthstone',60,f'x{self.game.stats.money_multiplier*2} MULTIPLIER',(50,50,150))
         self.width_multiplier_image,self.length_multiplier_image=self.multiplier_image.get_size()
         engine.render_image(self.multiplier_image,((engine.DISPLAY_W - self.width_multiplier_image)/2,225))
 

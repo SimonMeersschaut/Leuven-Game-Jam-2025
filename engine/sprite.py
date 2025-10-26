@@ -97,12 +97,35 @@ class Sprite():
         engine.render_image(self.image, self.position)
 
     def is_hovered(self):
+        # If any pointers (touch or mouse) intersect this sprite, consider it hovered.
+        try:
+            if self.get_intersecting_pointers():
+                return True
+        except Exception:
+            # defensive: if pointers subsystem is unavailable, fall back to mouse
+            pass
+
+        # fallback to mouse position (desktop)
         return self.rect.collidepoint(engine.get_scaled_mouse_pos())  # check if mouse is over the button
     
     def is_clicked(self):
-        return self.is_hovered() and pygame.mouse.get_pressed()[0]  # left mouse button
+        # For mouse: left button pressed and hovering
+        try:
+            mouse_pressed = pygame.mouse.get_pressed()[0]
+        except Exception:
+            mouse_pressed = False
+
+        if mouse_pressed and self.rect.collidepoint(engine.get_scaled_mouse_pos()):
+            return True
+
+        # For touch/mobile: treat any intersecting pointer as a "pressed" state
+        try:
+            return bool(self.get_intersecting_pointers())
+        except Exception:
+            return False
 
     def just_unclicked(self):
+        # True when we used to be clicked and now are not clicked anymore.
         return (not self.is_clicked()) and self.previously_clicked
     
     def get_intersecting_pointers(self):

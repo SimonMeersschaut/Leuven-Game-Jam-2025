@@ -18,7 +18,7 @@ def render_angry_animation(wave_number:int, progress: float):
         angry_animation1=engine.render_text('birthstone',100,'Elephant is getting angry!',COLOR)
         width_angry_animation1,length_angry_animation1=angry_animation1.get_size()
         engine.render_image(angry_animation1,(engine.DISPLAY_W/2-width_angry_animation1/2+x_shake,engine.DISPLAY_H/2-0.7*length_angry_animation1+y_shake))
-        angry_animation2=engine.render_text('birthstone',90,f'Wave level {wave_number}, plates will fall faster',COLOR)
+        angry_animation2=engine.render_text('birthstone',90,f'Wave level {wave_number+1}, plates will fall faster',COLOR)
         width_angry_animation2,length_angry_animation2=angry_animation2.get_size()
         engine.render_image(angry_animation2,(engine.DISPLAY_W/2-width_angry_animation2/2+x_shake,engine.DISPLAY_H/2+0.7*length_angry_animation1+y_shake))
 
@@ -26,7 +26,7 @@ def render_angry_animation(wave_number:int, progress: float):
         angry_animation1=engine.render_text('birthstone',100,'Elephant is getting angry!',COLOR)
         width_angry_animation1,length_angry_animation1=angry_animation1.get_size()
         engine.render_image(angry_animation1,(engine.DISPLAY_W/2-width_angry_animation1/2+x_shake,engine.DISPLAY_H/2-0.7*length_angry_animation1+y_shake))
-        angry_animation2=engine.render_text('birthstone',90,f'Wave level {wave_number}, plates will break in more pieces',COLOR)
+        angry_animation2=engine.render_text('birthstone',90,f'Wave level {wave_number+1}, plates will break in more pieces',COLOR)
         width_angry_animation2,length_angry_animation2=angry_animation2.get_size()
         engine.render_image(angry_animation2,(engine.DISPLAY_W/2-width_angry_animation2/2+x_shake,engine.DISPLAY_H/2+0.7*length_angry_animation1+y_shake))
 
@@ -34,7 +34,7 @@ def render_angry_animation(wave_number:int, progress: float):
         angry_animation1=engine.render_text('birthstone',100,'Elephant is getting angry!',COLOR)
         width_angry_animation1,length_angry_animation1=angry_animation1.get_size()
         engine.render_image(angry_animation1,(engine.DISPLAY_W/2-width_angry_animation1/2+x_shake,engine.DISPLAY_H/2-0.7*length_angry_animation1+y_shake))
-        angry_animation2=engine.render_text('birthstone',90,f'Wave level {wave_number}, plates will fall more frequent',COLOR)
+        angry_animation2=engine.render_text('birthstone',90,f'Wave level {wave_number+1}, plates will fall more frequent',COLOR)
         width_angry_animation2,length_angry_animation2=angry_animation2.get_size()
         engine.render_image(angry_animation2,(engine.DISPLAY_W/2-width_angry_animation2/2+x_shake,engine.DISPLAY_H/2+0.7*length_angry_animation1+y_shake))
 
@@ -42,6 +42,6 @@ def render_angry_animation(wave_number:int, progress: float):
         angry_animation1=engine.render_text('birthstone',100,'Elephant is getting angry!',COLOR)
         width_angry_animation1,length_angry_animation1=angry_animation1.get_size()
         engine.render_image(angry_animation1,(engine.DISPLAY_W/2-width_angry_animation1/2+x_shake,engine.DISPLAY_H/2-0.7*length_angry_animation1+y_shake))
-        angry_animation2=engine.render_text('birthstone',90,f'Wave level {wave_number}, plates come in different colors',COLOR)
+        angry_animation2=engine.render_text('birthstone',90,f'Wave level {wave_number+1}, plates come in different colors',COLOR)
         width_angry_animation2,length_angry_animation2=angry_animation2.get_size()
         engine.render_image(angry_animation2,(engine.DISPLAY_W/2-width_angry_animation2/2+x_shake,engine.DISPLAY_H/2+0.7*length_angry_animation1+y_shake))

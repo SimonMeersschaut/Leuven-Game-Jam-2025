@@ -76,7 +76,7 @@ class Stats:
 
         self.total_money = 50
         self.money=0
-        self.multiplier=1
+        self.money_multiplier = 1
         self.money_image=engine.render_text('birthstone',60,f'€{self.money}',(255,255,255))
         self.width_money_image,self.length_money_image=self.money_image.get_size()
 
@@ -101,8 +101,8 @@ class Stats:
             self.lives-=amount
     
     def add_money(self,amount):
-        self.money += amount*self.multiplier
-        self.total_money += amount*self.multiplier
+        self.money += amount*self.money_multiplier
+        self.total_money += amount*self.money_multiplier
 
         self.money_image=engine.render_text('birthstone',80,f'€{self.money}',(0,255,0))
         self.width_money_image,self.length_money_image=self.money_image.get_size()
