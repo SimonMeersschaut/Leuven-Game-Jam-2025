@@ -48,7 +48,6 @@ def create_split_lines(n: int, split_lines = None, start_index = 0, end_index = 
     return split_lines
     
 
-
 class PlateSupervisor:
     ANGRY_ANIMATION_DURATION = 1
     def __init__(self, game, loading_bar, stats):
@@ -65,7 +64,7 @@ class PlateSupervisor:
         # wave settings
         self.falling_multiplier = 1
         self.average_pieces = 1 # will still cut in 2 pieces on average
-        self.average_time_between_plates = 20
+        self.average_time_between_plates = 5
 
     def spawn_plate(self):
         self.time_until_next_spawn = max(0, random.normalvariate(self.average_time_between_plates, 5))
@@ -84,15 +83,19 @@ class PlateSupervisor:
     
     def apply_next_wave(self):
         # apply special
-        if self.game.wave_number%3 == 0:
+        if self.game.wave_number % 4 == 0:
             # More colors
             ...
-        if self.game.wave_number%3 == 1:
+        elif self.game.wave_number % 4 == 1:
             # Falling Faster
             self.falling_multiplier += 0.25
-        if self.game.wave_number%3 == 2:
+        elif self.game.wave_number % 4 == 2:
             # more pieces
             self.average_pieces += 1
+        elif self.game.wave_number % 4 == 3:
+            # More plates (more frequent)
+            self.average_time_between_plates /= .25
+
         # go to next
         self.game.wave_number += 1
         self.loading_bar.start_wave(self.game.wave_number)

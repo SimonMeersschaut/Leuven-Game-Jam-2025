@@ -44,15 +44,17 @@ class Loadingbar:
         self.wave_level=wave_level
         self.wave_started=True
         self.start_wave_time=time.time()
-        if wave_level%3 == 0:
+        if wave_level % 4 == 0:
             self.current_icon=self.more_colors_image
             self.width_current_icon,self.length_current_icon=self.width_more_colors_image, self.length_more_colors_image
-        if wave_level%3 == 1:
+        elif wave_level % 4 == 1:
             self.current_icon=self.falling_faster_image
             self.width_current_icon,self.length_current_icon=self.width_falling_faster_image, self.length_falling_faster_image
-        if wave_level%3 == 2:
+        elif wave_level % 4 == 2:
             self.current_icon=self.more_pieces_image
             self.width_current_icon,self.length_current_icon=self.width_more_pieces_image, self.length_more_pieces_image
+        elif wave_level % 4 == 3:
+            ...
         self.width_progression_bar=0   
 
     def wave_is_done(self) -> bool:
