@@ -8,7 +8,7 @@ import time
 from engine import engine
 from .angry_animation import render_angry_animation
 from .plate_settings import PLATE_IMAGES, COLOR_PRICES, COLOR_ORDER, calculate_price_of_plate
-from .plate_loading_fragments_supervisor import PlateLoadingFragmentSupervisor
+from .plate_loading_fragments_supervisor import loading_supervisor
 
 def is_within_distance(pos1, pos2, dist: int) -> bool:
     # Manhattan distance
@@ -75,7 +75,6 @@ class PlateSupervisor:
     ANGRY_ANIMATION_DURATION = 3
 
     def __init__(self, game, loading_bar, stats):
-        self.loading_supervisor = PlateLoadingFragmentSupervisor()
         
         self.plates = []
         self.held_plates = {}
@@ -133,7 +132,7 @@ class PlateSupervisor:
             )
             self.fragments.append(fragment)
             
-            self.loading_supervisor.aim_trunk(pos)
+            loading_supervisor.aim_trunk(pos)
     
     def unfreeze(self):
         self.is_frozen = False
@@ -166,7 +165,7 @@ class PlateSupervisor:
     
     def update(self, delta_t: float, events: list):
         # preLoading fragments
-        self.loading_supervisor.update()
+        loading_supervisor.update()
         
         if self.loading_bar.wave_is_done():
             # wait for all fragments to dissappear
@@ -248,10 +247,10 @@ class PlateSupervisor:
                                     self.stats.add_money(calculate_price_of_plate(held_fragment))
           
     def prerender(self):
-        self.loading_supervisor.prerender()
+        loading_supervisor.prerender()
 
     def render(self):
-        self.loading_supervisor.render()
+        loading_supervisor.render()
         for fragment in reversed(self.fragments):
             fragment.render()
         if self.angry_animation_start_t is not None:
