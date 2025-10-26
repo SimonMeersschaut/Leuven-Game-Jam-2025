@@ -42,9 +42,9 @@ class Game:
         
 
     def update(self, delta_t: float, events: list):
-        if self.stats.gouden_kak_bought:
+        if self.stats.gouden_kak_bought and not self.plate_supervisor.is_frozen:
             self.time_until_gouden_kak -= delta_t
-        if self.time_until_gouden_kak <= 0:
+        if self.time_until_gouden_kak <= 0 and not self.plate_supervisor.is_frozen:
             # spawn
             self.golden_poop.golden_poop_appears()
         if self.time_until_gouden_kak <= 3:
