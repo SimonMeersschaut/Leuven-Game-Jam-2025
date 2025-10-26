@@ -219,6 +219,7 @@ class PlateSupervisor:
                         if is_within_distance(self.held_fragment.get_center_pos(), fragment.get_center_pos(), 70):
                             self.held_fragment.combine_with(fragment)
                             self.fragments.remove(fragment)
+                            engine.spawn_particles(self.held_fragment.get_center_pos(), count=100, color=(255,200,60), spread=2, speed=50, lifetime=2, radius=2)
                             # Test full plate
                             if all(self.held_fragment.attendance_list) and not self.held_fragment.is_playing_finished_animation:
                                 # Success!
