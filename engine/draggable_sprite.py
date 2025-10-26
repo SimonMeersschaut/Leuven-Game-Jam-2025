@@ -16,7 +16,6 @@ class DraggableSprite(Sprite):
 
     def update(self):
         # Holding logic is in plate_supervisor
-
         if self.holding and self.holding_index != -1:
             if not self.previously_holding:
                 self.scale_factor(1.1)

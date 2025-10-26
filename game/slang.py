@@ -10,14 +10,13 @@ class Snake:
         self.y=random.randint(100,500)
         self.slang_image_button=self.slang_image.get_rect(topleft=(self.x,self.y))
 
-    def update(self, delta_t: float, events: list,loading_bar,stats):
+    def update(self, delta_t: float, events: list):
         mouse_pos = pygame.mouse.get_pos()
         # print(mouse_pos)
         if self.slang_image_button.collidepoint(mouse_pos):
             # print('dit lukt')
             for event in events:
                 if event.type==pygame.MOUSEBUTTONDOWN:
-                    loading_bar.start_wave(self.y)
                     self.x=random.randint(1,1000)
                     self.y=random.randint(1,600)
                     self.slang_image_button=self.slang_image.get_rect(topleft=(self.x,self.y))
