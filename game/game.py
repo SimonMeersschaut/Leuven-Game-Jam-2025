@@ -35,7 +35,7 @@ class Game:
         # self.stats.
         # self.elephant_ass=pygame.transform.scale_by(self.elephant_ass,0.2)
         # self.width_elephant_ass, self.length_elephant_ass=self.elephant_ass.get_size()
-        self.game.stats.kak_disabled = False
+        self.stats.kak_disabled = False
         self.stats.play_again()
         self.loading_bar = Loadingbar()
         self.gameoverscreen = Gameoverscreen(self)
@@ -68,8 +68,6 @@ class Game:
                 engine.spawn_particles((i*100, 50), count=20, color=(255,200,60), spread=30, speed=200, lifetime=4, radius=5)
             engine.spawn_particles((self.golden_poop.x_goldenpoop, self.golden_poop.y_goldenpoop), count=100, color=(255,200,60), spread=30, speed=200, lifetime=5, radius=5, gravity=0)
             
-        
-        
         if self.stats.lives > 0:
             self.plate_supervisor.update(delta_t, events)
         

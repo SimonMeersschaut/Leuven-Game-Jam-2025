@@ -14,7 +14,7 @@ class Shop:
 
         self.buy_kak = Button('resources/buttons/golden_poop.png', (engine.DISPLAY_W/6+5, 300), height=100)
         self.kak_price = 500
-        self.game.stats.kak_disabled = False
+        # self.game.stats.kak_disabled = False
 
         self.buy_extra_leven = Button('resources/buttons/extra_life.png', (engine.DISPLAY_W*5/6 - 85, 300), height=100)
         self.extra_leven_price = 500
