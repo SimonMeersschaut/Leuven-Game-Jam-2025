@@ -93,9 +93,9 @@ class PlateSupervisor:
         self.is_frozen = True
 
         # wave settings
-        self.falling_multiplier = 1
-        self.average_pieces = 1 # will still cut in 2 pieces on average
-        self.average_time_between_plates = 10
+        self.falling_multiplier = 1.3
+        self.average_pieces = 2 # will still cut in 2 pieces on average
+        self.average_time_between_plates = 4
         self.color_index = 0 # which indices of COLOR_ORDER are unlocked
 
         # Spawn first frozen plates
