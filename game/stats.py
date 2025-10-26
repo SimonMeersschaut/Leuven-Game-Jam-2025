@@ -19,12 +19,14 @@ class Stats:
         self.lives=1
         self.max_lives = 1
 
+        self.kak = False
+
     def lose_life(self):
         if self.lives>0:
             self.lives-=1
     
-    def update_money(self,amount):
-        self.money+=amount*self.multiplier
+    def add_money(self,amount):
+        self.money += amount*self.multiplier
         self.money_image=engine.render_text('birthstone',80,f'€{self.money}',(0,255,0))
         self.width_money_image,self.length_money_image=self.money_image.get_size()
     
