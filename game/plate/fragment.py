@@ -111,7 +111,7 @@ class Fragment(DraggableSprite):
     #     else:
     #         inside = (angle >= start or angle <= stop)
 
-        return inside
+        # return inside
 
     def set_not_loading(self):
         if self.is_loading:
