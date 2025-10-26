@@ -28,7 +28,7 @@ class Shop:
         elif self.buy_multiplier.update_and_check_clicked():
             if self.game.stats.total_money >= self.multiplier_price:
                 self.game.stats.total_money -= self.multiplier_price
-                self.game.stats.multiplier *= 2
+                self.game.stats.money_multiplier *= 2
                 self.multiplier_price *= 3
         elif self.buy_kak.update_and_check_clicked():
             if self.game.stats.total_money >= self.kak_price:
