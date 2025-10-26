@@ -174,6 +174,8 @@ class Engine:
         scaled_mx = (mx - offset_x) / scale
         scaled_my = (my - offset_y) / scale
 
+        return (scaled_mx, scaled_my)
+    
     def scale_position(self, position: tuple[int, int]) -> tuple[int, int]:
         mx, my = position
 
