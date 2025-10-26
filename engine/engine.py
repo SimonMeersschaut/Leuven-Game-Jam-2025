@@ -158,6 +158,24 @@ class Engine:
     def is_pressed(self, key) -> bool:
         return self.get_pressed_keys()[key]
 
+    def get_scaled_mouse_pos(self) -> tuple[int, int]:
+        """Returns the mouse position scaled to the internal 1920x1080 resolution."""
+
+        mx, my = pygame.mouse.get_pos()
+        scale_x = self.real_width / self._base_width
+        scale_y = self.real_height / self._base_height
+        scale = min(scale_x, scale_y)
+        
+        # compute offsets due to letter/pillar boxing
+        offset_x = (self.real_width - (self._base_width * scale)) / 2
+        offset_y = (self.real_height - (self._base_height * scale)) / 2
+        
+        # scale mouse position back to internal resolution
+        scaled_mx = (mx - offset_x) / scale
+        scaled_my = (my - offset_y) / scale
+
+        return (scaled_mx, scaled_my)
+    
     def scale_position(self, position: tuple[int, int]) -> tuple[int, int]:
         mx, my = position
 
@@ -175,6 +193,11 @@ class Engine:
         ix = (mx - dest_x) / scale
         iy = (my - dest_y) / scale
 
+        # clamp to internal bounds
+        ix = int(max(0, min(base_w - 1, ix)))
+        iy = int(max(0, min(base_h - 1, iy)))
+        return (ix, iy)
+    
     def spawn_particles(self, pos: tuple[int, int], count: int = 20, color: tuple[int, int, int] = (255, 215, 0), spread: float = 60.0, speed: float = 200.0, lifetime: float = 1.0, radius: float = 4.0, angle_min: float | None = None, angle_max: float | None = None, gravity: float = 700.0) -> None:
         """Spawn particles in internal (unscaled) coordinates.
 
