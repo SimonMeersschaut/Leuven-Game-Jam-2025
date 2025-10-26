@@ -92,7 +92,7 @@ class PlateSupervisor:
 
         # wave settings
         self.falling_multiplier = 1.3
-        self.average_pieces = 2 # will still cut in 2 pieces on average
+        self.average_pieces = 7 # will still cut in 2 pieces on average
         self.average_time_between_plates = 4
         self.color_index = 0 # which indices of COLOR_ORDER are unlocked
 
@@ -225,13 +225,14 @@ class PlateSupervisor:
         self.hovered_plate = None
 
         # Check glue
-        for held_fragment in self.fragments:
+        for i, (cursor, held_fragment) in enumerate(self.held_plates.items()):
                 for fragment in self.fragments:
-                    if fragment.ever_held or held_fragment.ever_held:
+                    if held_fragment.holding:
                         if is_combineable(held_fragment.attendance_list, fragment.attendance_list):
                             if is_within_distance(held_fragment.get_center_pos(), fragment.get_center_pos(), 70):
                                 held_fragment.combine_with(fragment)
                                 self.fragments.remove(fragment)
+                                # self.held_plates[cursor] = held_fragment
                                 engine.spawn_particles(held_fragment.get_center_pos(), count=100, color=(255,200,60), spread=2, speed=50, lifetime=2, radius=2)
                                 # Test full plate
                                 if all(held_fragment.attendance_list) and not held_fragment.is_playing_finished_animation:
