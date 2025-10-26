@@ -61,6 +61,8 @@ class PlateSupervisor:
         self.time_until_next_spawn:float = None
         self.angry_animation_start_t: float = None
 
+        self.is_frozen = True
+
         # wave settings
         self.falling_multiplier = 1
         self.average_pieces = 1 # will still cut in 2 pieces on average
@@ -93,6 +95,7 @@ class PlateSupervisor:
             ))
     
     def unfreeze(self):
+        self.is_frozen = False
         self.falling_multiplier = 1
         self.time_until_next_spawn = 1
         self.loading_bar.start_wave(self.game.wave_number)
@@ -135,12 +138,10 @@ class PlateSupervisor:
                     self.angry_animation_start_t = time.time()
             
         # Check for spawning
-        if len(self.fragments) == 0 and not self.loading_bar.wave_is_done():
-            self.spawn_plate()
-        if self.time_until_next_spawn is not None:
+        if self.time_until_next_spawn is not None and not self.time_until_next_spawn is None:
             self.time_until_next_spawn -= delta_t
-        if self.time_until_next_spawn <= 0 and not self.loading_bar.wave_is_done():
-            self.spawn_plate()
+            if self.time_until_next_spawn <= 0 and not self.loading_bar.wave_is_done():
+                self.spawn_plate()
 
         self.hovered_plate = None
 
@@ -164,10 +165,11 @@ class PlateSupervisor:
                                 # Success!
                                 engine.spawn_particles(self.held_fragment.get_center_pos(), count=200, color=(255,200,60), spread=160, speed=200, lifetime=2, radius=2)
                                 self.held_fragment.is_playing_finished_animation = True
-                                self.held_fragment.finished_animation_start_time = time.time()
-                                if self.time_until_next_spawn is None: # was frozen
-                                    print("Unfreeze")
+                                if self.is_frozen: # was frozen
                                     self.unfreeze()
+                                self.held_fragment.finished_animation_start_time = time.time()
+                                if len(self.fragments) == 1 and not self.loading_bar.wave_is_done() and self.time_until_next_spawn is not None:
+                                    self.spawn_plate()
             
             self.held_fragment = None
         
