@@ -36,10 +36,12 @@ class Shop:
                     self.game.stats.total_money -= self.kak_price
                     self.game.stats.gouden_kak_bought = True
                     self.game.stats.kak_disabled = True
+                    self.kak_price *= 2
         elif self.buy_extra_leven.update_and_check_clicked():
             if self.game.stats.total_money >= self.extra_leven_price:
                 self.game.stats.total_money -= self.extra_leven_price
                 self.game.stats.max_lives += 1
+                self.extra_leven_price *= 10
 
     def render(self):
         engine.fill((60, 60, 60))
@@ -87,10 +89,12 @@ class Shop:
         self.width_extra_leven_image,self.length_extra_leven_image=self.extra_leven_image.get_size()
         engine.render_image(self.extra_leven_image,(engine.DISPLAY_W*4/5 - self.width_extra_leven_image/2,225))
 
-        self.extra_leven_price_image=engine.render_text('birthstone',40,f'out of stock',(50,50,150))
-        if self.game.stats.total_money >= self.extra_leven_price:
-            self.extra_leven_price_image=engine.render_text('birthstone',40,f'€{self.extra_leven_price}',(50,200,50))
+        if self.game.stats.max_lives >= 5:
+            self.extra_leven_price_image=engine.render_text('birthstone',40,f'Max lives',(50,50,150))
         else:
-            self.extra_leven_price_image=engine.render_text('birthstone',40,f'€{self.extra_leven_price}',(200,50,50))
-        self.width_extra_leven_price_image,self.length_extra_leven_price_image=self.extra_leven_price_image.get_size()
+            if self.game.stats.total_money >= self.extra_leven_price:
+                self.extra_leven_price_image=engine.render_text('birthstone',40,f'€{self.extra_leven_price}',(50,200,50))
+            else:
+                self.extra_leven_price_image=engine.render_text('birthstone',40,f'€{self.extra_leven_price}',(200,50,50))
+            self.width_extra_leven_price_image,self.length_extra_leven_price_image=self.extra_leven_price_image.get_size()
         engine.render_image(self.extra_leven_price_image,(engine.DISPLAY_W*4/5 - self.width_extra_leven_price_image/2,400))

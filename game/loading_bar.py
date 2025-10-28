@@ -65,7 +65,7 @@ class Loadingbar:
         self.width_progression_bar=0   
 
     def wave_is_done(self) -> bool:
-        return time.time()-self.start_wave_time > self.wave_time_duration - 3
+        return time.time()-self.start_wave_time > self.wave_time_duration - 5
   
     def update(self, delta_t: float, events: list):
         if self.wave_started and self.width_progression_bar<0.76*self.width_loading_bar_image:

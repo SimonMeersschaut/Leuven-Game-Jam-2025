@@ -78,11 +78,10 @@ class PlateSupervisor:
 
     def __init__(self, game, loading_bar, stats):
         
-        self.plates = []
         self.held_plates = {}
    
         self.fragments = []
-        self.held_fragment = None
+        # self.held_fragment = None
         
         self.game = game
         self.loading_bar = loading_bar
@@ -94,7 +93,7 @@ class PlateSupervisor:
         self.is_frozen = True
 
         # wave settings
-        self.falling_multiplier = 1.5
+        self.falling_multiplier = 1.3
         self.average_pieces = 2 # will still cut in 2 pieces on average
         self.average_time_between_plates = 4
         self.color_index = 0 # which indices of COLOR_ORDER are unlocked
@@ -114,7 +113,7 @@ class PlateSupervisor:
             ))
 
     def spawn_plate(self):
-        self.time_until_next_spawn = max(0, random.normalvariate(self.average_time_between_plates, 3))
+        self.time_until_next_spawn = max(0, random.normalvariate(self.average_time_between_plates, 1.5))
 
         pieces_to_split = round(random.normalvariate(self.average_pieces, 1))
         split_lines = create_split_lines(n=pieces_to_split)
@@ -123,13 +122,13 @@ class PlateSupervisor:
         plate_settings = self.choose_random_plate()
         
         pieces = shatter_plate("resources/images/plates/"+plate_settings["image"], split_lines)
-        pos = (random.randint(0, 1000),  -random.randint(200, 800))
+        # pos = (random.randint(0, 1000),  -random.randint(200, 800))
         for piece in pieces:
             fragment = Fragment(
                 *piece, # where this fragment exists (in the list of the entire plate)
                 fragment_colors=[plate_settings["color"] for _  in range(8)],
                 fragment_symbols=[plate_settings["symbol"] for _  in range(8)],
-                position=(random.randint(0, 1000),  -150),
+                position=(random.randint(0, 1000),  -100),
                 is_loading=False
             )
             self.fragments.append(fragment)
@@ -148,20 +147,20 @@ class PlateSupervisor:
             self.color_index += 1
         elif wave_number % 4 == 1:
             # Falling Faster
-            self.falling_multiplier += 1
+            self.falling_multiplier += .5
         elif wave_number % 4 == 2:
             # more pieces
-            self.average_pieces += 1
+            self.average_pieces += .7
         elif wave_number % 4 == 3:
             # More plates (more frequent)
-            self.average_time_between_plates /= .5
+            self.average_time_between_plates *= 0.8
 
         # go to next
         self.angry_animation_start_t = None
         self.loading_bar.start_wave(self.game.wave_number)
     
     def choose_random_plate(self) -> dict:
-        color_index = random.randint(0, min(self.color_index, len(COLOR_ORDER)))
+        color_index = random.randint(0, min(self.color_index, len(COLOR_ORDER)-1))
         return random.choice([setting for setting in PLATE_IMAGES if setting["color"] == COLOR_ORDER[color_index]])
     
     def update(self, delta_t: float, events: list):
@@ -183,42 +182,47 @@ class PlateSupervisor:
         
         # Update Fragments
         for fragment in self.fragments:
-            fragment.previously_holding = fragment.holding
-            fragment.previously_hovering = fragment.hovering
+            if fragment.is_playing_finished_animation:
+                # Check for removal
+                # Complete plate, remove after 2 seconds
+                if fragment.finished_animation_start_time is not None:
+                    if time.time() - fragment.finished_animation_start_time > 2:
+                        self.remove_fragment(fragment)
+                        break
+            else:    
 
-            if fragment.holding: 
-                if (fragment.holding_index == "__mouse__" and not pygame.mouse.get_pressed()[0]) or (not fragment.holding_index in pointers.all_pointers):
-                    del self.held_plates[fragment.holding_index]
-                    fragment.holding = False
-                    fragment.holding_index = -1
-            else:
-                intersecting_pointers = fragment.get_intersecting_pointers()
-                if intersecting_pointers != []:
-                    for pointer_id in intersecting_pointers:
-                        if pointer_id not in self.held_plates:
-                            self.held_plates[pointer_id] = fragment
-                            fragment.holding = True
-                            fragment.ever_held = True
-                            fragment.holding_index = pointer_id
-                            
-            fragment.update(delta_t, events, self.falling_multiplier)
+                fragment.previously_holding = fragment.holding
+                fragment.previously_hovering = fragment.hovering
 
-            if fragment.get_center_pos()[1] >= 600:
-                if not self.is_frozen:
-                    shatter_sound = pygame.mixer.Sound('resources/sounds/glass_shatter.wav')
-                    pygame.mixer.Sound.play(shatter_sound)
-                    # break on ground
-                    # spawn an upward splash of particles to emphasise the breaking
-                    engine.spawn_particles(fragment.get_center_pos(), count=50, color=(220, 220, 220), spread=30, speed=200, lifetime=1.2, radius=5, angle_min=-math.pi, angle_max=-math.tau)
-                    self.fragments.remove(fragment)
-                    self.stats.lose_life(fragment.get_amount())
+                if fragment.holding: 
+                    if (fragment.holding_index == "__mouse__" and not pygame.mouse.get_pressed()[0]) or (not fragment.holding_index in pointers.all_pointers):
+                        del self.held_plates[fragment.holding_index]
+                        fragment.holding = False
+                        fragment.holding_index = -1
+                else:
+                    intersecting_pointers = fragment.get_intersecting_pointers()
+                    if intersecting_pointers != []:
+                        for pointer_id in intersecting_pointers:
+                            if pointer_id not in self.held_plates:
+                                self.held_plates[pointer_id] = fragment
+                                fragment.holding = True
+                                fragment.ever_held = True
+                                fragment.holding_index = pointer_id
+                                
+                fragment.update(delta_t, events, self.falling_multiplier)
 
-            # Check for removal
-            # Complete plate, remove after 2 seconds
-            if fragment.finished_animation_start_time is not None:
-                if time.time() - fragment.finished_animation_start_time > 2:
-                    self.fragments.remove(fragment)
-            
+                if fragment.get_center_pos()[1] >= 600:
+                    if not self.is_frozen:
+                        shatter_sound = pygame.mixer.Sound('resources/sounds/glass_shatter.wav')
+                        pygame.mixer.Sound.play(shatter_sound)
+                        # break on ground
+                        # spawn an upward splash of particles to emphasise the breaking
+                        engine.spawn_particles(fragment.get_center_pos(), count=50, color=(220, 220, 220), spread=30, speed=200, lifetime=1.2, radius=5, angle_min=-math.pi, angle_max=-math.tau)
+                        self.fragments.remove(fragment)
+                        self.stats.lose_life(fragment.get_amount())
+                        self.fragments = []
+                        self.held_plates = {}
+
         # Check for spawning
         if self.time_until_next_spawn is not None and not self.time_until_next_spawn is None:
             self.time_until_next_spawn -= delta_t
@@ -228,13 +232,14 @@ class PlateSupervisor:
         self.hovered_plate = None
 
         # Check glue
-        for i, (cursor, held_fragment) in enumerate(self.held_plates.items()):
+        for held_fragment in self.held_plates.values():
+            if held_fragment.holding: # True?
                 for fragment in self.fragments:
-                    if held_fragment.holding:
+                    if not(held_fragment.is_playing_finished_animation) and not(fragment.is_playing_finished_animation):
                         if is_combineable(held_fragment.attendance_list, fragment.attendance_list):
                             if is_within_distance(held_fragment.get_center_pos(), fragment.get_center_pos(), 70):
                                 held_fragment.combine_with(fragment)
-                                self.fragments.remove(fragment)
+                                self.remove_fragment(fragment)
                                 # self.held_plates[cursor] = held_fragment
                                 engine.spawn_particles(held_fragment.get_center_pos(), count=100, color=(255,200,60), spread=2, speed=50, lifetime=2, radius=2)
                                 # Test full plate
@@ -245,12 +250,32 @@ class PlateSupervisor:
                                     if self.is_frozen: # was frozen
                                         self.unfreeze()
                                     held_fragment.finished_animation_start_time = time.time()
-                                    if len(self.fragments) == 1 and not self.loading_bar.wave_is_done() and self.time_until_next_spawn is not None:
-                                        self.spawn_plate()
+                                    if not(self.loading_bar.wave_is_done()) and self.time_until_next_spawn is not None:
+                                        if self.count_incomplete_fragments() == 0:
+                                            # too easy? spice it up.
+                                            self.spawn_plate()
                                     # Give money
                                     self.stats.add_money(calculate_price_of_plate(held_fragment))
                                     # Add stats
                                     self.stats.plates_merged += 1
+                                return # otherwise "RuntimeError: dictionary changed size during iteration"
+        
+    
+    def remove_fragment(self, fragment):
+        self.fragments.remove(fragment)
+        if fragment in self.held_plates.values():
+            # remove held_fragment
+            for key, value in self.held_plates.items():
+                if value == fragment:
+                    del self.held_plates[key]
+                    break
+    
+    def count_incomplete_fragments(self) -> int:
+        count = 0
+        for fragment in self.fragments:
+            if not all(fragment.attendance_list):
+                count += 1
+        return count
     
     def render(self):
         for fragment in reversed(self.fragments):

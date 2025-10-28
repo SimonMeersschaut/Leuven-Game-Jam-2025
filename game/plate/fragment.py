@@ -64,6 +64,8 @@ class Fragment(DraggableSprite):
         assert fragment_colors is not None
         assert fragment_symbols is not None
 
+        # self.exists = True # used to resolve the glitch of invisible plates
+
         self.ever_held = False
         self.fragment_colors = fragment_colors
         self.fragment_symbols = fragment_symbols

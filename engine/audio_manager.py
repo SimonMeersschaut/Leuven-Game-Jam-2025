@@ -1,7 +1,7 @@
 import pygame
 
 _current_path = None
-_default_volume = 0.5
+_default_volume = 0.7
 
 def _ensure_init():
     if not pygame.mixer.get_init():

@@ -121,19 +121,19 @@ class Sprite():
         fall back to pygame.mouse.get_pressed().
         """
         # Prefer pointer subsystem (works for touch and mouse if engine handles events)
-        return self.is_hovered()
-        # try:
-        #     if self.get_intersecting_pointers():
-        #         return True
-        # except Exception:
-        #     # ignore and fall back to mouse
-        #     pass
+        # return self.is_hovered()
+        try:
+            if self.get_intersecting_pointers():
+                return True
+        except Exception:
+            # ignore and fall back to mouse
+            pass
 
-        # # Fallback to mouse pressed (desktop). Only count as clicked if mouse is over sprite.
-        # try:
-        #     return pygame.mouse.get_pressed()[0] and self.rect.collidepoint(engine.get_scaled_mouse_pos())
-        # except Exception:
-        #     return False
+        # Fallback to mouse pressed (desktop). Only count as clicked if mouse is over sprite.
+        try:
+            return pygame.mouse.get_pressed()[0] and self.rect.collidepoint(engine.get_scaled_mouse_pos())
+        except Exception:
+            return False
         
 
     def just_unclicked(self):
